@@ -1,0 +1,13 @@
+import './admin-user';
+import './profile-edit-profile';
+import './profile-edit-password';
+import './help';
+import './state';
+import './category';
+import './assist';
+import './detail-assist';
+import './s-i-g008';
+import './detail-help';
+import './r-h-m006';
+import './r-h-m0066';
+import './functionary';
