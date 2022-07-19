@@ -93,8 +93,33 @@
                                         <td>@{{ item.dependency }}</td>
                                         <td>@{{ item.fone }}</td>
                                         <td>@{{ item.problem }}</td>
-                                        <td class="text-center"><span :class="item.statuses.state.name == 'SOLICITADO' ? 'badge bg-warning' : 'badge bg-success' ">@{{  item.statuses.state.name}}</span></td>
+                                        <td v-if="item.statuses.state.id == 1" ><span class="badge bg-warning">@{{ item.statuses.state.name }}</span></td>
+                                        <td v-else-if="item.statuses.state.id == 2" ><span class="badge bg-success">@{{ item.statuses.state.name }}</span></td>
+                                        <td v-else-if="item.statuses.state.id == 9" ><span class="badge bg-secondary">@{{ item.statuses.state.name }}</span></td>
 
+                                        <td v-else><span class="badge bg-primary">@{{ item.statuses.state.name }}</span></td>
+                                        {{-- <td class="text-center"><span :class="item.statuses.state.name == 'SOLICITADO' ? 'badge bg-warning' : 'badge bg-success' ">@{{  item.statuses.state.name}}</span></td> --}}
+                                        {{-- <td style="text-align:center;">
+                                            @if ($help->state->name == 'SOLICITADO')
+                                                <span class="badge bg-warning">
+                                                    <td ><strong>ESTADO:</strong><span style="text-align:center;"> {{ $help->state->name }} </span></td>
+
+                                            @endif
+                                            @if ($help->state->name == 'ASIGNADO')
+                                                <span class="badge bg-success">
+                                                    <td ><strong>ESTADO:</strong><span style="text-align:center;" > {{ $help->state->name }}</span></td>
+                                            @endif
+                                            @if ($help->state->name == 'FINALIZADO')
+                                                <span class="badge bg-primary">
+                                                    <td ><strong>ESTADO:</strong><span style="text-align:center;" > {{ $help->state->name }}</span></td>
+                                            @endif
+
+                                            @if ($help->state->name == 'PENDIENTE')
+                                                <span class="badge bg-secondary">
+                                                    <td ><strong>ESTADO:</strong><span style="text-align:center;" > {{ $help->state->name }}</span></td>
+                                            @endif
+                                                </span>
+                                        </td> --}}
 
                                         <td>@{{ item.statuses.user.full_name }}</td>
                                         <td>@{{ item.created_at | datetime }}</td>
