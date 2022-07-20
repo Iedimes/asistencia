@@ -56,7 +56,7 @@
                     @endif
 
                     @if ($help->statuses->state->name == 'PENDIENTE')
-                        <span class="badge bg-secondary">
+                        <span class="badge"style="color:gray; background:yellow">
                             <td ><strong>ESTADO:</strong><span style="text-align:center;" > {{ $help->statuses->state->name }}</span></td>
                     @endif
                         </span>

@@ -95,7 +95,7 @@
                                         <td>@{{ item.problem }}</td>
                                         <td v-if="item.statuses.state.id == 1" ><span class="badge bg-warning">@{{ item.statuses.state.name }}</span></td>
                                         <td v-else-if="item.statuses.state.id == 2" ><span class="badge bg-success">@{{ item.statuses.state.name }}</span></td>
-                                        <td v-else-if="item.statuses.state.id == 9" ><span class="badge bg-secondary">@{{ item.statuses.state.name }}</span></td>
+                                        <td v-else-if="item.statuses.state.id == 9" ><span class="badge"style="color:gray; background:yellow">@{{ item.statuses.state.name }}</span></td>
 
                                         <td v-else><span class="badge bg-primary">@{{ item.statuses.state.name }}</span></td>
                                         {{-- <td class="text-center"><span :class="item.statuses.state.name == 'SOLICITADO' ? 'badge bg-warning' : 'badge bg-success' ">@{{  item.statuses.state.name}}</span></td> --}}
