@@ -19864,15 +19864,15 @@ input,
   color: #4273fa;
   font-weight: 600;
   display: inline;
-  width: 350px;
-  height: 35px;
+  width: auto;
+  height: auto;
   margin-right: 1rem;
   background: none !important;
   border: none;
 }
 .app-header.navbar .navbar-brand img {
-  max-width: 400px;
-  max-height: 50px;
+  max-width: 200px;
+  max-height: 20px;
 }
 
 .dropdown-toggle {

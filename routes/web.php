@@ -176,3 +176,20 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->gro
         });
     });
 });
+
+
+/* Auto-generated admin routes */
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {
+    Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->name('admin/')->group(static function() {
+        Route::prefix('reportes')->name('reportes/')->group(static function() {
+            Route::get('/',                                             'ReporteController@index')->name('index');
+            Route::get('/create',                                       'ReporteController@create')->name('create');
+            Route::post('/',                                            'ReporteController@store')->name('store');
+            Route::get('/{reporte}/edit',                               'ReporteController@edit')->name('edit');
+            Route::post('/bulk-destroy',                                'ReporteController@bulkDestroy')->name('bulk-destroy');
+            Route::post('/{reporte}',                                   'ReporteController@update')->name('update');
+            Route::delete('/{reporte}',                                 'ReporteController@destroy')->name('destroy');
+            Route::get('/imprimir',                                     'ReporteController@pdf')->name('imprimir');
+        });
+    });
+});

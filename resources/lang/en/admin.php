@@ -295,5 +295,23 @@ return [
         ],
     ],
 
+    'reporte' => [
+        'title' => 'Reporte',
+
+        'actions' => [
+            'index' => 'Reporte',
+            'create' => 'New Reporte',
+            'edit' => 'Edit :name',
+        ],
+
+        'columns' => [
+            'id' => 'ID',
+            'inicio' => 'Inicio',
+            'fin' => 'Fin',
+            'user_id' => 'User',
+            
+        ],
+    ],
+
     // Do not delete me :) I'm used for auto-generation
 ];

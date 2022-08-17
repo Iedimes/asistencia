@@ -182,3 +182,13 @@ $factory->define(App\Models\Functionary::class, static function (Faker\Generator
         
     ];
 });
+/** @var  \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(App\Models\Reporte::class, static function (Faker\Generator $faker) {
+    return [
+        'inicio' => $faker->dateTime,
+        'fin' => $faker->dateTime,
+        'user_id' => $faker->randomNumber(5),
+        
+        
+    ];
+});
