@@ -30,11 +30,10 @@
                     {{-- <i class="fa fa-plus"></i> {{ trans('admin.help.actions.create') }} --}}
 
                     <h4  class="d-flex justify-content-center"> <strong>SOLICITUD DE SOPORTE TIC</strong></h4>
-                    <div class="alert alert-primary" role="alert">
-                        <h4 class="alert-heading">Formulario para solicitar soporte informatico.</h4>
-                        <p>Ingrese los datos solicitados, y una breve descripción del incoveniente o ayuda que necesite.</p>
-                        <hr>
-                        <p class="mb-0">Una vez enviado,puede consultar su solicitud dando click en el boton consultar.</p>
+                    <div class="alert alert-info" role="alert">
+                        <h5 style="color: #365c72; font-weight: bold;">Formulario para solicitar soporte informatico.</h5>
+                        <li style="color: #365c72;">Ingrese los datos solicitados, y una breve descripción del incoveniente o ayuda que necesite.  <li style="color: #365c72;">Una vez enviado,puede consultar su solicitud dando click en el boton consultar.</li></i>
+
                       </div>
                     <div class="row">
 
