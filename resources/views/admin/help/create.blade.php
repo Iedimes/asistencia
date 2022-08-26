@@ -34,13 +34,13 @@
                         <h4 class="alert-heading">Formulario para solicitar soporte informatico.</h4>
                         <p>Ingrese los datos solicitados, y una breve descripción del incoveniente o ayuda que necesite.</p>
                         <hr>
-                        <p class="mb-0">Una vez enviado,puede consultar su solicitud dando click en el boton de abajo.</p>
+                        <p class="mb-0">Una vez enviado,puede consultar su solicitud dando click en el boton consultar.</p>
                       </div>
                     <div class="row">
 
                             <div class="col-sm-4"></div>
                             <div class="col-sm-4"></div>
-                            <div class="col-sm-4"> <a href='/consulta' class="btn btn-primary rounded-pill"> <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-home'"></i> INICIO </a></div>
+                            <div class="col-sm-4"> <a href='http://intranet' class="btn btn-primary rounded-pill"> <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-home'"></i> INICIO </a></div>
                              </div>
 
 
@@ -56,8 +56,7 @@
 
                     </button>
 
-                    <button  class="btn btn-primary rounded-pill" :disabled="submiting">
-                        <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-search'"></i> CONSULTAR</button>
+                    <a href='/consulta' class="btn btn-primary rounded-pill"> <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-search'"></i> CONSULTAR </a>
 
                         <button type="reset" class="btn btn-danger rounded-pill" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-times'"></i> CANCELAR</button>
