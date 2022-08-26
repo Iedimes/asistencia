@@ -7,8 +7,9 @@
     <div class="container-xl">
 
 
-
     <div class="card">
+
+
 
         <help-form
             {{-- :action="'{{ url('admin/helps') }}'" --}}
@@ -28,13 +29,20 @@
                 <div class="card-header">
                     {{-- <i class="fa fa-plus"></i> {{ trans('admin.help.actions.create') }} --}}
 
-                    <center><H4>SOLICITUD DE ASISTENCIA</H4></center>
-
-                      <div class="d-flex flex-row-reverse bd-highlight">
-                        <div class="p-2 bd-highlight"></div>
-                        <div class="p-2 bd-highlight"></div>
-                        <div class="p-2 bd-highlight"><a href='/consulta' class="btn btn-primary rounded-pill"> <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-search'"></i> CONSULTAR </a></div>
+                    <h4  class="d-flex justify-content-center"> <strong>SOLICITUD DE SOPORTE TIC</strong></h4>
+                    <div class="alert alert-primary" role="alert">
+                        <h4 class="alert-heading">Formulario para solicitar soporte informatico.</h4>
+                        <p>Ingrese los datos solicitados, y una breve descripción del incoveniente o ayuda que necesite.</p>
+                        <hr>
+                        <p class="mb-0">Una vez enviado,puede consultar su solicitud dando click en el boton de abajo.</p>
                       </div>
+                    <div class="row">
+
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4"> <a href='/consulta' class="btn btn-primary rounded-pill"> <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-home'"></i> INICIO </a></div>
+                             </div>
+
 
                 </div>
 
@@ -43,11 +51,16 @@
                 </div>
                     <div class="card-footer">
                     <button type="submit" class="btn btn-primary rounded-pill" :disabled="submiting">
-                        <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-download'"></i>
-                        {{ trans('brackets/admin-ui::admin.btn.save') }}
+                        <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-paper-plane'"></i>
+                   ENVIAR
 
                     </button>
-                    <a href='http://intranet2/' class="btn btn-warning rounded-pill">  <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-undo'"></i> CANCELAR</a>
+
+                    <button  class="btn btn-primary rounded-pill" :disabled="submiting">
+                        <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-search'"></i> CONSULTAR</button>
+
+                        <button type="reset" class="btn btn-danger rounded-pill" :disabled="submiting">
+                            <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-times'"></i> CANCELAR</button>
                 </div>
 
             </form>
