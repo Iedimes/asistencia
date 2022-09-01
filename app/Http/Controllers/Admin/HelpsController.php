@@ -82,32 +82,53 @@ class HelpsController extends Controller
 
             //return $help::find(21813);
 
-            $id = $help->id;
-            $busqueda = $request->search;
+            // $id = $help->id;
+            // $busqueda = $request->search;
 
-            // return $busqueda;
-            $data = AdminListing::create(Help::class)->processRequestAndGet(
-             // pass the request with params
+            // // return $busqueda;
+            // $data = AdminListing::create(Help::class)->processRequestAndGet(
+            //  // pass the request with params
 
-            $request,
+            // $request,
 
-             // set columns to query
-             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem','created_at'],
+            //  // set columns to query
+            //  ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem','created_at'],
 
-             // set columns to searchIn
-             ['id'],
+            //  // set columns to searchIn
+            //  ['id'],
 
-            function ($query) use ($busqueda) {
+            // function ($query) use ($busqueda) {
 
-                //    ->where('helps.id', '=', $id);
+            //     //    ->where('helps.id', '=', $id);
 
-                    $aux = $busqueda;
-                    $query->whereHas('tecnico.user', function($tecnico) use($aux) {
+            //         $aux = $busqueda;
+            //         $query->whereHas('tecnico.user', function($tecnico) use($aux) {
 
-                        //$tecnico->where('first_name', $aux);
-                        $tecnico->where('first_name', 'LIKE', '%'.$aux.'%');
-                });
-             }
+            //             //$tecnico->where('first_name', $aux);
+            //             $tecnico->where('first_name', 'LIKE', '%'.$aux.'%');
+            //     });
+            //  }
+
+
+             $id = $help->id;
+             $data = AdminListing::create(Help::class)->processRequestAndGet(
+              // pass the request with params
+
+              $request,
+              // set columns to query
+              ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem','created_at'],
+
+              // set columns to searchIn
+              ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+
+
+             function ($query) use ($id) {
+                  $query
+                     //  ->where('helps.id', '=', $id);
+                    ->orderBy('id', 'DESC');
+              }
+
+
 
     );
 
