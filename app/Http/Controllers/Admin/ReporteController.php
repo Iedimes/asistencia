@@ -119,7 +119,9 @@ class ReporteController extends Controller
 
         if ($user==0){
             $dhelps=DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"])
-                            ->where('state_id', 4)->get();
+                            ->where('state_id', 4)
+                            ->orderby('help_id', 'ASC')
+                            ->get();
                             $contar = count($dhelps);
                             $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps' , 'contar'))->setPaper('a4', 'landscape');
                             return $pdf->download('ReporteAsistencias.pdf');
@@ -128,7 +130,9 @@ class ReporteController extends Controller
 
         $dhelps=DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"])
                             ->where('state_id', 4)
-                            ->where('user_id', $user)->get();
+                            ->where('user_id', $user)
+                            ->orderby('help_id', 'ASC')
+                            ->get();
         //$visits = Visit::whereBetween('Exit_Datetime', ["$inicio", "$fin"])->get();
         $contar = count($dhelps);
         $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps' , 'contar'))->setPaper('a4', 'landscape');
