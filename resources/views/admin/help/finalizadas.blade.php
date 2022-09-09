@@ -93,8 +93,8 @@
                                         <td>@{{ item.fone }}</td>
                                         <td>@{{ item.problem }}</td>
                                         <td class="text-center"><span :class="item.statuses.state.name == 'FINALIZADO' ? 'badge bg-primary' : 'badge bg-warning' ">@{{  item.statuses.state.name}}</span></td>
-                                        {{-- <td>@{{ item.statuses.user}}</td> --}}
-                                        <td>@{{ item.statuses.user.first_name}} @{{ item.statuses.user.last_name}}</td>
+                                        <td>@{{ item.statuses.user}}</td>
+                                        {{-- <td>@{{ item.statuses.user.first_name}} @{{ item.statuses.user.last_name}}</td> --}}
                                         <td>@{{ item.tecnico.updated_at | datetime }}</td>
 
                                         <td>
