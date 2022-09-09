@@ -58,7 +58,7 @@
                                         <th is='sortable' :column="'fone'">{{ trans('admin.help.columns.fone') }}</th>
                                         <th width="250px" is='sortable' :column="'problem'">{{ trans('admin.help.columns.problem') }}</th>
                                         <th is='sortable' :column="'estado'">{{ trans('admin.help.columns.estado') }}</th>
-                                        {{-- <th is='sortable' :column="'tecnico'">{{ trans('admin.help.columns.tecnico') }}</th> --}}
+                                        <th is='sortable' :column="'tecnico'">{{ trans('admin.help.columns.tecnico') }}</th>
                                         <th is='sortable' :column="'fechahora'">{{ trans('admin.help.columns.fechahora') }}</th>
 
                                         <th></th>
@@ -93,7 +93,8 @@
                                         <td>@{{ item.fone }}</td>
                                         <td>@{{ item.problem }}</td>
                                         <td class="text-center"><span :class="item.statuses.state.name == 'FINALIZADO' ? 'badge bg-primary' : 'badge bg-warning' ">@{{  item.statuses.state.name}}</span></td>
-                                        {{-- <td>@{{ item.statuses.user.full_name }}</td> --}}
+                                        {{-- <td>@{{ item.statuses.user}}</td> --}}
+                                        <td>@{{ item.statuses.user.first_name}} @{{ item.statuses.user.last_name}}</td>
                                         <td>@{{ item.tecnico.updated_at | datetime }}</td>
 
                                         <td>
