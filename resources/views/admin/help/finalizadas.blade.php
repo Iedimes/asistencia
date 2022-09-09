@@ -58,7 +58,7 @@
                                         <th is='sortable' :column="'fone'">{{ trans('admin.help.columns.fone') }}</th>
                                         <th width="250px" is='sortable' :column="'problem'">{{ trans('admin.help.columns.problem') }}</th>
                                         <th is='sortable' :column="'estado'">{{ trans('admin.help.columns.estado') }}</th>
-                                        <th is='sortable' :column="'tecnico'">{{ trans('admin.help.columns.tecnico') }}</th>
+                                        {{-- <th is='sortable' :column="'tecnico'">{{ trans('admin.help.columns.tecnico') }}</th> --}}
                                         <th is='sortable' :column="'fechahora'">{{ trans('admin.help.columns.fechahora') }}</th>
 
                                         <th></th>
