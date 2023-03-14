@@ -36,7 +36,7 @@ class FuncionariosController extends Controller
                               ->attachPagination($request->currentPage)
                               ->modifyQuery(function ($query) use ($request) {
 
-                                    $query->where('FuncNro', '<>', 0);
+                                    $query->where('FuncNro', '>', 99);
 
             if ($request->search) {
 
