@@ -12,3 +12,4 @@ import './r-h-m006';
 import './r-h-m0066';
 import './functionary';
 import './reporte';
+import './funcionario';

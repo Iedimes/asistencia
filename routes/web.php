@@ -193,3 +193,19 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->gro
         });
     });
 });
+
+
+/* Auto-generated admin routes */
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {
+    Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->name('admin/')->group(static function() {
+        Route::prefix('funcionarios')->name('funcionarios/')->group(static function() {
+            Route::get('/',                                             'FuncionariosController@index')->name('index');
+            Route::get('/create',                                       'FuncionariosController@create')->name('create');
+            Route::post('/',                                            'FuncionariosController@store')->name('store');
+            Route::get('/{funcionario}/edit',                           'FuncionariosController@edit')->name('edit');
+            Route::post('/bulk-destroy',                                'FuncionariosController@bulkDestroy')->name('bulk-destroy');
+            Route::post('/{funcionario}',                               'FuncionariosController@update')->name('update');
+            Route::delete('/{funcionario}',                             'FuncionariosController@destroy')->name('destroy');
+        });
+    });
+});

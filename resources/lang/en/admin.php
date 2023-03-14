@@ -313,5 +313,23 @@ return [
         ],
     ],
 
+    'funcionario' => [
+        'title' => 'Funcionarios',
+
+        'actions' => [
+            'index' => 'Funcionarios',
+            'create' => 'New Funcionario',
+            'edit' => 'Edit :name',
+        ],
+
+        'columns' => [
+            'id' => 'ID',
+            'FuncNro' => 'FuncNro',
+            'FuncNom' => 'FuncNom',
+            'FUsuCod' => 'FUsuCod',
+            
+        ],
+    ],
+
     // Do not delete me :) I'm used for auto-generation
 ];
