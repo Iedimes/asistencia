@@ -31,23 +31,40 @@ class FuncionariosController extends Controller
      */
     public function index(IndexFuncionario $request)
     {
-        // create and AdminListing instance for a specific model and
-        $data = AdminListing::create(Funcionario::class)
-                              ->attachPagination($request->currentPage)
-                              ->modifyQuery(function ($query) use ($request) {
+        $ci = $request->search;
+        if (is_numeric($ci)){
+            $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
+                // pass the request with params
+                $request,
 
-                                    $query->where('FuncNro', '>', 99);
+                // set columns to query
+                ['FuncNro', 'FuncNom', 'FUsuCod'],
 
-            if ($request->search) {
+                // set columns to searchIn
+                ['FuncNro'],
+                function ($query) use ($ci) {
+                    $query
+                        ->where('RHM006.FuncNro', '=', $ci);
+                }
+            );
+        }else{
+            $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
+                // pass the request with params
+                $request,
 
-                    $query->where(function ($query) use ($request) {
-                    $query->where('FuncNro', 'like', '%' . $request->search . '%')
-                         ->orWhere('FuncNom', 'like', '%'. $request->search . '%');
-                });
-            }
-        })
+                // set columns to query
+                ['FuncNro', 'FuncNom', 'FUsuCod'],
 
-        ->get(['FuncNro', 'FuncNom', 'FUsuCod']);
+                // set columns to searchIn
+                ['FuncNro'],
+                function ($query) use ($ci) {
+                    $query
+                        ->where('RHM006.FuncNom', 'like', '%'. $ci . '%')
+                        ->orWhere('RHM006.FUsuCod', 'like', '%'. $ci . '%');;
+                }
+            );
+
+        }
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
@@ -55,11 +72,41 @@ class FuncionariosController extends Controller
                     'bulkItems' => $data->pluck('FuncNro')
                 ];
             }
+
             return ['data' => $data];
         }
 
         return view('admin.funcionario.index', ['data' => $data]);
     }
+
+
+
+
+    // public function index(IndexFuncionario $request)
+    // {
+    //     // create and AdminListing instance for a specific model and
+    //     $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
+    //         // pass the request with params
+    //         $request,
+
+    //         // set columns to query
+    //         ['FuncNro', 'FuncNom', 'FUsuCod'],
+
+    //         // set columns to searchIn
+    //         ['FuncNom']
+    //     );
+
+    //     if ($request->ajax()) {
+    //         if ($request->has('bulk')) {
+    //             return [
+    //                 'bulkItems' => $data->pluck('FuncNro')
+    //             ];
+    //         }
+    //         return ['data' => $data];
+    //     }
+
+    //     return view('admin.funcionario.index', ['data' => $data]);
+    // }
 
     /**
      * Show the form for creating a new resource.

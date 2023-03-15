@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Funcionario extends Model
 {
+
     protected $table = 'RHM006';
     protected $primaryKey = 'FuncNro';
+    public $keyType = 'string';
     public $timestamps = false;
     protected $connection = 'sqlsrv';
     public $incrementing = false;
