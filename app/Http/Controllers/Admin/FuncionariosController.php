@@ -84,7 +84,8 @@ class FuncionariosController extends Controller
                     ['FuncNom'],
                     function ($query) use ($x) {
                         $query
-                            ->where('RHM006.FuncNro', '>', $x);
+                            ->where('RHM006.FuncNro', '>', $x)
+                            ->orderBy('FuncNom');
                     }
                 );
     }
