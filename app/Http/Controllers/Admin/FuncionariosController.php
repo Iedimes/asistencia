@@ -31,23 +31,10 @@ class FuncionariosController extends Controller
      */
     public function index(IndexFuncionario $request)
     {
+
+    if($request->search){
         $ci = $request->search;
-        if (is_numeric($ci)){
-            $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
-                // pass the request with params
-                $request,
-
-                // set columns to query
-                ['FuncNro', 'FuncNom', 'FUsuCod'],
-
-                // set columns to searchIn
-                ['FuncNro'],
-                function ($query) use ($ci) {
-                    $query
-                        ->where('RHM006.FuncNro', '=', $ci);
-                }
-            );
-        }else if(!is_numeric($ci)){
+        if (!is_numeric($ci)){
             $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
                 // pass the request with params
                 $request,
@@ -62,9 +49,45 @@ class FuncionariosController extends Controller
                         ->where('RHM006.FuncNom', 'like', '%'. $ci . '%')
                         ->orWhere('RHM006.FUsuCod', 'like', '%'. $ci . '%');
                 }
+
+            );
+        }else{
+            //return "es numerico";
+            $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
+                // pass the request with params
+                $request,
+
+                // set columns to query
+                ['FuncNro', 'FuncNom', 'FUsuCod'],
+
+                // set columns to searchIn
+                ['FuncNro'],
+                function ($query) use ($ci) {
+                    $query
+                        ->where('RHM006.FuncNro', '=', $ci);
+                }
             );
 
         }
+    }else{
+
+        //return "No es busqueda";
+        $x=99;
+        $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
+                    // pass the request with params
+                    $request,
+
+                    // set columns to query
+                    ['FuncNro', 'FuncNom', 'FUsuCod'],
+
+                    // set columns to searchIn
+                    ['FuncNom'],
+                    function ($query) use ($x) {
+                        $query
+                            ->where('RHM006.FuncNro', '>', $x);
+                    }
+                );
+    }
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
