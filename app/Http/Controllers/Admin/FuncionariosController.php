@@ -47,7 +47,7 @@ class FuncionariosController extends Controller
                         ->where('RHM006.FuncNro', '=', $ci);
                 }
             );
-        }else{
+        }else if(!is_numeric($ci)){
             $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
                 // pass the request with params
                 $request,
@@ -60,7 +60,7 @@ class FuncionariosController extends Controller
                 function ($query) use ($ci) {
                     $query
                         ->where('RHM006.FuncNom', 'like', '%'. $ci . '%')
-                        ->orWhere('RHM006.FUsuCod', 'like', '%'. $ci . '%');;
+                        ->orWhere('RHM006.FUsuCod', 'like', '%'. $ci . '%');
                 }
             );
 

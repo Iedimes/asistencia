@@ -5348,6 +5348,70 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/admin/funcionario/Form.js":
+/*!************************************************!*\
+  !*** ./resources/js/admin/funcionario/Form.js ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _app_components_Form_AppForm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../app-components/Form/AppForm */ "./resources/js/admin/app-components/Form/AppForm.js");
+
+Vue.component('funcionario-form', {
+  mixins: [_app_components_Form_AppForm__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  data: function data() {
+    return {
+      form: {
+        FuncNro: '',
+        FuncNom: '',
+        FUsuCod: ''
+      }
+    };
+  }
+});
+
+/***/ }),
+
+/***/ "./resources/js/admin/funcionario/Listing.js":
+/*!***************************************************!*\
+  !*** ./resources/js/admin/funcionario/Listing.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _app_components_Listing_AppListing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../app-components/Listing/AppListing */ "./resources/js/admin/app-components/Listing/AppListing.js");
+
+Vue.component('funcionario-listing', {
+  mixins: [_app_components_Listing_AppListing__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  data: function data() {
+    return {
+      orderBy: {
+        column: 'FuncNro',
+        direction: 'asc'
+      }
+    };
+  }
+});
+
+/***/ }),
+
+/***/ "./resources/js/admin/funcionario/index.js":
+/*!*************************************************!*\
+  !*** ./resources/js/admin/funcionario/index.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Listing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Listing */ "./resources/js/admin/funcionario/Listing.js");
+/* harmony import */ var _Form__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Form */ "./resources/js/admin/funcionario/Form.js");
+
+
+
+/***/ }),
+
 /***/ "./resources/js/admin/functionary/Form.js":
 /*!************************************************!*\
   !*** ./resources/js/admin/functionary/Form.js ***!
@@ -5599,6 +5663,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _r_h_m0066__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./r-h-m0066 */ "./resources/js/admin/r-h-m0066/index.js");
 /* harmony import */ var _functionary__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./functionary */ "./resources/js/admin/functionary/index.js");
 /* harmony import */ var _reporte__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./reporte */ "./resources/js/admin/reporte/index.js");
+/* harmony import */ var _funcionario__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./funcionario */ "./resources/js/admin/funcionario/index.js");
+
 
 
 
@@ -13480,6 +13546,7 @@ exports["default"] = {
     }
 
 };
+
 
 /***/ }),
 
