@@ -118,25 +118,39 @@ class ReporteController extends Controller
         $user=$request->user_id;
 
         if ($user==0){
+            $finalizados=DetailHelp::where('state_id', 4)
+                                ->select('help_id')
+                                // ->get();
+                                ->pluck('help_id')->toArray();
+            $id_help = $finalizados;
+            //return $id_help;
             $dhelps=DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"])
-                            ->where('state_id', 4)
-                            ->orderby('help_id', 'ASC')
-                            ->get();
-                            $contar = count($dhelps);
-                            $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps' , 'contar'))->setPaper('a4', 'landscape');
-                            return $pdf->download('ReporteAsistencias.pdf');
+                               ->whereIn('help_id', $id_help)
+                               ->where('state_id', '<>', 1)
+                               ->where('user_id', '<>', 1)
+                               ->orderby('user_id', 'ASC')
+                               ->orderby('help_id', 'ASC')
+                                ->get();
+                                $contar = count($dhelps);
+                                $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps' , 'contar'))->setPaper('a4', 'landscape');
+                                return $pdf->download('ReporteAsistencias.pdf');
         }else{
-
-
-        $dhelps=DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"])
-                            ->where('state_id', 4)
-                            ->where('user_id', $user)
-                            ->orderby('help_id', 'ASC')
-                            ->get();
-        //$visits = Visit::whereBetween('Exit_Datetime', ["$inicio", "$fin"])->get();
-        $contar = count($dhelps);
-        $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps' , 'contar'))->setPaper('a4', 'landscape');
-        return $pdf->download('ReporteAsistencias.pdf');
+            $finalizados=DetailHelp::where('state_id', 4)
+                                ->select('help_id')
+                                // ->get();
+                                ->pluck('help_id')->toArray();
+            $id_help = $finalizados;
+            $dhelps=DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"])
+                                ->whereIn('help_id', $id_help)
+                                ->where('state_id', '<>', 1)
+                                ->where('user_id', '<>', 1)
+                                ->where('user_id', $user)
+                                ->orderby('help_id', 'ASC')
+                                ->get();
+                                //$visits = Visit::whereBetween('Exit_Datetime', ["$inicio", "$fin"])->get();
+                                $contar = count($dhelps);
+                                $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps' , 'contar'))->setPaper('a4', 'landscape');
+                                return $pdf->download('ReporteAsistencias.pdf');
         }
 
     }
