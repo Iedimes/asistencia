@@ -19,7 +19,7 @@
 
     </style>
     {{-- <img width="650" height="80" src="https://www.muvh.gov.py/sitio/wp-content/uploads/2022/05/LOGO.jpg"> --}}
-    <img src="{{storage_path('images/LOGO.jpg')}}" class="imagencentro" width="690" >
+    <img src="{{storage_path('images/MUVHOF.jpg')}}" class="imagencentro" width="690" >
 
 {{-- <style>
     header {
