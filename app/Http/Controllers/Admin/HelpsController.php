@@ -277,7 +277,13 @@ class HelpsController extends Controller
         // return $help = Help::find(1024);
 
         $help = Help::where('id', $id)->first();
-        $detalle = DetailHelp::all()->where('help_id', '=', $id);
+
+        //return $detalle = DetailHelp::all()->where('help_id', '=', $id)->sortBy('id');
+        //$detalle = DetailHelp::where('help_id', '=', $id)->orderBy('id', 'asc')->get();
+        $detalle = DetailHelp::where('help_id', '=', $id)
+                     ->orderBy('id', 'asc')
+                     ->orderBy('help_id', 'asc')
+                     ->get();
 
 
         $pdf = PDF::loadView('admin.help.pdf.prueba', compact('help' , 'detalle'));
