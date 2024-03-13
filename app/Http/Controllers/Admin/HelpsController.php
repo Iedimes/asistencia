@@ -445,4 +445,32 @@ class HelpsController extends Controller
     //     //return json_encode($ci, JSON_UNESCAPED_UNICODE);
     // }
 
+    public function api($ci = null)
+{
+    if ($ci) {
+        $x = RHM006::select('FuncNombr', 'FuncApell', 'FunFecNac')
+            ->where('FuncEst', 'A')
+            ->where('FuncNro', $ci)
+            ->orderBy('FunFecNac')
+            ->first();
+
+        // Eliminar los espacios en blanco de los campos FuncNombr y FuncApell
+        $x->FuncNombr = trim($x->FuncNombr);
+        $x->FuncApell = trim($x->FuncApell);
+    } else {
+        $x = RHM006::select('FuncNombr', 'FuncApell', 'FunFecNac')
+            ->where('FuncEst', 'A')
+            ->orderBy('FunFecNac')
+            ->get();
+
+        // Eliminar los espacios en blanco de los campos FuncNombr y FuncApell en cada registro
+        $x->transform(function ($item) {
+            $item->FuncNombr = trim($item->FuncNombr);
+            $item->FuncApell = trim($item->FuncApell);
+            return $item;
+        });
+    }
+
+    return response()->json($x);
+}
 }
