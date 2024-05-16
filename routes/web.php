@@ -74,7 +74,7 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->gro
             Route::post('/bulk-destroy',                                'HelpsController@bulkDestroy')->name('bulk-destroy');
             Route::post('/{help}',                                      'HelpsController@update')->name('update');
             Route::delete('/{help}',                                    'HelpsController@destroy')->name('destroy');
-            Route::get('{help}/showdetallepdf',                         'HelpsController@createPDF');
+            Route::get('{help}/showdetallepdf',                         'HelpsController@createPDF')->name('showdetallepdf');
         });
     });
 });

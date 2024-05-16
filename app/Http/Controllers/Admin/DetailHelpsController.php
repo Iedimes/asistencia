@@ -33,31 +33,31 @@ class DetailHelpsController extends Controller
      * @return array|Factory|View
      */
     public function index(IndexDetailHelp $request)
-    {
-        // create and AdminListing instance for a specific model and
-        $data = AdminListing::create(DetailHelp::class)->processRequestAndGet(
-            // pass the request with params
-            $request,
-
-            // set columns to query
-            ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
-
-            // set columns to searchIn
-            ['id', 'solution']
-        );
-
-
-        if ($request->ajax()) {
-            if ($request->has('bulk')) {
-                return [
-                    'bulkItems' => $data->pluck('id')
-                ];
-            }
-            return ['data' => $data];
+{
+    // create and AdminListing instance for a specific model and
+    $data = AdminListing::create(DetailHelp::class)->processRequestAndGet(
+        // pass the request with params
+        $request,
+        // set columns to query
+        ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
+        // set columns to searchIn
+        ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
+        function ($query) {
+            $query->where('user_id', '!=', 1)->orderBy('date', 'desc');
         }
+    );
 
-        return view('admin.detail-help.index', ['data' => $data]);
+    if ($request->ajax()) {
+        if ($request->has('bulk')) {
+            return [
+                'bulkItems' => $data->pluck('id')
+            ];
+        }
+        return ['data' => $data];
     }
+
+    return view('admin.detail-help.indexD', ['data' => $data]);
+}
 
     /**
      * Show the form for creating a new resource.

@@ -1,21 +1,21 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.help.actions.index'))
+@section('title', trans('admin.detail-help.actions.index'))
 
 @section('body')
 
-    <help-listing
+    <detail-help-listing
         :data="{{ $data->toJson() }}"
-        :url="'{{ url('admin/helps/finalizadas') }}'"
+        :url="'{{ url('admin/detail-helps') }}'"
+        {{-- :url="'{{ url('admin/'.$id.'/detail-helps/create') }}'" --}}
         inline-template>
 
         <div class="row">
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        {{-- <i class="fa fa-align-justify"></i> {{ trans('admin.help.actions.index') }} --}}
-                        <center><H4>ASISTENCIAS FINALIZADAS</H4></center>
-                        {{-- <a class="btn btn-primary rounded-pill btn-spinner btn-sm pull-right m-b-0" href="{{ url('admin/helps/createadm') }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.help.actions.create') }}</a> --}}
+                        <i class="fa fa-align-justify"></i> {{ trans('admin.detail-help.actions.index') }}
+                        {{-- <a class="btn btn-primary btn-spinner btn-sm pull-right m-b-0" href="{{ url('admin/'.$id.'/detail-helps/create') }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.detail-help.actions.create') }}</a> --}}
                     </div>
                     <div class="card-body" v-cloak>
                         <div class="card-block">
@@ -23,14 +23,14 @@
                                 <div class="row justify-content-md-between">
                                     <div class="col col-lg-7 col-xl-5 form-group">
                                         <div class="input-group">
-                                            <input class="form-control rounded-pill" placeholder="BUSCAR POR NOMBRE DE TECNICO" v-model="search" @keyup.enter="filter('search', $event.target.value)" />
+                                            <input class="form-control" placeholder="{{ trans('brackets/admin-ui::admin.placeholder.search') }}" v-model="search" @keyup.enter="filter('search', $event.target.value)" />
                                             <span class="input-group-append">
-                                                <button type="button" class="btn btn-primary rounded-pill" @click="filter('search', search)"><i class="fa fa-search"></i>&nbsp; {{ trans('brackets/admin-ui::admin.btn.search') }}</button>
+                                                <button type="button" class="btn btn-primary" @click="filter('search', search)"><i class="fa fa-search"></i>&nbsp; {{ trans('brackets/admin-ui::admin.btn.search') }}</button>
                                             </span>
                                         </div>
                                     </div>
                                     <div class="col-sm-auto form-group ">
-                                        <select class="form-control rounded-pill" v-model="pagination.state.per_page">
+                                        <select class="form-control" v-model="pagination.state.per_page">
 
                                             <option value="10">10</option>
                                             <option value="25">25</option>
@@ -50,34 +50,30 @@
                                             </label>
                                         </th> --}}
 
-                                        <th is='sortable' :column="'id'">{{ trans('admin.help.columns.id') }}</th>
-                                        <th is='sortable' :column="'ci'">{{ trans('admin.help.columns.ci') }}</th>
-                                        <th is='sortable' :column="'name'">{{ trans('admin.help.columns.name') }}</th>
-                                        {{-- <th is='sortable' :column="'user'">{{ trans('admin.help.columns.user') }}</th> --}}
-                                        <th width="250px" is='sortable' :column="'dependency'">{{ trans('admin.help.columns.dependency') }}</th>
-                                        <th is='sortable' :column="'fone'">{{ trans('admin.help.columns.fone') }}</th>
-                                        <th width="250px" is='sortable' :column="'problem'">{{ trans('admin.help.columns.problem') }}</th>
-                                        <th is='sortable' :column="'estado'">{{ trans('admin.help.columns.estado') }}</th>
-                                        <th is='sortable' :column="'tecnico'">{{ trans('admin.help.columns.tecnico') }}</th>
-                                        <th is='sortable' :column="'fechahora'">{{ trans('admin.help.columns.fechahora') }}</th>
+                                        {{-- <th is='sortable' :column="'id'">{{ trans('admin.detail-help.columns.id') }}</th> --}}
+                                        <th is='sortable' :column="'help_id'">{{ trans('admin.detail-help.columns.help_id') }}</th>
+                                        <th is='sortable' :column="'user_id'">{{ trans('admin.detail-help.columns.user_id') }}</th>
+                                        <th is='sortable' :column="'state_id'">{{ trans('admin.detail-help.columns.state_id') }}</th>
+                                        <th is='sortable' :column="'solution'">{{ trans('admin.detail-help.columns.solution') }}</th>
+                                        <th is='sortable' :column="'date'">{{ trans('admin.detail-help.columns.date') }}</th>
+                                        <th is='sortable' :column="'category_id'">{{ trans('admin.detail-help.columns.category_id') }}</th>
+                                        <th is='sortable' :column="'patrimony'">{{ trans('admin.detail-help.columns.patrimony') }}</th>
 
                                         <th></th>
                                     </tr>
                                     <tr v-show="(clickedBulkItemsCount > 0) || isClickedAll">
                                         <td class="bg-bulk-info d-table-cell text-center" colspan="9">
-                                            <span class="align-middle font-weight-light text-dark">{{ trans('brackets/admin-ui::admin.listing.selected_items') }} @{{ clickedBulkItemsCount }}.  <a href="#" class="text-primary" @click="onBulkItemsClickedAll('/admin/helps')" v-if="(clickedBulkItemsCount < pagination.state.total)"> <i class="fa" :class="bulkCheckingAllLoader ? 'fa-spinner' : ''"></i> {{ trans('brackets/admin-ui::admin.listing.check_all_items') }} @{{ pagination.state.total }}</a> <span class="text-primary">|</span> <a
+                                            <span class="align-middle font-weight-light text-dark">{{ trans('brackets/admin-ui::admin.listing.selected_items') }} @{{ clickedBulkItemsCount }}.  <a href="#" class="text-primary" @click="onBulkItemsClickedAll('/admin/detail-helps')" v-if="(clickedBulkItemsCount < pagination.state.total)"> <i class="fa" :class="bulkCheckingAllLoader ? 'fa-spinner' : ''"></i> {{ trans('brackets/admin-ui::admin.listing.check_all_items') }} @{{ pagination.state.total }}</a> <span class="text-primary">|</span> <a
                                                         href="#" class="text-primary" @click="onBulkItemsClickedAllUncheck()">{{ trans('brackets/admin-ui::admin.listing.uncheck_all_items') }}</a>  </span>
 
                                             <span class="pull-right pr-2">
-                                                <button class="btn btn-sm btn-danger pr-3 pl-3" @click="bulkDelete('/admin/helps/bulk-destroy')">{{ trans('brackets/admin-ui::admin.btn.delete') }}</button>
+                                                <button class="btn btn-sm btn-danger pr-3 pl-3" @click="bulkDelete('/admin/detail-helps/bulk-destroy')">{{ trans('brackets/admin-ui::admin.btn.delete') }}</button>
                                             </span>
 
                                         </td>
                                     </tr>
                                 </thead>
                                 <tbody>
-
-
                                     <tr v-for="(item, index) in collection" :key="item.id" :class="bulkItems[item.id] ? 'bg-bulk' : ''">
                                         {{-- <td class="bulk-checkbox">
                                             <input class="form-check-input" :id="'enabled' + item.id" type="checkbox" v-model="bulkItems[item.id]" v-validate="''" :data-vv-name="'enabled' + item.id"  :name="'enabled' + item.id + '_fake_element'" @click="onBulkItemClicked(item.id)" :disabled="bulkCheckingAllLoader">
@@ -85,33 +81,32 @@
                                             </label>
                                         </td> --}}
 
-                                    <td><strong>@{{ item.id }}</strong></td>
-                                        <td>@{{ item.ci }}</td>
-                                        <td>@{{ item.name }}</td>
-                                        {{-- <td>@{{ item.user }}</td> --}}
-                                        <td>@{{ item.dependency }}</td>
-                                        <td>@{{ item.fone }}</td>
-                                        <td>@{{ item.problem }}</td>
-                                        <td class="text-center"><span :class="item.statuses.state.name == 'FINALIZADO' ? 'badge bg-primary' : 'badge bg-warning' ">@{{  item.statuses.state.name}}</span></td>
-                                        <td>@{{ item.statuses.user.full_name}}</td>
-                                        {{-- <td>@{{ item.statuses.user.first_name}} @{{ item.statuses.user.last_name}}</td> --}}
-                                        <td>@{{ item.tecnico.updated_at | datetime }}</td>
+                                    {{-- <td>@{{ item.id }}</td> --}}
+                                        <td>@{{ item.help_id }}</td>
+                                        <td>@{{ item.user.full_name }}</td>
+
+                                        <td v-if="item.state.id == 1" ><span class="badge bg-warning">@{{ item.state.name }}</span></td>
+                                        <td v-else-if="item.state.id == 2" ><span class="badge bg-success">@{{ item.state.name }}</span></td>
+                                        <td v-else-if="item.state.id == 4" ><span class="badge bg-primary">@{{ item.state.name }}</span></td>
+                                        <td v-else-if="item.state.id == 9" ><span class="badge"style="color:gray; background:yellow">@{{ item.state.name }}</span></td>
+
+
+                                        <td>@{{ item.solution }}</td>
+                                        <td>@{{ item.date| date }}</td>
+                                        <td>@{{ item.category.name }}</td>
+                                        <td>@{{ item.patrimony }}</td>
 
                                         <td>
                                             <div class="row no-gutters">
-                                                <div class="col-auto">
-                                                    <a class="btn btn-sm btn-spinner btn-info rounded-pill" :href="item.resource_url + '/show'" title="{{ trans('brackets/admin-ui::admin.btn.show') }}" role="button"><i class="fa fa-search"></i></a>
-                                                </div>
-                                                <div class="col-auto">
+                                                {{-- <div class="col-auto">
                                                     <a class="btn btn-sm btn-spinner btn-info" :href="item.resource_url + '/edit'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a>
                                                 </div>
                                                 <form class="col" @submit.prevent="deleteItem(item.resource_url)">
-                                                    {{-- <button type="submit" class="btn btn-sm btn-danger" title="{{ trans('brackets/admin-ui::admin.btn.delete') }}"><i class="fa fa-trash-o"></i></button> --}}
-                                                </form>
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="{{ trans('brackets/admin-ui::admin.btn.delete') }}"><i class="fa fa-trash-o"></i></button>
+                                                </form> --}}
                                             </div>
                                         </td>
                                     </tr>
-
                                 </tbody>
                             </table>
 
@@ -128,13 +123,13 @@
                                 <i class="icon-magnifier"></i>
                                 <h3>{{ trans('brackets/admin-ui::admin.index.no_items') }}</h3>
                                 <p>{{ trans('brackets/admin-ui::admin.index.try_changing_items') }}</p>
-                                <a class="btn btn-primary btn-spinner" href="{{ url('admin/helps/create') }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.help.actions.create') }}</a>
+                                <a class="btn btn-primary btn-spinner" href="{{ url('admin/detail-helps/create') }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.detail-help.actions.create') }}</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </help-listing>
+    </detail-help-listing>
 
 @endsection

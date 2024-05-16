@@ -36,32 +36,29 @@ class HelpsController extends Controller
      * @param IndexHelp $request
      * @return array|Factory|View
      */
-    public function index(Help $help ,IndexHelp $request)
+    public function index(Help $help, IndexHelp $request)
     {
-            // create and AdminListing instance for a specific model and
+        //$id = $help->id;
 
-            $id = $help->id;
-            $data = AdminListing::create(Help::class)->processRequestAndGet(
-             // pass the request with params
+        $detalle = $detalle = DetailHelp::select('help_id')
+        ->where('state_id', '!=', 4)
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('detail_helps as dh2')
+                ->whereRaw('detail_helps.help_id = dh2.help_id')
+                ->whereRaw('detail_helps.created_at < dh2.created_at');
+        })
+        ->orderBy('help_id', 'desc')
+        ->pluck('help_id');
 
-             $request,
-             // set columns to query
-             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem','created_at'],
-
-             // set columns to searchIn
-             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-
-
-            function ($query) use ($id) {
-                 $query
-                    //  ->where('helps.id', '=', $id);
-                   ->orderBy('id', 'DESC');
-             }
-
-         );
-
-
-
+        $data = AdminListing::create(Help::class)->processRequestAndGet(
+            $request,
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+            function ($query) use ($detalle) {
+                $query->whereIn('id', $detalle)->orderBy('id', 'DESC');
+            }
+        );
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
@@ -69,7 +66,7 @@ class HelpsController extends Controller
                     'bulkItems' => $data->pluck('id')
                 ];
             }
-            return ['data' => $data,'help' => $help];
+            return ['data' => $data, 'help' => $help];
         }
 
         return view('admin.help.index', ['data' => $data, 'help' => $help]);
@@ -110,27 +107,31 @@ class HelpsController extends Controller
             //  }
 
 
-             $id = $help->id;
-             $data = AdminListing::create(Help::class)->processRequestAndGet(
-              // pass the request with params
+             //$id = $help->id;
 
-              $request,
-              // set columns to query
-              ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem','created_at'],
+        $detalle = $detalle = DetailHelp::select('help_id')
+        ->where('state_id', '=', 4)
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('detail_helps as dh2')
+                ->whereRaw('detail_helps.help_id = dh2.help_id')
+                ->whereRaw('detail_helps.created_at < dh2.created_at');
+        })
+        ->orderBy('help_id', 'desc')
+        ->pluck('help_id');
 
-              // set columns to searchIn
-              ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+        $data = AdminListing::create(Help::class)->processRequestAndGet(
+            $request,
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+            function ($query) use ($detalle) {
+                $query->whereIn('id', $detalle)->orderBy('id', 'DESC');
+            }
+        );
 
 
-             function ($query) use ($id) {
-                  $query
-                     //  ->where('helps.id', '=', $id);
-                    ->orderBy('id', 'DESC');
-              }
 
 
-
-    );
 
 
 

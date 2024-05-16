@@ -3,7 +3,7 @@
 @section('title', trans('admin.help.actions.index'))
 
 @section('body')
-<body onLoad="setTimeout('self.location.reload()', 300000)"></body>
+{{-- <body onLoad="setTimeout('self.location.reload()', 300000)"></body> --}}
 
     <help-listing
         :data="{{ $data->toJson() }}"
@@ -31,10 +31,10 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-auto form-group">
-                                        <select class="form-control rounded-pill" v-model="pagination.state.per_page" readonly option value ="100">
+                                        <select class="form-control rounded-pill" v-model="pagination.state.per_page">
 
-                                            {{-- <option value="10">10</option>
-                                            <option value="25">25</option> --}}
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
                                             <option value="100">100</option>
                                         </select>
                                     </div>
@@ -79,7 +79,7 @@
                                 <tbody>
 
 
-                                    <tr v-for="(item, index) in collection" :key="item.id" :class="bulkItems[item.id] ? 'bg-bulk' : ''" v-if="item.statuses.state.id !== 4">
+                                    <tr v-for="(item, index) in collection" :key="item.id" :class="bulkItems[item.id] ? 'bg-bulk' : ''">
                                         {{-- <td class="bulk-checkbox">
                                             <input class="form-check-input" :id="'enabled' + item.id" type="checkbox" v-model="bulkItems[item.id]" v-validate="''" :data-vv-name="'enabled' + item.id"  :name="'enabled' + item.id + '_fake_element'" @click="onBulkItemClicked(item.id)" :disabled="bulkCheckingAllLoader">
                                             <label class="form-check-label" :for="'enabled' + item.id">
@@ -144,7 +144,7 @@
 
                             <div class="row" v-if="pagination.state.total > 0">
                                 <div class="col-sm">
-                                    {{-- <span class="pagination-caption">{{ trans('brackets/admin-ui::admin.pagination.overview') }}</span> --}}
+                                     <span class="pagination-caption">{{ trans('brackets/admin-ui::admin.pagination.overview') }}</span>
                                 </div>
                                 <div class="col-sm-auto">
                                     <pagination></pagination>
