@@ -3,7 +3,7 @@
 @section('title', trans('admin.help.actions.index'))
 
 @section('body')
-{{-- <body onLoad="setTimeout('self.location.reload()', 300000)"></body> --}}
+<body onLoad="setTimeout('self.location.reload()', 300000)"></body>
 
     <help-listing
         :data="{{ $data->toJson() }}"
