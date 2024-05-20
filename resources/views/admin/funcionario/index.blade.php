@@ -28,8 +28,8 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="col-sm-auto form-group ">
-                                        <select class="form-control" v-model="pagination.state.per_page">
+                                    <div class="col-sm-auto form-group">
+                                        <select class="form-control rounded-pill" v-model="pagination.state.per_page">
 
                                             <option value="10">10</option>
                                             <option value="25">25</option>
