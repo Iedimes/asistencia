@@ -12,7 +12,7 @@
 
 
     </style>
-       <center><img src="{{storage_path('images/MUVHG.jpg')}}" class="imagencentro" width="950" height="140"></center>
+       <center><img src="{{storage_path('images/MUVHOF.jpg')}}" class="imagencentro" width="950" height="140"></center>
 
     </head>
 <body>
