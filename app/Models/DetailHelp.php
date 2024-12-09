@@ -57,6 +57,11 @@ class DetailHelp extends Model implements Auditable
     {
         return $this->belongsTo('App\Models\AdminUser', 'user_id', 'id');
     }
+    public function help()
+{
+    return $this->belongsTo(Help::class);
+}
+
 
 
 

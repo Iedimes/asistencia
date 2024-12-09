@@ -20,6 +20,8 @@ Route::get('/', function () {
 
 Route::get('/', 'App\Http\Controllers\Admin\HomeController@dashboard');
 
+Route::get('fetch-orders', 'App\Http\Controllers\Admin\HomeController@fetchOrders'); // Nueva ruta para obtener órdenes
+
 Route::get('cedula/{cedula}','App\Http\Controllers\Admin\HelpsController@cedula')->name('cedula');
 
 Route::post('test/', 'App\Http\Controllers\Admin\HelpsController@store')->name('store');
@@ -29,6 +31,7 @@ Route::get('/consulta', 'App\Http\Controllers\Admin\HomeController@consulta');
 Route::get('api/{ci?}', 'App\Http\Controllers\Admin\HelpsController@api');
 
 //Route::get('/helps/{help}/show', 'App\Http\Controllers\Admin\HelpsController@show');
+
 
 
 

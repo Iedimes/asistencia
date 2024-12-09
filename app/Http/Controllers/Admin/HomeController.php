@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Admin\Help\IndexHelp;
 use App\Models\Help;
 use App\Models\DetailHelp;
+use Illuminate\Support\Facades\DB;
 
 use App\Mail\DemoEmail;
 use Illuminate\Support\Facades\Mail;
@@ -52,79 +53,141 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function dashboard()
-    {
-        //$data = Mh::find(278);
-        //return view('home', compact('data'));
-        return view('admin.help.create');
+{
+    // Consulta de los IDs de las ayudas que cumplen con el estado 2
+    $detalleIds = DetailHelp::select('help_id')
+        ->where('state_id', '=', 2) // Filtrar por estado '2'
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('detail_helps as dh2')
+                ->whereRaw('detail_helps.help_id = dh2.help_id')
+                ->whereRaw('detail_helps.created_at < dh2.created_at');
+        })
+        ->pluck('help_id'); // Extraer los IDs como una colección
 
-    }
+    // Obtener las órdenes filtradas por los detalles con estado 2
+    $ordersBeingAttended = Help::whereIn('id', $detalleIds) // Filtrar solo los IDs válidos
+        ->with(['detailsHelps' => function ($query) {
+            $query->orderBy('updated_at', 'asc'); // Ordenar por la fecha de actualización ascendente
+        }])
+        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id = 2) asc') // Ordenar por la fecha de actualización del detalle donde el estado es 2
+        ->limit(10) // Limitar a las 5 órdenes más recientes
+        ->get();
 
+    // Asignar la posición de atención a cada orden
+    $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
+        $order->position = $index + 1; // La posición es el índice + 1
+        return $order;
+    });
+
+    // Retornar la vista con los datos obtenidos
+    return view('admin.help.create', compact('ordersBeingAttended'));
+}
+
+public function fetchOrders()
+{
+    // Reutilizar la lógica de obtención de órdenes
+    $detalleIds = DetailHelp::select('help_id')
+        ->where('state_id', '=', 2)
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('detail_helps as dh2')
+                ->whereRaw('detail_helps.help_id = dh2.help_id')
+                ->whereRaw('detail_helps.created_at < dh2.created_at');
+        })
+        ->pluck('help_id');
+
+    $ordersBeingAttended = Help::whereIn('id', $detalleIds)
+        ->with(['detailsHelps'])
+        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id = 2) asc')
+        ->limit(10) // Limitar a las 10 órdenes más recientes
+        ->get();
+
+    // Asignar la posición de atención a cada orden
+    $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
+        $order->position = $index + 1;
+        return $order;
+    });
+
+    return response()->json(['orders' => $ordersBeingAttended]);
+}
 
     public function consulta(IndexHelp $request)
     {
-         // create and AdminListing instance for a specific model and
-         $ci = $request->search;
-         $data = AdminListing::create(Help::class)->processRequestAndGet(
-            // pass the request with params
+        // Consulta de los IDs de las ayudas que cumplen con el estado 2
+        $detalleIds = DetailHelp::select('help_id')
+            ->where('state_id', '=', 2) // Filtrar por estado '2'
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('detail_helps as dh2')
+                    ->whereRaw('detail_helps.help_id = dh2.help_id')
+                    ->whereRaw('detail_helps.created_at < dh2.created_at');
+            })
+            ->pluck('help_id'); // Extraer los IDs como una colección
+
+        // Obtener las órdenes filtradas por los detalles con estado 2
+        $ordersBeingAttended = Help::whereIn('id', $detalleIds) // Filtrar solo los IDs válidos
+            ->with(['detailsHelps' => function ($query) {
+                $query->orderBy('updated_at', 'asc'); // Ordenar por la fecha de actualización ascendente
+            }])
+            ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id = 2) asc') // Ordenar por la fecha de actualización del detalle donde el estado es 2
+            // ->limit(15) // Limitar a las 5 órdenes más recientes
+            ->get();
+
+        // // Asignar la posición de atención a cada orden
+        // $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
+        //     $order->position = $index + 1; // La posición es el índice + 1
+        //     return $order;
+        // });
+
+        // Obtener el valor de `search` que es el CI o ID
+        $ci = $request->search;
+
+        // Consulta adicional si hay búsqueda por CI o ID
+        $data = AdminListing::create(Help::class)->processRequestAndGet(
             $request,
-
-            // set columns to query
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-
-            // set columns to searchIn
-            ['ci'],
-            function ($query) use ($ci) {
-                $query
-                    ->where('helps.ci', '=', $ci);
+            ['ci', 'id'],
+            function ($query) use ($ci, $detalleIds) {
+                $query->whereIn('helps.id', $detalleIds) // Filtrar por los IDs válidos
+                      ->where(function ($q) use ($ci) {
+                          $q->where('helps.ci', '=', $ci)
+                            ->orWhere('helps.id', '=', $ci); // Buscar por CI o ID
+                      });
             }
         );
 
-       // return $RHM=RHM006::where('FuncNro', 1976712)
-       //         ->first();
+        // Si la solicitud es AJAX, retornar los datos en el formato esperado
+        if ($request->ajax()) {
+            if ($request->has('bulk')) {
+                return [
+                    'bulkItems' => $data->pluck('id'),
+                ];
+            }
 
-       //return $RHM=RHM006::all();
+            if (!$request->search) {
+                $ci = '-1';
+                $data = AdminListing::create(Help::class)->processRequestAndGet(
+                    $request,
+                    ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+                    ['ci'],
+                    function ($query) use ($ci, $detalleIds) {
+                        $query->whereIn('helps.id', $detalleIds) // Filtrar por los IDs válidos
+                              ->where('helps.ci', '=', $ci);
+                    }
+                );
+            }
 
-
-       if ($request->ajax()) {
-           if ($request->has('bulk')) {
-               return [
-                   'bulkItems' => $data->pluck('id')
-               ];
-           }
-
-           if (!$request->search) {
-            $ci = '-1';
-            $data = AdminListing::create(Help::class)->processRequestAndGet(
-                $request,
-                ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-                ['ci'],
-                function ($query) use ($ci) {
-                    $query
-                        ->where('helps.ci', '=', $ci);
-                }
-            );
+            return ['data' => $data];
         }
-        //return ['data' => $data];
 
-           return ['data' => $data];
-       }
-
-            $id = '-1';
-            $ci = '-1';
-            $data = AdminListing::create(Help::class)->processRequestAndGet(
-            $request,
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            ['ci'],
-            function ($query) use ($id, $ci) {
-                $query
-                    ->where('helps.ci', '=', $ci);
-
-            }
-        );
-
-        return view('admin.help.detalle', compact('data'));
-
+        // Retornar la vista con los datos obtenidos
+        return view('admin.help.detalle', compact('data', 'ordersBeingAttended'));
     }
+
+
+
+
 
 
 //   public function index(Request $request)

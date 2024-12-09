@@ -33,7 +33,7 @@ class Help extends Model implements Auditable
     protected $guarded = [];
 
     protected $appends = ['resource_url'];
-    protected $with = ['statuses','tecnico'];
+    protected $with = ['statuses','tecnico', 'detailsHelps'];
 
 
     /* ************************ ACCESSOR ************************* */
@@ -53,6 +53,11 @@ class Help extends Model implements Auditable
         return $this->hasOne(DetailHelp::class)->latest();
     }
 
+
+    public function detailsHelps()
+    {
+        return $this->hasMany(DetailHelp::class);  // Relación de uno a muchos
+    }
 
 
 }
