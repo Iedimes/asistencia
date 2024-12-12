@@ -56,10 +56,11 @@
 
 <div class="form-group row align-items-center" :class="{'has-danger': errors.has('problem'), 'has-success': fields.problem && fields.problem.valid }">
     <label for="problem" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-2'">{{ trans('admin.help.columns.problem') }}(*)</label>
-        <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
-        <textarea v-model="form.problem" @input="validate($event)" class="form-control" :class="{'form-control-danger': errors.has('problem'), 'form-control-success': fields.problem && fields.problem.valid}" id="problem" name="problem" placeholder="DESCRIBA BREVEMENTE LO QUE SOLICITA O EL INCONVENIENTE QUE PRESENTA"></textarea>
+    <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
+        <textarea v-model="form.problem" @input="validate($event); form.problem = form.problem.toUpperCase()" class="form-control" :class="{'form-control-danger': errors.has('problem'), 'form-control-success': fields.problem && fields.problem.valid}" id="problem" name="problem" placeholder="DESCRIBA BREVEMENTE LO QUE SOLICITA O EL INCONVENIENTE QUE PRESENTA"></textarea>
         <div v-if="errors.has('problem')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('problem') }}</div>
     </div>
 </div>
+
 <center><h6>(*) DATOS OBLIGATORIOS</h6></center>
 

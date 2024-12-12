@@ -9,8 +9,10 @@ use App\Http\Requests\Admin\Reporte\IndexReporte;
 use App\Http\Requests\Admin\Reporte\StoreReporte;
 use App\Http\Requests\Admin\Reporte\UpdateReporte;
 use App\Models\Reporte;
+use App\Models\State;
 use App\Models\DetailHelp;
 use App\Models\AdminUser;
+use App\Models\Help;
 use Illuminate\Http\Request;
 use Brackets\AdminListing\Facades\AdminListing;
 use Exception;
@@ -41,7 +43,7 @@ class ReporteController extends Controller
             $request,
 
             // set columns to query
-            ['inicio', 'fin', 'user_id'],
+            ['inicio', 'fin', 'user_id', 'state_id'],
 
             // set columns to searchIn
             ['']
@@ -68,9 +70,10 @@ class ReporteController extends Controller
     public function create()
     {
         $this->authorize('admin.reporte.create');
-        $user = AdminUser::all();
+        $user = AdminUser::where('id', '<>', 1)->get();
+        $estado = State::all();
 
-        return view('admin.reporte.create', compact('user'));
+        return view('admin.reporte.create', compact('user', 'estado'));
     }
 
     /**
@@ -96,64 +99,114 @@ class ReporteController extends Controller
 
 
     public function pdf(Request $request)
-    {
-        $request;
+{
+    // Validación de entradas
+    $rules = [
+        'inicio' => 'required|date',
+        'fin' => 'required|date',
+    ];
+    $messages = [
+        'inicio.required' => 'Debe cargar la fecha de inicio.',
+        'fin.required' => 'Debe cargar la fecha de fin.',
+    ];
+    $this->validate($request, $rules, $messages);
 
-        $rules = [
-            'inicio' => 'required',
-            'fin' => 'required',
-        ];
+    // Obtener datos del request
+    $inicio = $request->inicio;
+    $fin = $request->fin;
+    $user = $request->user_id;
+    $estado = $request->state_id;
 
-        $messages = [
-            'inicio.required' => 'Debe cargar la fecha de inicio.',
-            'fin.required' => 'Debe cargar la fecha de fin.',
-        ];
+    // Inicializar la consulta
+    $query = DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"]);
 
-        $this->validate($request, $rules, $messages);
-
-
-
-        $inicio=$request->inicio;
-        $fin=$request->fin;
-        $user=$request->user_id;
-
-        if ($user==0){
-            $finalizados=DetailHelp::where('state_id', 4)
-                                ->select('help_id')
-                                // ->get();
-                                ->pluck('help_id')->toArray();
-            $id_help = $finalizados;
-            //return $id_help;
-            $dhelps=DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"])
-                               ->whereIn('help_id', $id_help)
-                               ->where('state_id', '<>', 1)
-                               ->where('user_id', '<>', 1)
-                               ->orderby('user_id', 'ASC')
-                               ->orderby('help_id', 'ASC')
-                                ->get();
-                                $contar = count($dhelps);
-                                $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps' , 'contar'))->setPaper('a4', 'landscape');
-                                return $pdf->download('ReporteAsistencias.pdf');
-        }else{
-            $finalizados=DetailHelp::where('state_id', 4)
-                                ->select('help_id')
-                                // ->get();
-                                ->pluck('help_id')->toArray();
-            $id_help = $finalizados;
-            $dhelps=DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"])
-                                ->whereIn('help_id', $id_help)
-                                ->where('state_id', '<>', 1)
-                                ->where('user_id', '<>', 1)
-                                ->where('user_id', $user)
-                                ->orderby('help_id', 'ASC')
-                                ->get();
-                                //$visits = Visit::whereBetween('Exit_Datetime', ["$inicio", "$fin"])->get();
-                                $contar = count($dhelps);
-                                $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps' , 'contar'))->setPaper('a4', 'landscape');
-                                return $pdf->download('ReporteAsistencias.pdf');
-        }
-
+    // Filtrado de resultados según los parámetros
+    if ($user == 0 && $estado == 0) {
+        // Todos los registros
+    } elseif ($user > 0 && $estado == 0) {
+        $query->where('user_id', $user);
+    } elseif ($estado > 0 && $user == 0) {
+        $query->where('state_id', $estado);
+    } elseif ($estado == 1) {
+        $query->where('state_id', 1);
+    } else {
+        $query->where('user_id', $user)->where('state_id', $estado);
     }
+
+    // Obtener resultados
+    $dhelps = $query->orderby('user_id', 'ASC')->orderby('help_id', 'ASC')->get();
+
+    // Contar registros
+    $contar = $dhelps->count();
+
+    // Preparar datos de filtros para la vista
+    $filtros = [
+        'inicio' => $inicio,
+        'fin' => $fin,
+        'user_id' => $user,
+        'state_id' => $estado,
+    ];
+
+    // Generar PDF
+    $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps', 'contar', 'filtros'))
+              ->setPaper('a4', 'landscape');
+
+    // Descargar PDF
+    return $pdf->download('ReporteAsistencias.pdf');
+}
+
+
+    public function resultados(Request $request)
+{
+    // Validación de entradas
+    $rules = [
+        'inicio' => 'required|date',
+        'fin' => 'required|date',
+    ];
+    $messages = [
+        'inicio.required' => 'Debe cargar la fecha de inicio.',
+        'fin.required' => 'Debe cargar la fecha de fin.',
+    ];
+    $this->validate($request, $rules, $messages);
+
+    // Obtener datos del request
+    $inicio = $request->inicio;
+    $fin = $request->fin;
+    $user = $request->user_id;
+    $estado = $request->state_id;
+
+    // Inicializar la consulta
+    $query = DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"]);
+
+    // Filtrado de resultados según los parámetros
+    if ($user == 0 && $estado == 0) {
+        // Todos los registros
+    } elseif ($user > 0 && $estado == 0) {
+        $query->where('user_id', $user);
+    } elseif ($estado > 0 && $user == 0) {
+        $query->where('state_id', $estado);
+    } elseif ($estado == 1) {
+        $query->where('state_id', 1);
+    } else {
+        $query->where('user_id', $user)->where('state_id', $estado);
+    }
+
+    // Obtener resultados
+    $dhelps = $query->orderby('user_id', 'ASC')->orderby('help_id', 'ASC')->get();
+
+    // Contar registros
+    $contar = $dhelps->count();
+
+    // Pasar los filtros a la vista
+    $filtros = [
+        'inicio' => $inicio,
+        'fin' => $fin,
+        'user_id' => $user,
+        'state_id' => $estado,
+    ];
+
+    return view('admin.reporte.resultados', compact('dhelps', 'contar', 'filtros'));
+}
 
 
 

@@ -37,40 +37,61 @@ class HelpsController extends Controller
      * @return array|Factory|View
      */
     public function index(Help $help, IndexHelp $request)
-    {
-        //$id = $help->id;
-
-        $detalle = $detalle = DetailHelp::select('help_id')
-        ->where('state_id', '!=', 4)
+{
+    // Consulta de los IDs de las ayudas que cumplen con el estado 1 o 2
+    $detalleIds = DetailHelp::select('help_id')
+        ->whereIn('state_id', [1, 2]) // Filtrar por los estados 1 y 2
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('detail_helps as dh2')
                 ->whereRaw('detail_helps.help_id = dh2.help_id')
                 ->whereRaw('detail_helps.created_at < dh2.created_at');
         })
-        ->orderBy('help_id', 'desc')
         ->pluck('help_id');
 
-        $data = AdminListing::create(Help::class)->processRequestAndGet(
-            $request,
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            function ($query) use ($detalle) {
-                $query->whereIn('id', $detalle)->orderBy('id', 'DESC');
-            }
-        );
+    // Obtener las órdenes atendidas con su posición en la cola
+    $ordersBeingAttended = Help::whereIn('id', $detalleIds)
+        ->with(['detailsHelps'])
+        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id IN (1, 2)) ASC') // Ordenar por la fecha más reciente en los detalles
+        ->get();
 
-        if ($request->ajax()) {
-            if ($request->has('bulk')) {
-                return [
-                    'bulkItems' => $data->pluck('id')
-                ];
-            }
-            return ['data' => $data, 'help' => $help];
+    // Asignar la posición en la cola (la posición es el índice + 1)
+    $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
+        $order->position = $index + 1; // La posición es el índice + 1
+        return $order;
+    });
+
+    // Procesar la consulta de AdminListing
+    $data = AdminListing::create(Help::class)->processRequestAndGet(
+        $request,
+        ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+        ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+        function ($query) use ($detalleIds) {
+            $query->whereIn('id', $detalleIds)->orderBy('id', 'DESC');
         }
+    );
 
-        return view('admin.help.index', ['data' => $data, 'help' => $help]);
+    // Encontrar la posición del ticket en la cola
+    foreach ($data as $ticket) {
+        $ticketPosition = $ordersBeingAttended->where('id', $ticket->id)->first();
+        $ticket->position = $ticketPosition ? $ticketPosition->position : null;
     }
+
+    // Retornar los datos con la posición
+    if ($request->ajax()) {
+        return response()->json([
+            'orders' => $ordersBeingAttended,
+            'data' => $data
+        ]);
+    }
+
+    return view('admin.help.index', [
+        'data' => $data,
+        'help' => $help,
+        'ordersBeingAttended' => $ordersBeingAttended
+    ]);
+}
+
 
 
     public function finalizadas(Help $help,IndexHelp $request)

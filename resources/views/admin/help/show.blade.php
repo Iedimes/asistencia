@@ -36,7 +36,7 @@
                 <p class="card-text"><strong>TELEFONO:</strong> {{ $help->fone }}</p>
             </div>
             <div class="form-group col-sm-3">
-                <p class="card-text"><strong>DESCRIPCION SOLICITUD:</strong> {{ $help->problem }}</p>
+                <p class="card-text" style="text-transform: uppercase;"><strong>DESCRIPCION SOLICITUD:</strong> {{ $help->problem }}</p>
             </div>
             <div class="form-group col-sm-4">
 
@@ -119,7 +119,7 @@
                                         <td>@{{ item.help_id }}</td> --}}
                                         <td>@{{ item.user.full_name }}</td>
                                         {{-- <td>@{{ item.state_id }}</td> --}}
-                                        <td>@{{ item.solution }}</td>
+                                        <td style="text-transform: uppercase;">@{{ item.solution }}</td>
                                         <td>@{{ item.date | date }}</td>
                                         <td>@{{ item.category.name }}</td>
                                         <td>@{{ item.patrimony }}</td>

@@ -52,6 +52,7 @@
                                         </th> --}}
 
                                         <th is='sortable' :column="'id'">{{ trans('admin.help.columns.id') }}</th>
+                                        <th is='sortable' :column="'posicion'">{{ trans('ORDEN') }}</th>
                                         <th is='sortable' :column="'ci'">{{ trans('admin.help.columns.ci') }}</th>
                                         <th is='sortable' :column="'name'">{{ trans('admin.help.columns.name') }}</th>
                                         {{-- <th is='sortable' :column="'user'">{{ trans('admin.help.columns.user') }}</th> --}}
@@ -87,12 +88,15 @@
                                         </td> --}}
 
                                     <td><strong>@{{ item.id }}</strong></td>
+                                    <td class="text-center"><strong class="text-danger">@{{ item.position }}</strong></td>
+
                                         <td>@{{ item.ci }}</td>
                                         <td>@{{ item.name }}</td>
                                         {{-- <td>@{{ item.user }}</td> --}}
                                         <td>@{{ item.dependency }}</td>
                                         <td>@{{ item.fone }}</td>
-                                        <td>@{{ item.problem }}</td>
+                                        <td style="text-transform: uppercase;">@{{ item.problem }}</td>
+
                                         <td v-if="item.statuses.state.id == 1" ><span class="badge bg-warning">@{{ item.statuses.state.name }}</span></td>
                                         <td v-else-if="item.statuses.state.id == 2" ><span class="badge bg-success">@{{ item.statuses.state.name }}</span></td>
                                         <td v-else-if="item.statuses.state.id == 9" ><span class="badge"style="color:gray; background:yellow">@{{ item.statuses.state.name }}</span></td>

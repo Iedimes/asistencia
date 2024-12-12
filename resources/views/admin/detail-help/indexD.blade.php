@@ -91,7 +91,8 @@
                                         <td v-else-if="item.state.id == 9" ><span class="badge"style="color:gray; background:yellow">@{{ item.state.name }}</span></td>
 
 
-                                        <td>@{{ item.solution }}</td>
+
+                                        <td style="text-transform: uppercase;">@{{ item.solution }}</td>
                                         <td>@{{ item.date| date }}</td>
                                         <td>@{{ item.category.name }}</td>
                                         <td>@{{ item.patrimony }}</td>

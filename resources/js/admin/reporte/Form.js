@@ -8,7 +8,8 @@ Vue.component('reporte-form', {
                 inicio:  '' ,
                 fin:  '' ,
                 user_id:  '' ,
-                
+                state_id:  '' ,
+
             }
         }
     }

@@ -6,7 +6,7 @@
 @include('admin.help.orden')
 
     <!-- Contenedor para Solicitud de Soporte TIC -->
-    <div class="col-md-8"> <!-- Ajusta el tamaño según lo necesites -->
+    <div class="col-md-8">
         <div class="card">
             <help-form
                 :action="'{{ url('test') }}'"
@@ -16,19 +16,20 @@
 
                 <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
                     <div class="card-header">
-                        <h4 class="d-flex justify-content-center"><strong>SOLICITUD DE SOPORTE TIC</strong></h4>
+                        <h4 class="d-flex justify-content-center" style="color: red;"><strong>SOLICITUD DE SOPORTE TIC</strong></h4>
                         <div class="alert alert-info" role="alert">
-                            <h5 style="color: #365c72; font-weight: bold;">Formulario para solicitar soporte informático.</h5>
+                            <h5 style="color: #365c72; font-weight: bold;">FORMULARIO PARA SOLICITAR SOPORTE INFORMATICO.</h5>
                             <ul>
-                                <li style="color: #365c72;">Ingrese los datos solicitados, y una breve descripción del inconveniente o ayuda que necesite.</li>
-                                <li style="color: #365c72;">Una vez enviado, puede consultar su solicitud dando clic en el botón consultar.</li>
+                                <li style="color: #365c72;">INGRESE LOS DATOS SOLICITADOS, Y UNA BREVE DESCRIPCION DEL INCONVENIENTE O AYUDA QUE NECESITE.</li>
+                                <li style="color: #365c72;">EL SISTEMA GENERARA UN TICKET AUTOMATICO Y SE LE ASIGNARA EL NUMERO DE ORDEN DE ATENCION.</li>
+                                <li style="color: #365c72;">UNA VEZ ENVIADO, PUEDE CONSULTAR SU SOLICITUD DANDO CLIC EN LE BOTON CONSULTAR.</li>
                             </ul>
                         </div>
                         <div class="row">
                             <div class="col-sm-4"></div>
                             <div class="col-sm-4"></div>
                             <div class="col-sm-4">
-                                <a href='http://intranet' class="btn btn-primary rounded-pill">
+                                <a href='http://intranet' class="btn btn-danger rounded-pill">
                                     <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-home'"></i> INICIO
                                 </a>
                             </div>
@@ -40,10 +41,10 @@
                     </div>
 
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary rounded-pill" :disabled="submiting">
+                        <button type="submit" class="btn rounded-pill" style="background-color: #365c72; color: white;" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-paper-plane'"></i> ENVIAR
                         </button>
-                        <a href='/consulta' class="btn btn-primary rounded-pill">
+                        <a href='/consulta' class="btn btn-warning rounded-pill" style="background-color: #e9ad07; color: white;" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-search'"></i> CONSULTAR
                         </a>
                         <button type="reset" class="btn btn-danger rounded-pill" :disabled="submiting">

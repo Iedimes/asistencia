@@ -12,12 +12,11 @@
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <div class="card-header">
-                        {{-- <i class="fa fa-align-justify"></i> {{ trans('admin.help.actions.index') }} --}}
-                        <center><H4>CONSULTA DE ASISTENCIAS SOLICITADAS</H4></center>
-                        <a class="btn btn-primary btn-spinner btn-sm pull-right m-b-0 rounded-pill" href="{{ url('/') }}" role="button"><i class="fa fa-undo"></i>&nbsp; VOLVER</a>
+                    <div class="card-header text-center">
+                        <h4 style="color: red; font-weight: bold; text-transform: uppercase; margin-bottom: 0px;">CONSULTA DE ASISTENCIAS SOLICITADAS</h4>
+                        <a class="btn btn-danger btn-spinner btn-sm pull-right m-b-0 rounded-pill" href="{{ url('/') }}" role="button"><i class="fa fa-undo"></i>&nbsp; VOLVER</a>
                         {{-- <a class="btn btn-primary btn-spinner btn-sm pull-right m-b-0" href="{{ url()->previous() }}" role="button"><i class="fa fa-undo"></i>&nbsp; {{ trans('admin.help') }}</a> --}}
-                    </div>
+                     </div>
                     <div class="card-body" v-cloak>
                         <div class="card-block">
                             <form @submit.prevent="">
@@ -26,18 +25,18 @@
                                         <div class="input-group">
                                             <input class="form-control rounded-pill" placeholder="BUSCAR POR NRO DE CEDULA" v-model="search" @keyup.enter="filter('search', $event.target.value)" />
                                             <span class="input-group-append">
-                                                <button type="button" class="btn btn-primary rounded-pill" @click="filter('search', search)"><i class="fa fa-search"></i>&nbsp; {{ trans('brackets/admin-ui::admin.btn.search') }}</button>
+                                                <button type="button" class="btn btn-danger rounded-pill" @click="filter('search', search)"><i class="fa fa-search"></i>&nbsp; {{ trans('brackets/admin-ui::admin.btn.search') }}</button>
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="col-sm-auto form-group ">
+                                    {{-- <div class="col-sm-auto form-group ">
                                         <select class="form-control rounded-pill" v-model="pagination.state.per_page">
 
                                             <option value="10">10</option>
                                             <option value="25">25</option>
                                             <option value="100">100</option>
                                         </select>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </form>
 
@@ -52,6 +51,7 @@
                                         </th> --}}
 
                                         <th is='sortable' :column="'id'">{{ trans('admin.help.columns.id') }}</th>
+                                        <th is='sortable' :column="'posicion'">{{ trans('ORDEN') }}</th>
                                         <th is='sortable' :column="'ci'">{{ trans('admin.help.columns.ci') }}</th>
                                         <th is='sortable' :column="'name'">{{ trans('admin.help.columns.name') }}</th>
                                         <th is='sortable' :column="'user'">{{ trans('admin.help.columns.user') }}</th>
@@ -83,7 +83,10 @@
                                             </label>
                                         </td> --}}
 
-                                    <td><strong># @{{ item.id }} #</strong></td>
+                                    <td><strong>@{{ item.id }}</strong></td>
+                                    <td class="text-center"><strong class="text-danger">@{{ item.position }}</strong></td>
+
+
                                         <td>@{{ item.ci }}</td>
                                         <td>@{{ item.name }}</td>
                                         <td>@{{ item.user }}</td>

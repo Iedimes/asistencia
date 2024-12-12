@@ -29,7 +29,8 @@ class StoreReporte extends FormRequest
             'inicio' => ['nullable', 'date'],
             'fin' => ['nullable', 'date'],
             'user_id' => ['nullable', 'integer'],
-            
+            'state_id' => ['nullable', 'integer'],
+
         ];
     }
 

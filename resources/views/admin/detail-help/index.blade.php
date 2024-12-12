@@ -85,7 +85,9 @@
                                         <td>@{{ item.help_id }}</td>
                                         <td>@{{ item.user_id }}</td>
                                         <td>@{{ item.state_id }}</td>
+
                                         <td>@{{ item.solution }}</td>
+                                        <td style="text-transform: uppercase;">@{{ item.solution }}</td>
                                         <td>@{{ item.date}}</td>
                                         <td>@{{ item.category_id }}</td>
                                         <td>@{{ item.patrimony }}</td>

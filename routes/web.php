@@ -30,6 +30,7 @@ Route::get('/consulta', 'App\Http\Controllers\Admin\HomeController@consulta');
 
 Route::get('api/{ci?}', 'App\Http\Controllers\Admin\HelpsController@api');
 
+
 //Route::get('/helps/{help}/show', 'App\Http\Controllers\Admin\HelpsController@show');
 
 
@@ -195,6 +196,7 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->gro
             Route::post('/{reporte}',                                   'ReporteController@update')->name('update');
             Route::delete('/{reporte}',                                 'ReporteController@destroy')->name('destroy');
             Route::get('/imprimir',                                     'ReporteController@pdf')->name('imprimir');
+            Route::get('/resultados',                                   'ReporteController@resultados')->name('resultados');
         });
     });
 });
