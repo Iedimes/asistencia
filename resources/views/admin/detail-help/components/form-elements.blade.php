@@ -44,7 +44,7 @@
 <div class="form-group row align-items-center" :class="{'has-danger': errors.has('solution'), 'has-success': fields.solution && fields.solution.valid }">
     <label for="solution" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-2'">{{ trans('admin.detail-help.columns.solution') }}</label>
         <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
-        <textarea v-model="form.solution"  @input="validate($event)" class="form-control" :class="{'form-control-danger': errors.has('solution'), 'form-control-success': fields.solution && fields.solution.valid}" id="solution" name="solution" placeholder="{{ trans('admin.detail-help.columns.solution') }}"></textarea>
+        <textarea v-model="form.solution"  @input="validate($event); form.solution = form.solution.toUpperCase()" class="form-control" :class="{'form-control-danger': errors.has('solution'), 'form-control-success': fields.solution && fields.solution.valid}" id="solution" name="solution" placeholder="{{ trans('admin.detail-help.columns.solution') }}"></textarea>
         <div v-if="errors.has('solution')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('solution') }}</div>
     </div>
 </div>

@@ -9,11 +9,11 @@
         :url="'{{ url('consulta') }}'"
         inline-template>
 
-        <div class="row">
+        <div class="row mt-3">
             <div class="col">
                 <div class="card">
-                    <div class="card-header text-center">
-                        <h4 style="color: red; font-weight: bold; text-transform: uppercase; margin-bottom: 0px;">CONSULTA DE ASISTENCIAS SOLICITADAS</h4>
+                    <div class="card-header">
+                        <h4 style="color: red; font-weight: bold; text-transform: uppercase; margin-bottom: 0px;" class="d-flex justify-content-center">CONSULTA DE ASISTENCIAS SOLICITADAS</h4>
                         <a class="btn btn-danger btn-spinner btn-sm pull-right m-b-0 rounded-pill" href="{{ url('/') }}" role="button"><i class="fa fa-undo"></i>&nbsp; VOLVER</a>
                         {{-- <a class="btn btn-primary btn-spinner btn-sm pull-right m-b-0" href="{{ url()->previous() }}" role="button"><i class="fa fa-undo"></i>&nbsp; {{ trans('admin.help') }}</a> --}}
                      </div>
