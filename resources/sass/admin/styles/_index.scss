@@ -17,3 +17,44 @@ select.form-control {
     padding: 0 14px 0 0 !important;
     font-size: 14px;
 }
+
+//codigo css Nestor M.
+
+.logo {
+    display: block;
+    width: 300px;
+    height: auto;
+    margin: 0 auto;
+    padding-bottom: 20px; /* Espacio interior debajo de la imagen */
+}
+
+
+.app-header {
+    position: relative;
+    flex-direction: row;
+    height: 80px;
+    padding: 0;
+    margin: 0;
+    background-color: #fff;
+    border-bottom: 1px solid #c8ced3;
+    margin-bottom: 10px;
+
+  }
+
+
+  .app-header.navbar .navbar-brand img {
+    max-width: 475px;
+    max-height: 67px;
+}
+
+  .app-header .navbar-brand {
+    display: inline-flex
+;
+    align-items: center;
+    justify-content: center;
+    width: 155px;
+    height: 55px;
+    padding: 0;
+    margin-right: 0;
+    background-color: transparent;
+}

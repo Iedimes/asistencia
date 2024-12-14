@@ -1,6 +1,6 @@
 <div class="row">
     <!-- Contenedor para Orden de Atención -->
-    <div class="col-md-2">
+    <div class="col-md-2 mt-3">
         <div class="card mb-3">
             <div class="card-header text-center">
                 <h5 style="color: red; font-weight: bold; text-transform: uppercase; margin-bottom: 0px;">Orden de Atención</h5>

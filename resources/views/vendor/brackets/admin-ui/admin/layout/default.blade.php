@@ -30,7 +30,7 @@
         <div class="container-fluid">
             <div class="container-xl">
             <span class="pull-right">
-               <strong> Desarrollado por </strong><a href="http://192.168.101.248/" target="_blank" style="color: #002555">MUVH-DGTIC 2022</a>
+               <strong> Desarrollado por </strong><a href="#" target="_blank" style="color: #002555">MUVH-DGTIC 2024</a>
             </span>
             </div>
         </div>

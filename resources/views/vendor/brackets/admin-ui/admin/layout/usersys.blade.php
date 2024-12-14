@@ -33,7 +33,7 @@
     <footer class="app-footer">
         <div class="container-fluid">
             <div class="container-xl">
-                <div class="d-flex justify-content-center">     <img src="https://www.muvh.gov.py/sitio/wp-content/uploads/2022/06/copydgtic.jpg" alt="Marca producto/servicio MUVH" class="img-fluid" style="
+                <div class="d-flex justify-content-center">     <img src="http://intranet/sitio/wp-content/uploads/2023/04/dgti.jpg" alt="Marca producto/servicio MUVH" class="img-fluid" style="
                     width: 250px;
                 "></div>
 
