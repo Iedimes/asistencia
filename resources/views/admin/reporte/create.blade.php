@@ -83,7 +83,7 @@
                                 <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-file-pdf-o'"></i>
                                 GENERAR INFORME
                             </button> --}}
-                            <button type="button" class="btn btn-secondary" onclick="verResultados()">
+                            <button type="button" class="btn btn-primary" onclick="verResultados()">
                                 <i class="fa fa-eye"></i> VER RESULTADOS
                             </button>
 

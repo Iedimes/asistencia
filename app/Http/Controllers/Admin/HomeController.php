@@ -97,10 +97,11 @@ public function fetchOrders()
         })
         ->pluck('help_id');
 
+
     $ordersBeingAttended = Help::whereIn('id', $detalleIds)
-        ->with(['detailsHelps'])
-        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id IN (1, 2)) asc') // Ordenar por la fecha de actualización del detalle donde el estado es 1 o 2
-        ->limit(10) // Limitar a las 10 órdenes más recientes
+        ->with(['detailsHelps']) // Incluye los detalles relacionados
+        ->orderBy('created_at', 'asc') // Ordenar por la fecha más vieja de la cabecera
+        ->limit(10)
         ->get();
 
     // Asignar la posición de atención a cada orden
@@ -127,9 +128,10 @@ public function consulta(IndexHelp $request)
 
     // Obtener las órdenes atendidas con su posición en la cola
     $ordersBeingAttended = Help::whereIn('id', $detalleIds)
-        ->with(['detailsHelps'])
-        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id IN (1, 2)) ASC') // Ordenar por la fecha más reciente en los detalles
-        ->get();
+    ->with(['detailsHelps']) // Incluye los detalles relacionados
+    ->orderBy('created_at', 'asc') // Ordenar por la fecha más vieja de la cabecera
+    ->get();
+
 
     // Asignar la posición en la cola
     $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {

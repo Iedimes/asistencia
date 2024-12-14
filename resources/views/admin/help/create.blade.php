@@ -29,9 +29,9 @@
                             <div class="col-sm-4"></div>
                             <div class="col-sm-4"></div>
                             <div class="col-sm-4">
-                                <a href='http://intranet' class="btn btn-danger rounded-pill">
+                                {{-- <a href='http://intranet' class="btn btn-danger rounded-pill">
                                     <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-home'"></i> INICIO
-                                </a>
+                                </a> --}}
                             </div>
                         </div>
                     </div>
@@ -44,10 +44,10 @@
                         <button type="submit" class="btn rounded-pill" style="background-color: #365c72; color: white;" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-paper-plane'"></i> ENVIAR
                         </button>
-                        <a href='/consulta' class="btn btn-warning rounded-pill" style="background-color: #e9ad07; color: white;" :disabled="submiting">
+                        <a href='/consulta' class="btn rounded-pill" style="background-color: #365c72; color: white;" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-search'"></i> CONSULTAR
                         </a>
-                        <button type="reset" class="btn btn-danger rounded-pill" :disabled="submiting">
+                        <button type="reset" class="btn rounded-pill" style="background-color: #365c72; color: white;" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa fa-times'"></i> CANCELAR
                         </button>
                     </div>

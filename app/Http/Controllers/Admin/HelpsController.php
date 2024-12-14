@@ -51,11 +51,12 @@ class HelpsController extends Controller
 
     // Obtener las órdenes atendidas con su posición en la cola
     $ordersBeingAttended = Help::whereIn('id', $detalleIds)
-        ->with(['detailsHelps'])
-        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id IN (1, 2)) ASC') // Ordenar por la fecha más reciente en los detalles
-        ->get();
+    ->with(['detailsHelps']) // Incluye los detalles relacionados
+    ->orderBy('created_at', 'asc') // Ordenar por la fecha más vieja de la cabecera
+    ->get();
 
-    // Asignar la posición en la cola (la posición es el índice + 1)
+
+    // Asignar la posición en la cola
     $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
         $order->position = $index + 1; // La posición es el índice + 1
         return $order;
@@ -72,10 +73,11 @@ class HelpsController extends Controller
     );
 
     // Encontrar la posición del ticket en la cola
-    foreach ($data as $ticket) {
-        $ticketPosition = $ordersBeingAttended->where('id', $ticket->id)->first();
-        $ticket->position = $ticketPosition ? $ticketPosition->position : null;
+     // Encontrar la posición del ticket en la cola
+     foreach ($data as $ticket) {
+        $ticket->position = $ordersBeingAttended->where('id', $ticket->id)->first()->position ?? null;
     }
+
 
     // Retornar los datos con la posición
     if ($request->ajax()) {
