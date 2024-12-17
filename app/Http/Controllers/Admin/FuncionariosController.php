@@ -46,9 +46,9 @@ class FuncionariosController extends Controller
                 ['FuncNro'],
                 function ($query) use ($ci) {
                     $query
-                        ->where('RHM006.FuncEst', '=', 'A')
-                        ->where('RHM006.FuncNom', 'like', '%'. $ci . '%')
-                        ->orWhere('RHM006.FUsuCod', 'like', '%'. $ci . '%');
+                        ->where('RHM006.FuncEst','A')
+                        ->where('RHM006.FuncNom', 'like', '%'. $ci . '%');
+                        // ->orWhere('RHM006.FUsuCod', 'like', '%'. $ci . '%');
                 }
 
             );
@@ -65,7 +65,7 @@ class FuncionariosController extends Controller
                 ['FuncNro'],
                 function ($query) use ($ci) {
                     $query
-                        ->where('RHM006.FuncEst', '=', 'A')
+                        ->where('RHM006.FuncEst','A')
                         ->where('RHM006.FuncNro', '=', $ci);
                 }
             );

@@ -15,6 +15,7 @@ use App\Models\Category;
 use App\Models\SIG008;
 use App\Models\RHM006;
 use App\Models\DetailHelp;
+use App\Models\Medium;
 use Brackets\AdminListing\Facades\AdminListing;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -68,7 +69,7 @@ class HelpsController extends Controller
         ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
         ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
         function ($query) use ($detalleIds) {
-            $query->whereIn('id', $detalleIds)->orderBy('id', 'DESC');
+            $query->whereIn('id', $detalleIds)->orderBy('id', 'ASC');
         }
     );
 
@@ -356,6 +357,15 @@ class HelpsController extends Controller
         ]);
     }
 
+    public function editar(Help $help)
+    {
+        // $this->authorize('admin.help.editar', $help);
+
+        return view('admin.help.editar', [
+            'help' => $help,
+        ]);
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -497,4 +507,30 @@ class HelpsController extends Controller
 
     return response()->json($x);
 }
+
+public function documento($id)
+    {
+        $help = Help::findOrFail($id); // Busca el 'help' específico
+        return view('admin.help.createdocument', compact('help'));
+    }
+
+    // Método para manejar la carga del archivo
+    public function storeDocument(Request $request, $id)
+    {
+        $help = Help::findOrFail($id); // Asegúrate de que el 'help' exista
+
+        // Verificar que el archivo esté presente
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('help_documents'); // Guarda el archivo en el directorio de documentos
+
+            // Asocia el archivo al modelo Help (si estás usando media)
+            $help->addMedia($file)->toMediaCollection('gallery'); // Guarda en la colección de medios
+
+            // Puedes devolver una respuesta de éxito o redirigir
+            return response()->json(['message' => 'Documento adjuntado con éxito.'], 200);
+        }
+
+        return response()->json(['message' => 'No se adjuntó ningún documento.'], 400);
+    }
 }

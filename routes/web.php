@@ -24,6 +24,8 @@ Route::get('fetch-orders', 'App\Http\Controllers\Admin\HomeController@fetchOrder
 
 Route::get('cedula/{cedula}','App\Http\Controllers\Admin\HelpsController@cedula')->name('cedula');
 
+Route::get('admin/helps/{help}/editar','App\Http\Controllers\Admin\HelpsController@editar')->name('editar');
+
 Route::post('test/', 'App\Http\Controllers\Admin\HelpsController@store')->name('store');
 
 Route::get('/consulta', 'App\Http\Controllers\Admin\HomeController@consulta');
