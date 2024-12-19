@@ -13,10 +13,10 @@ class UpdateHelp extends FormRequest
      *
      * @return bool
      */
-    public function authorize(): bool
-    {
-        return Gate::allows('admin.help.edit', $this->help);
-    }
+    // public function authorize(): bool
+    // {
+    //     return Gate::allows('admin.help.edit', $this->help);
+    // }
 
     /**
      * Get the validation rules that apply to the request.

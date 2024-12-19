@@ -32,6 +32,8 @@ Route::get('/consulta', 'App\Http\Controllers\Admin\HomeController@consulta');
 
 Route::get('api/{ci?}', 'App\Http\Controllers\Admin\HelpsController@api');
 
+Route::post('admin/helps/{help}/guardar', 'App\Http\Controllers\Admin\HelpsController@guardarSolicitud')->name('admin.helps.guardar');
+
 
 //Route::get('/helps/{help}/show', 'App\Http\Controllers\Admin\HelpsController@show');
 

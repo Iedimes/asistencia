@@ -8,7 +8,8 @@
         <div class="card m-3" >
 
             <help-form
-                :action="'{{ $help->resource_url }}'"
+                {{-- :action="'{{ $help->resource_url }}'" --}}
+                :action="'{{ route('admin.helps.guardar', $help) }}'"
                 :data="{{ $help->toJson() }}"
                 :finddataurl = "'{{ url('cedula') }}'"
                 v-cloak
@@ -16,7 +17,8 @@
 
                 <form class="form-horizontal form-edit" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
 
-
+                    @method('PUT') <!-- Esto simula el método PUT -->
+                    @csrf <!-- Para proteger la solicitud contra ataques CSRF -->
                     <div class="card-header">
                         {{-- <i class="fa fa-pencil"></i> {{ trans('admin.help.actions.edit', ['name' => $help->name]) }} --}}
                         @if ($help->statuses->state_id != 4)
@@ -30,7 +32,7 @@
                     </div>
 
                     <div class="card-body">
-                        @include('admin.help.components.form-elementsU')
+                        {{-- @include('admin.help.components.form-elements') --}}
                          <!-- Uploader de Documentos Adjuntos -->
                          <div>
                             @include('brackets/admin-ui::admin.includes.media-uploader', [

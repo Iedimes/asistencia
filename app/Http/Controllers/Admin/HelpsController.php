@@ -226,11 +226,16 @@ class HelpsController extends Controller
         $status->save();
 
         if ($request->ajax()) {
-            return ['redirect' => url('/'), 'ticket' => $help['id'] ];
+            return [
+                'redirect' => url('/'),
+                'ticket' => $help['id'],
+                'showTicketModal' => true // Indicador de que debe mostrarse el modal
+            ];
         }
 
         return redirect('/');
     }
+
 
 
     public function storeadm(StoreHelp $request)
@@ -253,8 +258,11 @@ class HelpsController extends Controller
         $status->save();
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/helps'), 'ticket' => $help['id'] ];
-
+            return [
+                'redirect' => url('admin/helps'),
+                'ticket' => $help['id'],
+                'showTicketModal' => true // Indicador para mostrar el modal
+            ];
         }
 
         return redirect('admin/helps');
@@ -382,20 +390,47 @@ class HelpsController extends Controller
         $help->update($sanitized);
 
         if ($request->ajax()) {
-            // return [
-            //     'redirect' => url('admin/helps'),
-            //     'message' => trans('brackets/admin-ui::admin.operation.succeeded'),];
-            if ($help->statuses->state->id == 4){
-                return ['redirect' => url('admin/helps/finalizadas'), 'ticket' => $help['id'] ];
-            }else{
-            return ['redirect' => url('admin/helps/'), 'ticket' => $help['id'] ];
+            // Condicional basado en el estado del ticket
+            if ($help->statuses->state->id == 4) {
+                return [
+                    'redirect' => url('admin/helps/finalizadas'),
+                    'ticket' => $help['id'],
+                    'showTicketModal' => true // Indicador para mostrar el modal
+                ];
+            } else {
+                return [
+                    'redirect' => url('admin/helps/'),
+                    'ticket' => $help['id'],
+                    'showTicketModal' => true // Indicador para mostrar el modal
+                ];
             }
-
         }
 
         return redirect('admin/helps');
+    }
+
+
+    public function guardarSolicitud(UpdateHelp $request, Help $help)
+    {
+        // Sanitize input
+        $sanitized = $request->getSanitized();
+
+        // Si el archivo se ha cargado, asociarlo con el modelo Help
+        if ($request->hasFile('media')) { // 'media' es el nombre del campo en el formulario
+            $help->addMediaFromRequest('media')
+                 ->toMediaCollection('gallery');
+        }
+
+        // Actualiza los valores cambiados
+        $help->update($sanitized);
+
+        // Redirige directamente a /home
+        return ['redirect' => '/', 'showTicketModal' => false];
 
     }
+
+
+
 
     /**
      * Remove the specified resource from storage.

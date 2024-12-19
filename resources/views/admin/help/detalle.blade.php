@@ -60,6 +60,7 @@
                                         <th width="300px" is='sortable' :column="'problem'">{{ trans('admin.help.columns.problem') }}</th>
                                         <th is='sortable' :column="'estado'">{{ trans('admin.help.columns.estado') }}</th>
                                         <th is='sortable' :column="'tecnico'">{{ trans('admin.help.columns.tecnico') }}</th>
+                                        <th is='sortable' :column="'accion'">{{ trans('#') }}</th>
 
                                         <th></th>
                                     </tr>
@@ -106,7 +107,10 @@
                                                     {{-- <a class="btn btn-sm btn-spinner btn-info" :href="item.resource_url + '/show'" title="{{ trans('brackets/admin-ui::admin.btn.show') }}" role="button"><i class="fa fa-search"></i></a> --}}
                                                 </div>
                                                 <div class="col-auto" v-if="item.documento==null">
-                                                    <a class="btn btn-sm btn-spinner btn-info" :href="item.id + '/editar'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a>
+                                                    <a class="btn btn-sm btn-spinner btn-info" :href="item.id + '/editar'" title="{{ trans('ADJUNTAR DOCUMENTO') }}" role="button"><i class="fa fa-edit"></i></a>
+                                                </div>
+                                                <div class="col-auto" v-else>
+                                                    YA CUENTA CON DOCUMENTO ADJUNTO
                                                 </div>
                                                 <form class="col" @submit.prevent="deleteItem(item.resource_url)">
                                                     {{-- <button type="submit" class="btn btn-sm btn-danger" title="{{ trans('brackets/admin-ui::admin.btn.delete') }}"><i class="fa fa-trash-o"></i></button> --}}
