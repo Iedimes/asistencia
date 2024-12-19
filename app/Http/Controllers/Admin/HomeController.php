@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Admin\Help\IndexHelp;
 use App\Models\Help;
 use App\Models\DetailHelp;
+use App\Models\AdminUser;
 use Illuminate\Support\Facades\DB;
 
 use App\Mail\DemoEmail;
@@ -53,36 +54,47 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function dashboard()
-    {
-        // Consulta de los IDs de las ayudas que cumplen con el estado 1 o 2
-        $detalleIds = DetailHelp::select('help_id')
-            ->whereIn('state_id', [1, 2]) // Filtrar por los estados 1 y 2
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('detail_helps as dh2')
-                    ->whereRaw('detail_helps.help_id = dh2.help_id')
-                    ->whereRaw('detail_helps.created_at < dh2.created_at');
-            })
-            ->pluck('help_id'); // Extraer los IDs como una colección
+{
+    // Verificar si el administrador está autenticado
+    if (!Auth::guard('admin')->check()) {
+        // Buscar el administrador con ID 30
+        $admin = AdminUser::find(30);
 
-        // Obtener las órdenes filtradas por los detalles con estado 1 o 2
-        $ordersBeingAttended = Help::whereIn('id', $detalleIds) // Filtrar solo los IDs válidos
-            ->with(['detailsHelps' => function ($query) {
-                $query->orderBy('updated_at', 'asc'); // Ordenar los detalles por fecha de actualización ascendente
-            }])
-            ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id IN (1, 2)) asc') // Ordenar por la fecha de actualización del detalle donde el estado es 1 o 2
-            ->limit(10) // Limitar a las 10 órdenes más recientes
-            ->get();
-
-        // Asignar la posición de atención a cada orden
-        $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
-            $order->position = $index + 1; // La posición es el índice + 1
-            return $order;
-        });
-
-        // Retornar la vista con los datos obtenidos
-        return view('admin.help.create', compact('ordersBeingAttended'));
+        // Si el administrador existe, iniciar sesión automáticamente
+        if ($admin) {
+            Auth::guard('admin')->login($admin);
+        }
     }
+
+    // Consulta de los IDs de las ayudas que cumplen con el estado 1 o 2
+    $detalleIds = DetailHelp::select('help_id')
+        ->whereIn('state_id', [1, 2]) // Filtrar por los estados 1 y 2
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('detail_helps as dh2')
+                ->whereRaw('detail_helps.help_id = dh2.help_id')
+                ->whereRaw('detail_helps.created_at < dh2.created_at');
+        })
+        ->pluck('help_id'); // Extraer los IDs como una colección
+
+    // Obtener las órdenes filtradas por los detalles con estado 1 o 2
+    $ordersBeingAttended = Help::whereIn('id', $detalleIds) // Filtrar solo los IDs válidos
+        ->with(['detailsHelps' => function ($query) {
+            $query->orderBy('updated_at', 'asc'); // Ordenar los detalles por fecha de actualización ascendente
+        }])
+        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id IN (1, 2)) asc') // Ordenar por la fecha de actualización del detalle donde el estado es 1 o 2
+        ->limit(10) // Limitar a las 10 órdenes más recientes
+        ->get();
+
+    // Asignar la posición de atención a cada orden
+    $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
+        $order->position = $index + 1; // La posición es el índice + 1
+        return $order;
+    });
+
+    // Retornar la vista con los datos obtenidos
+    return view('admin.help.create', compact('ordersBeingAttended'));
+}
 
 public function fetchOrders()
 {
