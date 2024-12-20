@@ -58,7 +58,7 @@ class HomeController extends Controller
     // Verificar si el administrador está autenticado
     if (!Auth::guard('admin')->check()) {
         // Buscar el administrador con ID 30
-        $admin = AdminUser::find(30);
+        $admin = AdminUser::find(29);
 
         // Si el administrador existe, iniciar sesión automáticamente
         if ($admin) {
