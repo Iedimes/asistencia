@@ -374,6 +374,79 @@ class HelpsController extends Controller
         ]);
     }
 
+
+
+
+    public function verdocumento($helpId)
+    {
+        // Encuentra todos los archivos relacionados con el helpId
+        $media = Medium::where('model_id', $helpId)->get();
+
+
+        if ($media->isEmpty()) {
+            abort(404, 'No se encontraron documentos relacionados.');
+        }
+
+        // Itera sobre los archivos para encontrar uno válido
+        foreach ($media as $medium) {
+            $filePath = public_path("media/{$medium->id}/{$medium->file_name}");
+            // dd(public_path("media/{$medium->id}/{$medium->file_name}"));
+            // Opcional: Depura la ruta para verificar si es correcta
+
+
+            if (file_exists($filePath)) {
+                // Obtén el tipo MIME del archivo para definir su comportamiento
+                $mimeType = mime_content_type($filePath);
+                $headers = [
+                    'Content-Type' => $mimeType,
+                ];
+
+                // Retorna el archivo para abrirlo en el navegador si es compatible
+                return response()->file($filePath, $headers);
+            }
+        }
+
+        // Si ningún archivo es válido, lanza un error 404
+        abort(404, 'No se encontró ningún archivo válido.');
+    }
+
+
+
+    public function eliminardocumento($helpId)
+{
+    // Encuentra todos los archivos relacionados con el modelo de 'help'
+    $media = Medium::where('model_id', $helpId)->get();
+
+    if ($media->isEmpty()) {
+        // Si no se encuentra ningún archivo relacionado, muestra un mensaje de error
+        session()->flash('error', 'No se encontraron documentos relacionados.');
+        return back(); // Regresa a la misma página
+    }
+
+    // Itera sobre los archivos y elimina el primero que exista
+    foreach ($media as $medium) {
+        // Construye la ruta del archivo
+        $filePath = public_path("media/{$medium->id}/{$medium->file_name}");
+
+        if (file_exists($filePath)) {
+            // Elimina el archivo físico
+            unlink($filePath);
+
+            // Elimina el registro de la base de datos
+            $medium->delete();
+        }
+    }
+
+    // Después de eliminar, muestra un mensaje de éxito
+    session()->flash('success', 'El documento ha sido eliminado exitosamente.');
+    return back(); // Regresa a la misma página
+}
+
+
+
+
+
+
     /**
      * Update the specified resource in storage.
      *

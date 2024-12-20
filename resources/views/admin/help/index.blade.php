@@ -20,6 +20,15 @@
                     </div>
                     <div class="card-body" v-cloak>
                         <div class="card-block">
+                            @if (session('success'))
+                            <div class="alert alert-success" role="alert">
+                                {{ session('success') }}
+                            </div>
+                        @elseif (session('error'))
+                            <div class="alert alert-danger" role="alert">
+                                {{ session('error') }}
+                            </div>
+                        @endif
                             <form @submit.prevent="">
                                 <div class="row justify-content-md-between">
                                     <div class="col col-lg-7 col-xl-5 form-group">
@@ -129,18 +138,30 @@
                                         <td>@{{ item.created_at | datetime }}</td>
 
                                         <td>
-                                            <div class="row no-gutters">
-                                                <div class="col-auto">
-                                                    <a class="btn btn-sm btn-spinner btn-info rounded-pill" :href="item.resource_url + '/show'" title="{{ trans('brackets/admin-ui::admin.btn.show') }}" role="button"><i class="fa fa-search"></i></a>
+                                            <div class="d-flex flex-column">
+                                                <!-- Fila superior con 2 botones -->
+                                                <div class="d-flex mb-2">
+                                                    <div class="me-2">
+                                                        <a class="btn btn-sm btn-spinner btn-success rounded-pill" :href="item.resource_url + '/show'" title="{{ trans('brackets/admin-ui::admin.btn.show') }}" role="button"><i class="fa fa-search"></i></a>
+                                                    </div>
+                                                    <div class="me-2">
+                                                        <a class="btn btn-sm btn-spinner btn-info rounded-pill" :href="item.resource_url + '/edit'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a>
+                                                    </div>
                                                 </div>
-                                                <div class="col-auto">
-                                                    <a class="btn btn-sm btn-spinner btn-info" :href="item.resource_url + '/edit'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a>
+
+                                                <!-- Fila inferior con 2 botones -->
+                                                <div class="d-flex">
+                                                    <div class="me-2" v-if="item.documento!=null">
+                                                        <a class="btn btn-sm btn-spinner btn-warning rounded-pill" :href="item.resource_url + '/documento'" title="{{ trans('VER DOCUMENTO') }}" role="button" target="_blank"><i class="fa fa-eye"></i></a>
+                                                    </div>
+                                                    <div class="me-2" v-if="item.documento!=null">
+                                                        <a class="btn btn-sm btn-spinner btn-danger rounded-pill" :href="item.resource_url + '/eliminar'" title="{{ trans('ELIMINAR') }}" role="button"><i class="fa fa-trash"></i></a>
+                                                    </div>
                                                 </div>
-                                                <form class="col" @submit.prevent="deleteItem(item.resource_url)">
-                                                    {{-- <button type="submit" class="btn btn-sm btn-danger" title="{{ trans('brackets/admin-ui::admin.btn.delete') }}"><i class="fa fa-trash-o"></i></button> --}}
-                                                </form>
                                             </div>
                                         </td>
+
+
                                     </tr>
 
                                 </tbody>
@@ -169,3 +190,23 @@
     </help-listing>
 
 @endsection
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    // Comprueba si hay mensajes
+    const successMessage = document.querySelector('.alert-success');
+    const errorMessage = document.querySelector('.alert-danger');
+
+    if (successMessage) {
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+        }, 10000);  // 10 segundos
+    }
+
+    if (errorMessage) {
+        setTimeout(() => {
+            errorMessage.style.display = 'none';
+        }, 10000);  // 10 segundos
+    }
+});
+
+</script>

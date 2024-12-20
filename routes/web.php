@@ -34,6 +34,11 @@ Route::get('api/{ci?}', 'App\Http\Controllers\Admin\HelpsController@api');
 
 Route::post('admin/helps/{help}/guardar', 'App\Http\Controllers\Admin\HelpsController@guardarSolicitud')->name('admin.helps.guardar');
 
+Route::get('admin/helps/{help}/documento', 'App\Http\Controllers\Admin\HelpsController@verdocumento')->name('verdocumento');
+Route::get('admin/helps/{help}/eliminar', 'App\Http\Controllers\Admin\HelpsController@eliminardocumento')->name('eliminardocumento');
+
+
+
 
 //Route::get('/helps/{help}/show', 'App\Http\Controllers\Admin\HelpsController@show');
 
