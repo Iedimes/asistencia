@@ -26,7 +26,7 @@
                         @else
                         <a class="btn btn-primary btn-spinner btn-sm pull-right m-b-0 rounded-pill" href="{{ url('admin/helps/finalizadas') }}" role="button"><i class="fa fa-undo"></i>&nbsp; VOLVER</a>
                         @endif
-                        <h4 style="color: red; font-weight: bold; text-transform: uppercase; margin-bottom: 0px;" class="d-flex justify-content-center">AGREGAR FORMULARIO SOLICITUD DE USUARIO</h4>
+                        <h4 style="color: red; font-weight: bold; text-transform: uppercase; margin-bottom: 0px;" class="d-flex justify-content-center">ADJUNTAR DOCUMENTO</h4>
 
 
                     </div>

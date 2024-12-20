@@ -110,8 +110,9 @@
                                                     <a class="btn btn-sm btn-spinner btn-info" :href="item.id + '/editar'" title="{{ trans('ADJUNTAR DOCUMENTO') }}" role="button"><i class="fa fa-edit"></i></a>
                                                 </div>
                                                 <div class="col-auto" v-else>
-                                                    YA CUENTA CON DOCUMENTO ADJUNTO
+                                                    <a class="btn btn-sm btn-spinner btn-warning rounded-pill" :href="item.resource_url + '/documento'" title="{{ trans('VER DOCUMENTO') }}" role="button" target="_blank"><i class="fa fa-eye"></i></a>
                                                 </div>
+
                                                 <form class="col" @submit.prevent="deleteItem(item.resource_url)">
                                                     {{-- <button type="submit" class="btn btn-sm btn-danger" title="{{ trans('brackets/admin-ui::admin.btn.delete') }}"><i class="fa fa-trash-o"></i></button> --}}
                                                 </form>

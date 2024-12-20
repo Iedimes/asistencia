@@ -35,7 +35,8 @@
                         <div class="form-check mb-4">
                             <input type="checkbox" id="require-docs" class="form-check-input" v-model="requiresDocuments">
                             <label for="require-docs" class="form-check-label" style="color: #365c72; font-weight: bold;">
-                                ¿Va a solicitar usuario? Chequee aquí y adjunte el documento requerido.
+                                {{-- ¿Va a solicitar usuario? Chequee aquí y adjunte el documento requerido. --}}
+                                Clic en el cuadro para adjuntar documento
                             </label>
                         </div>
 
