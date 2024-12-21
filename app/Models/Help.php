@@ -61,7 +61,7 @@ class Help extends Model implements Auditable, HasMedia
 
     public function documento()
     {
-        return $this->belongsTo('App\Models\medium', 'id', 'model_id');
+        return $this->belongsTo('App\Models\Medium', 'id', 'model_id');
     }
 
     /* ************************ MEDIA CONFIGURATION ************************* */
