@@ -70,7 +70,7 @@ class Help extends Model implements Auditable, HasMedia
     {
         $this->addMediaCollection('gallery')
             ->maxFilesize(1024 * 1024 * 30) // Tamaño máximo 30 MB
-            ->maxNumberOfFiles(1);          // Máximo 5 archivos
+            ->maxNumberOfFiles(1);          // Máximo 1 archivos
     }
 
     public function registerMediaConversions(Media $media = null): void
