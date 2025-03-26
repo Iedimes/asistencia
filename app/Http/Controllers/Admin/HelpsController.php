@@ -549,7 +549,8 @@ class HelpsController extends Controller
     public function cedula($ced)
     {
         $ci = RHM006::where('FuncNro', $ced)
-                ->first();
+                    ->where('FuncEst','A')
+                    ->first();
                 if ($ci) {
                     return response()->json([
                         'error' => false,
