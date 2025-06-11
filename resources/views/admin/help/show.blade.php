@@ -18,26 +18,45 @@
     <div class="card-body">
 
         <div class="row">
-            <div class="form-group col-sm-2">
-            <p class="card-text"><strong>TICKET NUMERO:</strong>  {{ $help->id }}</p>
-            </div>
-            <div class="form-group col-sm-3">
-                <p class="card-text"><strong>NOMBRE:</strong>  {{ $help->name }}</p>
-            </div>
-            <div class="form-group col-sm-3">
-                <p class="card-text"><strong>CEDULA:</strong> {{ $help->ci }}</p>
-            </div>
-            <div class="form-group col-sm-4">
-                <p class="card-text"><strong>DEPENDENCIA:</strong> {{ $help->dependency }} </p>
-            </div>
+        <div class="form-group col-sm-2">
+            <p class="card-text">
+                <strong class="text-primary text-uppercase">TICKET NUMERO:</strong>
+                <span class="text-dark font-weight-bold">{{ $help->id }}</span>
+            </p>
         </div>
+        <div class="form-group col-sm-3">
+            <p class="card-text">
+                <strong class="text-primary text-uppercase">NOMBRE:</strong>
+                <span class="text-dark font-weight-bold">{{ $help->name }}</span>
+            </p>
+        </div>
+        <div class="form-group col-sm-3">
+            <p class="card-text">
+                <strong class="text-primary text-uppercase">CEDULA:</strong>
+                <span class="text-dark font-weight-bold">{{ $help->ci }}</span>
+            </p>
+        </div>
+        <div class="form-group col-sm-4">
+            <p class="card-text">
+                <strong class="text-primary text-uppercase">DEPENDENCIA:</strong>
+                <span class="text-dark font-weight-bold">{{ $help->dependency }}</span>
+            </p>
+        </div>
+    </div>
+
         <div class="row">
             <div class="form-group col-sm-2">
-                <p class="card-text"><strong>TELEFONO:</strong> {{ $help->fone }}</p>
-            </div>
-            <div class="form-group col-sm-3">
-                <p class="card-text" style="text-transform: uppercase;"><strong>DESCRIPCION SOLICITUD:</strong> {{ $help->problem }}</p>
-            </div>
+            <p class="card-text">
+                <strong class="text-primary text-uppercase">TELEFONO:</strong>
+                <span class="text-dark font-weight-bold">{{ $help->fone }}</span>
+            </p>
+        </div>
+        <div class="form-group col-sm-3">
+            <p class="card-text text-uppercase">
+                <strong class="text-primary text-uppercase">DESCRIPCIÓN SOLICITUD:</strong>
+                <span class="text-dark font-weight-bold">{{ $help->problem }}</span>
+            </p>
+        </div>
             <div class="form-group col-sm-4">
 
                 <td style="text-align:center;">
@@ -94,35 +113,29 @@
 
 
                             <table class="table table-hover table-listing">
-                                <thead>
-                                    <tr>
+                                <thead class="text-primary">
+                                <tr>
+                                    <th is='sortable' :column="'user_id'">{{ trans('admin.detail-help.columns.user_id') }}</th>
+                                    <th width="850px" is='sortable' :column="'solution'">{{ trans('admin.detail-help.columns.solution') }}</th>
+                                    <th is='sortable' :column="'date'">{{ trans('admin.detail-help.columns.date') }}</th>
+                                    <th is='sortable' :column="'category_id'">{{ trans('admin.detail-help.columns.category_id') }}</th>
+                                    <th is='sortable' :column="'patrimony'">{{ trans('admin.detail-help.columns.patrimony') }}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
 
-
-                                        {{-- <th is='sortable' :column="'id'">{{ trans('admin.detail-help.columns.id') }}</th>
-                                        <th is='sortable' :column="'help_id'">{{ trans('admin.detail-help.columns.help_id') }}</th> --}}
-                                        <th is='sortable' :column="'user_id'">{{ trans('admin.detail-help.columns.user_id') }}</th>
-                                        {{-- <th is='sortable' :column="'state_id'">{{ trans('admin.detail-help.columns.state_id') }}</th> --}}
-                                        <th width="850px" is='sortable' :column="'solution'">{{ trans('admin.detail-help.columns.solution') }}</th>
-                                        <th is='sortable' :column="'date'">{{ trans('admin.detail-help.columns.date') }}</th>
-                                        <th is='sortable' :column="'category_id'">{{ trans('admin.detail-help.columns.category_id') }}</th>
-                                        <th is='sortable' :column="'patrimony'">{{ trans('admin.detail-help.columns.patrimony') }}</th>
-
-                                        <th></th>
-                                    </tr>
-
-                                </thead>
                                 <tbody>
                                     <tr V-if="item.user.id !== 1" v-for="(item, index) in collection" :key="item.id" :class="bulkItems[item.id] ? 'bg-bulk' : ''">
 
 
                                     {{-- <td>@{{ item.id }}</td>
                                         <td>@{{ item.help_id }}</td> --}}
-                                        <td>@{{ item.user.full_name }}</td>
+                                        <td class="text-dark font-weight-bold">@{{ item.user.full_name }}</td>
                                         {{-- <td>@{{ item.state_id }}</td> --}}
-                                        <td style="text-transform: uppercase;">@{{ item.solution }}</td>
-                                        <td>@{{ item.date | date }}</td>
-                                        <td>@{{ item.category.name }}</td>
-                                        <td>@{{ item.patrimony }}</td>
+                                        <td class="text-uppercase text-dark font-weight-bold">@{{ item.solution }}</td>
+                                        <td class="text-dark font-weight-bold">@{{ item.date | date }}</td>
+                                        <td class="text-dark font-weight-bold">@{{ item.category.name }}</td>
+                                        <td class="text-dark font-weight-bold">@{{ item.patrimony }}</td>
 
                                         <td>
                                             @if ($help->statuses->state_id == 4)
