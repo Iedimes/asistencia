@@ -10,7 +10,8 @@
     <label for="user_id" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-2'">{{ trans('admin.detail-help.columns.user_id') }}</label>
         <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
         {{-- <input type="text" v-model="form.user_id" v-validate="'required|integer'" @input="validate($event)" class="form-control" :class="{'form-control-danger': errors.has('user_id'), 'form-control-success': fields.user_id && fields.user_id.valid}" id="user_id" name="user_id" placeholder="{{ trans('admin.detail-help.columns.user_id') }}"> --}}
-        <multiselect
+      <multiselect
+        class="text-dark font-weight-bold"
         v-model="form.user"
         :options="user"
         :multiple="false"
@@ -20,6 +21,7 @@
         tag-placeholder=""
         placeholder="{{ trans('admin.detail-help.columns.user_id') }}">
     </multiselect>
+
         <div v-if="errors.has('user_id')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('user_id') }}</div>
     </div>
 </div>
@@ -28,6 +30,7 @@
     <label for="state_id" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-2'">{{ trans('admin.detail-help.columns.state_id') }}</label>
         <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
             <multiselect
+            class="text-dark font-weight-bold"
             v-model="form.state"
             :options="state"
             :multiple="false"
@@ -45,14 +48,15 @@
     <label for="solution" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-2'">{{ trans('admin.detail-help.columns.solution') }}</label>
         <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
             <textarea
-            v-model="form.solution"
-            @input="handleInput"
-            class="form-control"
-            :class="{'form-control-danger': errors.has('solution'), 'form-control-success': fields.solution && fields.solution.valid}"
-            id="solution"
-            name="solution"
-            placeholder="{{ trans('admin.detail-help.columns.solution') }}">
-        </textarea>
+                v-model="form.solution"
+                @input="handleInput"
+                class="form-control text-dark font-weight-bold"
+                :class="{'form-control-danger': errors.has('solution'), 'form-control-success': fields.solution && fields.solution.valid}"
+                id="solution"
+                name="solution"
+                placeholder="{{ trans('admin.detail-help.columns.solution') }}">
+            </textarea>
+
 
         <div v-if="errors.has('solution')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('solution') }}</div>
     </div>
@@ -63,7 +67,19 @@
     <div :class="isFormLocalized ? 'col-md-4' : 'col-sm-8'">
         <div class="input-group input-group--custom">
             <div class="input-group-addon"><i class="fa fa-calendar"></i></div>
-            <datetime v-model="form.date" :config="datePickerConfig"  class="flatpickr" :class="{'form-control-danger': errors.has('date'), 'form-control-success': fields.date && fields.date.valid}" id="date" name="date" placeholder="{{ trans('brackets/admin-ui::admin.forms.select_a_date') }}"></datetime>
+            <datetime
+                v-model="form.date"
+                :config="datePickerConfig"
+                class="flatpickr text-dark font-weight-bold"
+                :class="{
+                    'form-control-danger': errors.has('date'),
+                    'form-control-success': fields.date && fields.date.valid
+                }"
+                id="date"
+                name="date"
+                placeholder="{{ trans('brackets/admin-ui::admin.forms.select_a_date') }}">
+            </datetime>
+
         </div>
         <div v-if="errors.has('date')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('date') }}</div>
     </div>
@@ -74,6 +90,7 @@
         <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
         {{-- <input type="text" v-model="form.category_id" v-validate="'required|integer'" @input="validate($event)" class="form-control" :class="{'form-control-danger': errors.has('category_id'), 'form-control-success': fields.category_id && fields.category_id.valid}" id="category_id" name="category_id" placeholder="{{ trans('admin.detail-help.columns.category_id') }}"> --}}
         <multiselect
+            class="text-dark font-weight-bold"
             v-model="form.category"
             :options="category"
             :multiple="false"
@@ -91,7 +108,7 @@
 <div class="form-group row align-items-center" :class="{'has-danger': errors.has('patrimony'), 'has-success': fields.patrimony && fields.patrimony.valid }">
     <label for="help_id" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-2'">{{ trans('admin.detail-help.columns.patrimony') }}</label>
         <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
-        <input type="text" v-model="form.patrimony"  @input="validate($event)" class="form-control" :class="{'form-control-danger': errors.has('patrimony'), 'form-control-success': fields.patrimony && fields.patrimony.valid}" id="patrimony" name="patrimony" placeholder="{{ trans('admin.detail-help.columns.patrimony') }}">
+        <input type="text" v-model="form.patrimony"  @input="validate($event)" class="form-control text-dark font-weight-bold" :class="{'form-control-danger': errors.has('patrimony'), 'form-control-success': fields.patrimony && fields.patrimony.valid}" id="patrimony" name="patrimony" placeholder="{{ trans('admin.detail-help.columns.patrimony') }}">
         <div v-if="errors.has('patrimony')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('patrimony') }}</div>
     </div>
 </div>
