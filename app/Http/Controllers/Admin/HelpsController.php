@@ -173,6 +173,48 @@ class HelpsController extends Controller
     }
 
 
+    public function pendientes(Help $help,IndexHelp $request)
+    {
+        $detalle = $detalle = DetailHelp::select('help_id')
+        ->where('state_id', '=', 9)
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('detail_helps as dh2')
+                ->whereRaw('detail_helps.help_id = dh2.help_id')
+                ->whereRaw('detail_helps.created_at < dh2.created_at');
+        })
+        ->orderBy('help_id', 'desc')
+        ->pluck('help_id');
+
+        $data = AdminListing::create(Help::class)->processRequestAndGet(
+            $request,
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+            function ($query) use ($detalle) {
+                $query->whereIn('id', $detalle)->orderBy('id', 'DESC');
+            }
+        );
+
+
+
+
+
+
+
+        if ($request->ajax()) {
+            if ($request->has('bulk')) {
+                return [
+                    'bulkItems' => $data->pluck('id')
+                ];
+            }
+            //return $request;
+            return ['data' => $data,'help' => $help];
+        }
+
+        return view('admin.help.pendientes', ['data' => $data, 'help' => $help]);
+    }
+
+
 
     /**
      * Show the form for creating a new resource.

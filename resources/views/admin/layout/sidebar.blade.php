@@ -4,6 +4,7 @@
             <li class="nav-title">{{ trans('brackets/admin-ui::admin.sidebar.content') }}</li>
             <li class="nav-item"><a class="nav-link" href="{{ url('admin/helps') }}" style="font-size: 15px;font-weight: bold"><i class="fa fa-id-card" style="font-size: 24px;"></i>&nbsp;&nbsp; {{ trans('admin.help.title') }}</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url('admin/helps/finalizadas') }}" style="font-size: 15px;font-weight: bold"><i class="fa fa-check-circle" style="font-size: 24px;"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FINALIZADAS</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url('admin/helps/pendientes') }}" style="font-size: 15px;font-weight: bold"><i class="fa fa-times" style="font-size: 24px;"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PENDIENTES</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url('admin/detail-helps') }}" style="font-size: 15px;font-weight: bold"><i class="fa fa-search" style="font-size: 24px;"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BUSCAR DETALLE</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url('admin/reportes/create') }}" style="font-size: 15px;font-weight: bold"><i class="fa fa-book" style="font-size: 24px;"></i>&nbsp;&nbsp;&nbsp;&nbsp; {{ trans('admin.reporte.title') }}</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url('admin/states') }}" style="font-size: 15px;font-weight: bold"><i class="fa fa-line-chart" style="font-size: 24px;"></i>&nbsp;&nbsp;&nbsp; {{ trans('admin.state.title') }}</a></li>
