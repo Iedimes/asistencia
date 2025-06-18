@@ -81,6 +81,8 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->gro
             Route::get('/createadm',                                    'HelpsController@createadm')->name('createadm');
             // Route::post('/',                                          'HelpsController@store')->name('store');
             Route::post('/storeadm',                                    'HelpsController@storeadm');
+            Route::get('/finalizadas',                                  'HelpsController@finalizadas')->name('finalizadas');
+            Route::get('/pendientes',                                   'HelpsController@pendientes')->name('pendientes');
             Route::get('/{help}/show',                                  'HelpsController@show')->name('show');
             Route::get('/{help}/createdetail',                          'HelpsController@createdetail')->name('createdetail');
             Route::get('/{help}/edit',                                  'HelpsController@edit')->name('edit');
@@ -91,28 +93,6 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->gro
         });
     });
 });
-
-
-/* Auto-generated admin routes */
-Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {
-    Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->name('admin/')->group(static function() {
-        Route::prefix('helps/finalizadas')->name('helps/finalizadas')->group(static function() {
-            Route::get('/',                                             'HelpsController@finalizadas')->name('finalizadas');
-            Route::get('/create',                                       'HelpsController@create')->name('create');
-            Route::get('/createadm',                                    'HelpsController@createadm')->name('createadm');
-            // Route::post('/',                                          'HelpsController@store')->name('store');
-            Route::post('/storeadm',                                    'HelpsController@storeadm');
-            Route::get('/{help}/show',                                  'HelpsController@show')->name('show');
-            Route::get('/{help}/createdetail',                          'HelpsController@createdetail')->name('createdetail');
-            Route::get('/{help}/edit',                                  'HelpsController@edit')->name('edit');
-            Route::post('/bulk-destroy',                                'HelpsController@bulkDestroy')->name('bulk-destroy');
-            Route::post('/{help}',                                      'HelpsController@update')->name('update');
-            Route::delete('/{help}',                                    'HelpsController@destroy')->name('destroy');
-        });
-    });
-});
-
-
 
 /* Auto-generated admin routes */
 Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {

@@ -97,42 +97,9 @@ class HelpsController extends Controller
 
 
 
-    public function finalizadas(Help $help,IndexHelp $request)
+    public function finalizadas(IndexHelp $request)
     {
             // create and AdminListing instance for a specific model and
-
-            //return $help::find(21813);
-
-            // $id = $help->id;
-            // $busqueda = $request->search;
-
-            // // return $busqueda;
-            // $data = AdminListing::create(Help::class)->processRequestAndGet(
-            //  // pass the request with params
-
-            // $request,
-
-            //  // set columns to query
-            //  ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem','created_at'],
-
-            //  // set columns to searchIn
-            //  ['id'],
-
-            // function ($query) use ($busqueda) {
-
-            //     //    ->where('helps.id', '=', $id);
-
-            //         $aux = $busqueda;
-            //         $query->whereHas('tecnico.user', function($tecnico) use($aux) {
-
-            //             //$tecnico->where('first_name', $aux);
-            //             $tecnico->where('first_name', 'LIKE', '%'.$aux.'%');
-            //     });
-            //  }
-
-
-             //$id = $help->id;
-
         $detalle = $detalle = DetailHelp::select('help_id')
         ->where('state_id', '=', 4)
         ->whereNotExists(function ($query) {
@@ -153,12 +120,6 @@ class HelpsController extends Controller
             }
         );
 
-
-
-
-
-
-
         if ($request->ajax()) {
             if ($request->has('bulk')) {
                 return [
@@ -169,11 +130,11 @@ class HelpsController extends Controller
             return ['data' => $data,'help' => $help];
         }
 
-        return view('admin.help.finalizadas', ['data' => $data, 'help' => $help]);
+        return view('admin.help.finalizadas', ['data' => $data]);
     }
 
 
-    public function pendientes(Help $help,IndexHelp $request)
+    public function pendientes(IndexHelp $request)
     {
         $detalle = $detalle = DetailHelp::select('help_id')
         ->where('state_id', '=', 9)
@@ -211,7 +172,7 @@ class HelpsController extends Controller
             return ['data' => $data,'help' => $help];
         }
 
-        return view('admin.help.pendientes', ['data' => $data, 'help' => $help]);
+        return view('admin.help.pendientes', ['data' => $data]);
     }
 
 
