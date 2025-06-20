@@ -98,45 +98,44 @@ class HelpsController extends Controller
 
 
     public function finalizadas(IndexHelp $request)
-    {
-            // create and AdminListing instance for a specific model and
-        $detalle = $detalle = DetailHelp::select('help_id')
+{
+    // Subquery dinámico sin ejecutar todavía
+    $detalleQuery = DetailHelp::select('help_id')
         ->where('state_id', '=', 4)
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('detail_helps as dh2')
                 ->whereRaw('detail_helps.help_id = dh2.help_id')
                 ->whereRaw('detail_helps.created_at < dh2.created_at');
-        })
-        ->orderBy('help_id', 'desc')
-        ->pluck('help_id');
+        });
 
-        $data = AdminListing::create(Help::class)->processRequestAndGet(
-            $request,
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            function ($query) use ($detalle) {
-                $query->whereIn('id', $detalle)->orderBy('id', 'DESC');
-            }
-        );
-
-        if ($request->ajax()) {
-            if ($request->has('bulk')) {
-                return [
-                    'bulkItems' => $data->pluck('id')
-                ];
-            }
-            //return $request;
-            return ['data' => $data,'help' => $help];
+    $data = AdminListing::create(Help::class)->processRequestAndGet(
+        $request,
+        ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+        ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+        function ($query) use ($detalleQuery) {
+            $query->whereIn('id', $detalleQuery)->orderBy('id', 'DESC');
         }
+    );
 
-        return view('admin.help.finalizadas', ['data' => $data]);
+    if ($request->ajax()) {
+        if ($request->has('bulk')) {
+            return [
+                'bulkItems' => $data->pluck('id')
+            ];
+        }
+        return ['data' => $data];
     }
+
+    return view('admin.help.finalizadas', ['data' => $data]);
+}
+
 
 
     public function pendientes(IndexHelp $request)
-    {
-        $detalle = $detalle = DetailHelp::select('help_id')
+{
+    // Subquery dinámico sin ejecutar todavía
+    $detalleQuery = DetailHelp::select('help_id')
         ->where('state_id', '=', 9)
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
@@ -144,36 +143,30 @@ class HelpsController extends Controller
                 ->whereRaw('detail_helps.help_id = dh2.help_id')
                 ->whereRaw('detail_helps.created_at < dh2.created_at');
         })
-        ->orderBy('help_id', 'desc')
-        ->pluck('help_id');
+        ->orderBy('help_id', 'desc');
 
-        $data = AdminListing::create(Help::class)->processRequestAndGet(
-            $request,
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            function ($query) use ($detalle) {
-                $query->whereIn('id', $detalle)->orderBy('id', 'DESC');
-            }
-        );
+    $data = AdminListing::create(Help::class)->processRequestAndGet(
+        $request,
+        ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+        ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+        function ($query) use ($detalleQuery) {
+            $query->whereIn('id', $detalleQuery)->orderBy('id', 'DESC');
+        }
+    );
 
-
-
-
-
-
-
-        if ($request->ajax()) {
-            if ($request->has('bulk')) {
-                return [
-                    'bulkItems' => $data->pluck('id')
-                ];
-            }
-            //return $request;
-            return ['data' => $data,'help' => $help];
+    if ($request->ajax()) {
+        if ($request->has('bulk')) {
+            return [
+                'bulkItems' => $data->pluck('id')
+            ];
         }
 
-        return view('admin.help.pendientes', ['data' => $data]);
+        return ['data' => $data];
     }
+
+    return view('admin.help.pendientes', ['data' => $data]);
+}
+
 
 
 
