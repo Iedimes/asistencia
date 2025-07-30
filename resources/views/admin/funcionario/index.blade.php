@@ -52,6 +52,8 @@
                                         <th is='sortable' :column="'FuncNro'">{{ trans('admin.funcionario.columns.FuncNro') }}</th>
                                         <th is='sortable' :column="'FuncNom'">{{ trans('admin.funcionario.columns.FuncNom') }}</th>
                                         <th is='sortable' :column="'FUsuCod'">{{ trans('admin.funcionario.columns.FUsuCod') }}</th>
+                                        <th>Origen</th>
+
 
                                         <th></th>
                                     </tr>
@@ -78,6 +80,7 @@
                                     <td>@{{ item.FuncNro }}</td>
                                         <td>@{{ item.FuncNom }}</td>
                                         <td>@{{ item.FUsuCod }}</td>
+                                        <td>@{{ item.Origen }}</td>
 
                                         <td>
                                             <div class="row no-gutters">

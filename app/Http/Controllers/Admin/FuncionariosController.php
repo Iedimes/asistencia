@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\Funcionario\IndexFuncionario;
 use App\Http\Requests\Admin\Funcionario\StoreFuncionario;
 use App\Http\Requests\Admin\Funcionario\UpdateFuncionario;
 use App\Models\Funcionario;
+use App\Models\Usuario;
 use Brackets\AdminListing\Facades\AdminListing;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -19,6 +20,8 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 
 class FuncionariosController extends Controller
 {
@@ -29,82 +32,123 @@ class FuncionariosController extends Controller
      * @param IndexFuncionario $request
      * @return array|Factory|View
      */
+
+
     public function index(IndexFuncionario $request)
     {
+        $search = $request->search;
 
-    if($request->search){
-        $ci = $request->search;
-        if (!is_numeric($ci)){
-            $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
-                // pass the request with params
-                $request,
+        $funcionarios = collect();
+        $usuarios = collect();
 
-                // set columns to query
-                ['FuncNro', 'FuncNom', 'FUsuCod'],
+        if ($search) {
+            $words = preg_split('/\s+/', trim($search)); // divide por espacios
 
-                // set columns to searchIn
-                ['FuncNro'],
-                function ($query) use ($ci) {
-                    $query
-                        ->where('RHM006.FuncEst','A')
-                        ->where('RHM006.FuncNom', 'like', '%'. $ci . '%');
-                        // ->orWhere('RHM006.FUsuCod', 'like', '%'. $ci . '%');
-                }
+            if (!is_numeric($search)) {
+                // FUNCIONARIOS - RRHH
+                $funcionarios = Funcionario::where('FuncEst', 'A')
+                    ->where(function ($query) use ($words) {
+                        foreach ($words as $word) {
+                            $query->where('FuncNom', 'like', "%{$word}%");
+                        }
+                    })
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'FuncNro' => $item->FuncNro,
+                            'FuncNom' => trim($item->FuncNom),
+                            'FUsuCod' => trim($item->FUsuCod),
+                            'Origen' => 'RRHH',
+                        ];
+                    });
 
-            );
-        }else{
-            //return "es numerico";
-            $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
-                // pass the request with params
-                $request,
+                // USUARIOS - SEGURIDAD
+                $usuarios = Usuario::where('Usuest', 'A')
+                    ->where(function ($query) use ($words) {
+                        foreach ($words as $word) {
+                            $query->where('UsuNombre', 'like', "%{$word}%");
+                        }
+                    })
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'FuncNro' => trim($item->UsuCed),
+                            'FuncNom' => trim($item->UsuNombre),
+                            'FUsuCod' => trim($item->UsuCod),
+                            'Origen' => 'SEGURIDAD',
+                        ];
+                    });
 
-                // set columns to query
-                ['FuncNro', 'FuncNom', 'FUsuCod'],
+            } else {
+                // Buscar por CÉDULA
+                $funcionarios = Funcionario::where('FuncEst', 'A')
+                    ->where('FuncNro', $search)
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'FuncNro' => $item->FuncNro,
+                            'FuncNom' => trim($item->FuncNom),
+                            'FUsuCod' => trim($item->FUsuCod),
+                            'Origen' => 'RRHH',
+                        ];
+                    });
 
-                // set columns to searchIn
-                ['FuncNro'],
-                function ($query) use ($ci) {
-                    $query
-                        ->where('RHM006.FuncEst','A')
-                        ->where('RHM006.FuncNro', '=', $ci);
-                }
-            );
+                $usuarios = Usuario::where('Usuest', 'A')
+                    ->where('UsuCed', $search)
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'FuncNro' => trim($item->UsuCed),
+                            'FuncNom' => trim($item->UsuNombre),
+                            'FUsuCod' => trim($item->UsuCod),
+                            'Origen' => 'SEGURIDAD',
+                        ];
+                    });
+            }
 
+        } else {
+            // Sin búsqueda, listar funcionarios
+            $funcionarios = Funcionario::where('FuncEst', 'A')
+                ->where('FuncNro', '>', 99)
+                ->orderBy('FuncNom')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'FuncNro' => $item->FuncNro,
+                        'FuncNom' => trim($item->FuncNom),
+                        'FUsuCod' => trim($item->FUsuCod),
+                        'Origen' => 'RRHH',
+                    ];
+                });
+
+            $usuarios = collect();
         }
-    }else{
 
-        //return "No es busqueda";
-        $x=99;
-        $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
-                    // pass the request with params
-                    $request,
+        // Unir y paginar
+        $merged = $funcionarios->merge($usuarios);
 
-                    // set columns to query
-                    ['FuncNro', 'FuncNom', 'FUsuCod'],
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+        $total = $merged->count();
+        $results = $merged->slice(($page - 1) * $perPage, $perPage)->values();
 
-                    // set columns to searchIn
-                    ['FuncNom'],
-                    function ($query) use ($x) {
-                        $query
-                            ->where('RHM006.FuncNro', '>', $x)
-                            ->where('RHM006.FuncEst', '=', 'A')
-                            ->orderBy('FuncNom');
-                    }
-                );
-    }
+        $data = new LengthAwarePaginator($results, $total, $perPage, $page, [
+            'path' => $request->url(),
+            'query' => $request->query(),
+        ]);
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
-                return [
-                    'bulkItems' => $data->pluck('FuncNro')
-                ];
+                return ['bulkItems' => $data->pluck('FuncNro')];
             }
-
             return ['data' => $data];
         }
 
         return view('admin.funcionario.index', ['data' => $data]);
     }
+
+
+
 
 
 
