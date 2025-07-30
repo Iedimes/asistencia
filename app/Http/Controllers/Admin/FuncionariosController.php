@@ -35,82 +35,26 @@ class FuncionariosController extends Controller
 
 
     public function index(IndexFuncionario $request)
-    {
-        $search = $request->search;
+{
+    $search = $request->search;
 
-        $funcionarios = collect();
-        $usuarios = collect();
+    $funcionarios = collect();
+    $usuarios = collect();
 
-        if ($search) {
-            $words = preg_split('/\s+/', trim($search)); // divide por espacios
+    if ($search) {
+        $words = preg_split('/\s+/', trim($search)); // divide por espacios
 
-            if (!is_numeric($search)) {
-                // FUNCIONARIOS - RRHH
-                $funcionarios = Funcionario::where('FuncEst', 'A')
-                    ->where(function ($query) use ($words) {
-                        foreach ($words as $word) {
-                            $query->where('FuncNom', 'like', "%{$word}%");
-                        }
-                    })
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'FuncNro' => $item->FuncNro,
-                            'FuncNom' => trim($item->FuncNom),
-                            'FUsuCod' => trim($item->FUsuCod),
-                            'Origen' => 'RRHH',
-                        ];
-                    });
-
-                // USUARIOS - SEGURIDAD
-                $usuarios = Usuario::where('Usuest', 'A')
-                    ->where(function ($query) use ($words) {
-                        foreach ($words as $word) {
-                            $query->where('UsuNombre', 'like', "%{$word}%");
-                        }
-                    })
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'FuncNro' => trim($item->UsuCed),
-                            'FuncNom' => trim($item->UsuNombre),
-                            'FUsuCod' => trim($item->UsuCod),
-                            'Origen' => 'SEGURIDAD',
-                        ];
-                    });
-
-            } else {
-                // Buscar por CÉDULA
-                $funcionarios = Funcionario::where('FuncEst', 'A')
-                    ->where('FuncNro', $search)
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'FuncNro' => $item->FuncNro,
-                            'FuncNom' => trim($item->FuncNom),
-                            'FUsuCod' => trim($item->FUsuCod),
-                            'Origen' => 'RRHH',
-                        ];
-                    });
-
-                $usuarios = Usuario::where('Usuest', 'A')
-                    ->where('UsuCed', $search)
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'FuncNro' => trim($item->UsuCed),
-                            'FuncNom' => trim($item->UsuNombre),
-                            'FUsuCod' => trim($item->UsuCod),
-                            'Origen' => 'SEGURIDAD',
-                        ];
-                    });
-            }
-
-        } else {
-            // Sin búsqueda, listar funcionarios
+        if (!is_numeric($search)) {
+            // FUNCIONARIOS - RRHH
             $funcionarios = Funcionario::where('FuncEst', 'A')
-                ->where('FuncNro', '>', 99)
-                ->orderBy('FuncNom')
+                ->where(function ($query) use ($words) {
+                    $query->where(function ($q) use ($words) {
+                        foreach ($words as $word) {
+                            $q->orWhere('FuncNom', 'like', "%{$word}%")
+                              ->orWhere('FUsuCod', 'like', "%{$word}%");
+                        }
+                    });
+                })
                 ->get()
                 ->map(function ($item) {
                     return [
@@ -121,31 +65,95 @@ class FuncionariosController extends Controller
                     ];
                 });
 
-            $usuarios = collect();
+            // USUARIOS - SEGURIDAD
+            $usuarios = Usuario::where('Usuest', 'A')
+                ->where(function ($query) use ($words) {
+                    $query->where(function ($q) use ($words) {
+                        foreach ($words as $word) {
+                            $q->orWhere('UsuNombre', 'like', "%{$word}%")
+                              ->orWhere('UsuCod', 'like', "%{$word}%");
+                        }
+                    });
+                })
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'FuncNro' => trim($item->UsuCed),
+                        'FuncNom' => trim($item->UsuNombre),
+                        'FUsuCod' => trim($item->UsuCod),
+                        'Origen' => 'SEGURIDAD',
+                    ];
+                });
+
+        } else {
+            // Buscar por CÉDULA
+            $funcionarios = Funcionario::where('FuncEst', 'A')
+                ->where('FuncNro', $search)
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'FuncNro' => $item->FuncNro,
+                        'FuncNom' => trim($item->FuncNom),
+                        'FUsuCod' => trim($item->FUsuCod),
+                        'Origen' => 'RRHH',
+                    ];
+                });
+
+            $usuarios = Usuario::where('Usuest', 'A')
+                ->where('UsuCed', $search)
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'FuncNro' => trim($item->UsuCed),
+                        'FuncNom' => trim($item->UsuNombre),
+                        'FUsuCod' => trim($item->UsuCod),
+                        'Origen' => 'SEGURIDAD',
+                    ];
+                });
         }
 
-        // Unir y paginar
-        $merged = $funcionarios->merge($usuarios);
+    } else {
+        // Sin búsqueda, listar funcionarios
+        $funcionarios = Funcionario::where('FuncEst', 'A')
+            ->where('FuncNro', '>', 99)
+            ->orderBy('FuncNom')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'FuncNro' => $item->FuncNro,
+                    'FuncNom' => trim($item->FuncNom),
+                    'FUsuCod' => trim($item->FUsuCod),
+                    'Origen' => 'RRHH',
+                ];
+            });
 
-        $page = $request->input('page', 1);
-        $perPage = $request->input('per_page', 10);
-        $total = $merged->count();
-        $results = $merged->slice(($page - 1) * $perPage, $perPage)->values();
-
-        $data = new LengthAwarePaginator($results, $total, $perPage, $page, [
-            'path' => $request->url(),
-            'query' => $request->query(),
-        ]);
-
-        if ($request->ajax()) {
-            if ($request->has('bulk')) {
-                return ['bulkItems' => $data->pluck('FuncNro')];
-            }
-            return ['data' => $data];
-        }
-
-        return view('admin.funcionario.index', ['data' => $data]);
+        $usuarios = collect();
     }
+
+    // Unir y paginar
+    $merged = collect($funcionarios)->merge($usuarios)->values(); // aseguramos colección
+
+    $page = $request->input('page', 1);
+    $perPage = $request->input('per_page', 10);
+    $total = $merged->count();
+    $results = $merged->forPage($page, $perPage)->values();
+
+    $data = new LengthAwarePaginator($results, $total, $perPage, $page, [
+        'path' => $request->url(),
+        'query' => $request->query(),
+    ]);
+
+
+    if ($request->ajax()) {
+        if ($request->has('bulk')) {
+            return ['bulkItems' => $data->pluck('FuncNro')];
+        }
+        return ['data' => $data];
+    }
+
+    return view('admin.funcionario.index', ['data' => $data]);
+}
+
 
 
 
