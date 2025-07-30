@@ -14,6 +14,7 @@ use App\Models\State;
 use App\Models\Category;
 use App\Models\SIG008;
 use App\Models\RHM006;
+use App\Models\Usuario;
 use App\Models\DetailHelp;
 use App\Models\Medium;
 use Brackets\AdminListing\Facades\AdminListing;
@@ -543,26 +544,52 @@ class HelpsController extends Controller
     }
 
     public function cedula($ced)
-    {
-        $ci = RHM006::where('FuncNro', $ced)
-                    ->where('FuncEst','A')
-                    ->first();
-                if ($ci) {
-                    return response()->json([
-                        'error' => false,
-                        'cedula' => $ci
-                    ]);
-                }else{
-                    return response()->json([
-                        'error' => true,
-                        //'cedula' => $ci
-                    ]);
-                }
+{
+    $ci = RHM006::with('dpto')
+                ->where('FuncNro', $ced)
+                ->where('FuncEst', 'A')
+                ->first();
 
-        //return $ci;
-        //return json_encode($ci, JSON_FORCE_OBJECT);
-        //return json_encode($ci, JSON_UNESCAPED_UNICODE);
+    if ($ci) {
+        return response()->json([
+            'error' => false,
+            'cedula' => [
+                'FuncNom' => trim($ci->FuncNombr).' '.trim($ci->FuncApell),
+                'FUsuCod' => $ci->FUsuCod,
+                'dpto' => $ci->dpto ? [
+                    'DepenDes' => $ci->dpto->DepenDes,
+                    'DepenCod' => $ci->dpto->DepenCod,
+                ] : null,
+            ]
+        ]);
     }
+
+    // Si no encontró en RHM006, buscar en USUARIO
+    $usuario = Usuario::with('dpto')
+        ->where('UsuCed', $ced)
+        ->where('Usuest', 'A')
+        ->first();
+
+    if ($usuario) {
+        return response()->json([
+            'error' => false,
+            'cedula' => [
+                'FuncNom' => trim($usuario->UsuNombre),
+                'FUsuCod' => $usuario->UsuCed,
+                'dpto' => $usuario->dpto ? [
+                    'DepenDes' => $usuario->dpto->DepenDes,
+                    'DepenCod' => $usuario->dpto->DepenCod,
+                ] : null,
+            ]
+        ]);
+    }
+
+    // Si no encontró en ninguno
+    return response()->json([
+        'error' => true,
+        'message' => 'Cédula no se encuentra en ninguna tabla'
+    ]);
+}
     // public function username($username)
     // {
     //     $usr = RHM006::where('FUsucod', $username)
