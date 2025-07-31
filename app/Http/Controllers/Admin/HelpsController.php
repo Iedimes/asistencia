@@ -575,7 +575,7 @@ class HelpsController extends Controller
             'error' => false,
             'cedula' => [
                 'FuncNom' => trim($usuario->UsuNombre),
-                'FUsuCod' => $usuario->UsuCed,
+                'FUsuCod' => $usuario->UsuCod,
                 'dpto' => $usuario->dpto ? [
                     'DepenDes' => $usuario->dpto->DepenDes,
                     'DepenCod' => $usuario->dpto->DepenCod,
