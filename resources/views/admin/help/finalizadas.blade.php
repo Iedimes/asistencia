@@ -105,6 +105,15 @@
                                                 <div class="col-auto">
                                                     <a class="btn btn-sm btn-spinner btn-info" :href="item.resource_url + '/edit'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a>
                                                 </div>
+                                                <!-- Fila inferior con 2 botones -->
+                                                <div class="d-flex">
+                                                    <div class="me-2" v-if="item.documento!=null">
+                                                        <a class="btn btn-sm btn-spinner btn-warning rounded-pill" :href="item.resource_url + '/documento'" title="{{ trans('VER DOCUMENTO') }}" role="button" target="_blank"><i class="fa fa-eye"></i></a>
+                                                    </div>
+                                                    <div class="me-2" v-if="item.documento!=null">
+                                                        <a class="btn btn-sm btn-spinner btn-danger rounded-pill" :href="item.resource_url + '/eliminar'" title="{{ trans('ELIMINAR') }}" role="button"><i class="fa fa-trash"></i></a>
+                                                    </div>
+                                                </div>
                                                 <form class="col" @submit.prevent="deleteItem(item.resource_url)">
                                                     {{-- <button type="submit" class="btn btn-sm btn-danger" title="{{ trans('brackets/admin-ui::admin.btn.delete') }}"><i class="fa fa-trash-o"></i></button> --}}
                                                 </form>
