@@ -34,11 +34,6 @@ class DetailHelpsController extends Controller
      */
     public function index(IndexDetailHelp $request)
     {
-        // Limpiar el término de búsqueda si existe
-        if ($request->has('search') && is_string($request->search)) {
-            $request->merge(['search' => trim($request->search)]);
-        }
-
         // create and AdminListing instance for a specific model and
         $data = AdminListing::create(DetailHelp::class)->processRequestAndGet(
             // pass the request with params
@@ -47,8 +42,23 @@ class DetailHelpsController extends Controller
             ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
             // set columns to searchIn
             ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
-            function ($query) {
+            function ($query) use ($request) {
                 $query->where('user_id', '!=', 1)->orderBy('date', 'desc');
+
+                // Si AdminListing no encuentra bien, forzar búsqueda manual
+                if ($request->filled('search')) {
+                    $search = $request->input('search');
+                    $query->where(function($q) use ($search) {
+                        $q->where('solution', 'ILIKE', "%{$search}%")
+                        ->orWhere('patrimony', 'ILIKE', "%{$search}%")
+                        ->orWhere(\DB::raw('CAST(id AS TEXT)'), 'ILIKE', "%{$search}%")
+                        ->orWhere(\DB::raw('CAST(help_id AS TEXT)'), 'ILIKE', "%{$search}%")
+                        ->orWhere(\DB::raw('CAST(user_id AS TEXT)'), 'ILIKE', "%{$search}%")
+                        ->orWhere(\DB::raw('CAST(state_id AS TEXT)'), 'ILIKE', "%{$search}%")
+                        ->orWhere(\DB::raw('CAST(category_id AS TEXT)'), 'ILIKE', "%{$search}%")
+                        ->orWhere(\DB::raw("TO_CHAR(date, 'YYYY-MM-DD')"), 'ILIKE', "%{$search}%");
+                    });
+                }
             }
         );
 
