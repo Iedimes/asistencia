@@ -17,19 +17,22 @@ class DetailHelp extends Model implements Auditable
         'date',
         'category_id',
         'patrimony',
+
     ];
+
 
     protected $dates = [
         'date',
         'created_at',
         'updated_at',
+
     ];
 
     use AuditableTrait;
 
     protected $guarded = [];
 
-    protected $appends = ['resource_url', 'user_full_name']; // AGREGAR user_full_name aquí
+    protected $appends = ['resource_url'];
     protected $with = ['state','category','user'];
 
     /* ************************ ACCESSOR ************************* */
@@ -39,17 +42,10 @@ class DetailHelp extends Model implements Auditable
         return url('/admin/detail-helps/'.$this->getKey());
     }
 
-    // AGREGAR ESTE ACCESSOR
-    public function getUserFullNameAttribute()
-    {
-        return $this->user ? $this->user->full_name : '';
-    }
-
-    /* ************************ RELATIONSHIPS ************************* */
-
     public function state()
     {
         return $this->belongsTo('App\Models\State');
+
     }
 
     public function category()
@@ -57,13 +53,22 @@ class DetailHelp extends Model implements Auditable
         return $this->belongsTo('App\Models\Category');
     }
 
+    // En tu modelo DetailHelp.php, modifica la relación user:
+
     public function user()
     {
-        return $this->belongsTo('App\Models\AdminUser', 'user_id', 'id');
+        return $this->belongsTo('App\Models\AdminUser', 'user_id', 'id')
+                    ->withTrashed(); // AGREGAR ESTO
     }
-
     public function help()
     {
         return $this->belongsTo(Help::class);
     }
+
+
+
+
+
+
+
 }
