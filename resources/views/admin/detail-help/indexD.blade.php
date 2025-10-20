@@ -83,7 +83,7 @@
 
                                     {{-- <td>@{{ item.id }}</td> --}}
                                         <td>@{{ item.help_id }}</td>
-                                        <td>@{{ item.user.full_name }}</td>
+                                        <td>@{{ item.user_full_name }}</td>
 
                                         <td v-if="item.state.id == 1" ><span class="badge bg-warning">@{{ item.state.name }}</span></td>
                                         <td v-else-if="item.state.id == 2" ><span class="badge bg-success">@{{ item.state.name }}</span></td>

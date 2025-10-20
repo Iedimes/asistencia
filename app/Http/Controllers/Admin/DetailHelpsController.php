@@ -33,31 +33,31 @@ class DetailHelpsController extends Controller
      * @return array|Factory|View
      */
     public function index(IndexDetailHelp $request)
-    {
-        $query = DetailHelp::where('user_id', '!=', 1);
-
-        // Búsqueda manual
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function($q) use ($search) {
-                $q->where('solution', 'ILIKE', "%{$search}%")
-                ->orWhere('patrimony', 'ILIKE', "%{$search}%")
-                ->orWhereRaw('CAST(id AS TEXT) ILIKE ?', ["%{$search}%"])
-                ->orWhereRaw('CAST(help_id AS TEXT) ILIKE ?', ["%{$search}%"]);
-            });
+{
+    // create and AdminListing instance for a specific model and
+    $data = AdminListing::create(DetailHelp::class)->processRequestAndGet(
+        // pass the request with params
+        $request,
+        // set columns to query
+        ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
+        // set columns to searchIn
+        ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
+        function ($query) {
+            $query->where('user_id', '!=', 1)->orderBy('date', 'desc');
         }
+    );
 
-        $data = $query->orderBy('date', 'desc')->paginate(15);
-
-        if ($request->ajax()) {
-            if ($request->has('bulk')) {
-                return ['bulkItems' => $data->pluck('id')];
-            }
-            return ['data' => $data];
+    if ($request->ajax()) {
+        if ($request->has('bulk')) {
+            return [
+                'bulkItems' => $data->pluck('id')
+            ];
         }
-
-        return view('admin.detail-help.indexD', ['data' => $data]);
+        return ['data' => $data];
     }
+
+    return view('admin.detail-help.indexD', ['data' => $data]);
+}
 
     /**
      * Show the form for creating a new resource.
