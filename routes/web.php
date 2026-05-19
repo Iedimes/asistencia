@@ -37,7 +37,8 @@ Route::post('admin/helps/{help}/guardar', 'App\Http\Controllers\Admin\HelpsContr
 Route::get('admin/helps/{help}/documento', 'App\Http\Controllers\Admin\HelpsController@verdocumento')->name('verdocumento');
 Route::get('admin/helps/{help}/eliminar', 'App\Http\Controllers\Admin\HelpsController@eliminardocumento')->name('eliminardocumento');
 
-
+// Upload público para adjuntar documentos desde el formulario de soporte
+Route::post('upload', 'App\Http\Controllers\PublicUploadController@upload')->name('brackets/media::upload');
 
 
 //Route::get('/helps/{help}/show', 'App\Http\Controllers\Admin\HelpsController@show');

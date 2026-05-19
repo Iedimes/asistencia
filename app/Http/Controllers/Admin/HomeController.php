@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Applicant;
 use App\Models\Subsidio;
 use App\Models\City;
@@ -27,7 +26,6 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Admin\Help\IndexHelp;
 use App\Models\Help;
 use App\Models\DetailHelp;
-use App\Models\AdminUser;
 use Illuminate\Support\Facades\DB;
 
 use App\Mail\DemoEmail;
@@ -55,17 +53,6 @@ class HomeController extends Controller
      */
     public function dashboard()
 {
-    // Verificar si el administrador está autenticado
-    if (!Auth::guard('admin')->check()) {
-        // Buscar el administrador con ID 30
-        $admin = AdminUser::find(29);
-
-        // Si el administrador existe, iniciar sesión automáticamente
-        if ($admin) {
-            Auth::guard('admin')->login($admin);
-        }
-    }
-
     // Subquery sin ejecutar
     $detalleQuery = DetailHelp::select('help_id')
         ->whereIn('state_id', [1, 2])
