@@ -40,48 +40,46 @@ class HelpsController extends Controller
      */
     public function index(Help $help, IndexHelp $request)
 {
-    // Consulta de los IDs de las ayudas que cumplen con el estado 1 o 2
-    $detalleIds = DetailHelp::select('help_id')
-        ->whereIn('state_id', [1, 2]) // Filtrar por los estados 1 y 2
+    // Subquery sin ejecutar (MySQL optimiza internamente)
+    $detalleQuery = DetailHelp::select('help_id')
+        ->whereIn('state_id', [1, 2])
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('detail_helps as dh2')
                 ->whereRaw('detail_helps.help_id = dh2.help_id')
                 ->whereRaw('detail_helps.created_at < dh2.created_at');
-        })
-        ->pluck('help_id');
+        });
 
-    // Obtener las órdenes atendidas con su posición en la cola
-    $ordersBeingAttended = Help::whereIn('id', $detalleIds)
-    ->with(['detailsHelps']) // Incluye los detalles relacionados
-    ->orderBy('created_at', 'asc') // Ordenar por la fecha más vieja de la cabecera
-    ->get();
+    // Obtener solo id + created_at para la cola (sin relaciones innecesarias)
+    $ordersBeingAttended = Help::whereIn('id', $detalleQuery)
+        ->select('id', 'created_at')
+        ->without(['statuses', 'tecnico', 'detailsHelps', 'documento'])
+        ->orderBy('created_at', 'asc')
+        ->get()
+        ->values()
+        ->map(function ($order, $index) {
+            $order->position = $index + 1;
+            return $order;
+        });
 
+    // Mapa posición por id para lookup O(1)
+    $positionMap = $ordersBeingAttended->pluck('position', 'id');
 
-    // Asignar la posición en la cola
-    $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
-        $order->position = $index + 1; // La posición es el índice + 1
-        return $order;
-    });
-
-    // Procesar la consulta de AdminListing
+    // AdminListing paginado con subquery
     $data = AdminListing::create(Help::class)->processRequestAndGet(
         $request,
         ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
         ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-        function ($query) use ($detalleIds) {
-            $query->whereIn('id', $detalleIds)->orderBy('id', 'ASC');
+        function ($query) use ($detalleQuery) {
+            $query->whereIn('id', $detalleQuery)->orderBy('id', 'ASC');
         }
     );
 
-    // Encontrar la posición del ticket en la cola
-     // Encontrar la posición del ticket en la cola
-     foreach ($data as $ticket) {
-        $ticket->position = $ordersBeingAttended->where('id', $ticket->id)->first()->position ?? null;
+    // Asignar posición usando el mapa (O(1) por ticket)
+    foreach ($data as $ticket) {
+        $ticket->position = $positionMap[$ticket->id] ?? null;
     }
 
-
-    // Retornar los datos con la posición
     if ($request->ajax()) {
         return response()->json([
             'orders' => $ordersBeingAttended,
