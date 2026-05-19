@@ -35,7 +35,7 @@ class Help extends Model implements Auditable, HasMedia
     protected $guarded = [];
 
     protected $appends = ['resource_url'];
-    protected $with = ['statuses', 'tecnico', 'detailsHelps', 'documento'];
+    protected $with = ['statuses', 'tecnico', 'documento'];
 
     /* ************************ ACCESSOR ************************* */
 
