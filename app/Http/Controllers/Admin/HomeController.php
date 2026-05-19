@@ -66,100 +66,92 @@ class HomeController extends Controller
         }
     }
 
-    // Consulta de los IDs de las ayudas que cumplen con el estado 1 o 2
-    $detalleIds = DetailHelp::select('help_id')
-        ->whereIn('state_id', [1, 2]) // Filtrar por los estados 1 y 2
+    // Subquery sin ejecutar
+    $detalleQuery = DetailHelp::select('help_id')
+        ->whereIn('state_id', [1, 2])
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('detail_helps as dh2')
                 ->whereRaw('detail_helps.help_id = dh2.help_id')
                 ->whereRaw('detail_helps.created_at < dh2.created_at');
-        })
-        ->pluck('help_id'); // Extraer los IDs como una colección
+        });
 
-    // Obtener las órdenes filtradas por los detalles con estado 1 o 2
-    $ordersBeingAttended = Help::whereIn('id', $detalleIds) // Filtrar solo los IDs válidos
-        ->with(['detailsHelps' => function ($query) {
-            $query->orderBy('updated_at', 'asc'); // Ordenar los detalles por fecha de actualización ascendente
-        }])
-        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id IN (1, 2)) asc') // Ordenar por la fecha de actualización del detalle donde el estado es 1 o 2
-        ->limit(10) // Limitar a las 10 órdenes más recientes
-        ->get();
+    // Obtener solo id + created_at (sin relaciones innecesarias)
+    $ordersBeingAttended = Help::whereIn('id', $detalleQuery)
+        ->select('id', 'created_at')
+        ->without(['statuses', 'tecnico', 'detailsHelps', 'documento'])
+        ->orderByRaw('(SELECT MAX(updated_at) FROM detail_helps WHERE help_id = helps.id AND state_id IN (1, 2)) asc')
+        ->limit(10)
+        ->get()
+        ->map(function ($order, $index) {
+            $order->position = $index + 1;
+            return $order;
+        });
 
-    // Asignar la posición de atención a cada orden
-    $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
-        $order->position = $index + 1; // La posición es el índice + 1
-        return $order;
-    });
-
-    // Retornar la vista con los datos obtenidos
     return view('admin.help.create', compact('ordersBeingAttended'));
 }
 
 public function fetchOrders()
 {
-    // Reutilizar la lógica de obtención de órdenes
-    $detalleIds = DetailHelp::select('help_id')
-    ->whereIn('state_id', [1, 2]) // Filtrar por los estados 1 y 2
+    $detalleQuery = DetailHelp::select('help_id')
+        ->whereIn('state_id', [1, 2])
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('detail_helps as dh2')
                 ->whereRaw('detail_helps.help_id = dh2.help_id')
                 ->whereRaw('detail_helps.created_at < dh2.created_at');
-        })
-        ->pluck('help_id');
+        });
 
-
-    $ordersBeingAttended = Help::whereIn('id', $detalleIds)
-        ->with(['detailsHelps']) // Incluye los detalles relacionados
-        ->orderBy('created_at', 'asc') // Ordenar por la fecha más vieja de la cabecera
+    $ordersBeingAttended = Help::whereIn('id', $detalleQuery)
+        ->select('id', 'created_at')
+        ->without(['statuses', 'tecnico', 'detailsHelps', 'documento'])
+        ->orderBy('created_at', 'asc')
         ->limit(10)
-        ->get();
-
-    // Asignar la posición de atención a cada orden
-    $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
-        $order->position = $index + 1;
-        return $order;
-    });
+        ->get()
+        ->values()
+        ->map(function ($order, $index) {
+            $order->position = $index + 1;
+            return $order;
+        });
 
     return response()->json(['orders' => $ordersBeingAttended]);
 }
 
 public function consulta(IndexHelp $request)
 {
-    // Consulta de los IDs de las ayudas que cumplen con el estado 1 o 2
-    $detalleIds = DetailHelp::select('help_id')
-        ->whereIn('state_id', [1, 2]) // Filtrar por los estados 1 y 2
+    // Subquery sin ejecutar
+    $detalleQuery = DetailHelp::select('help_id')
+        ->whereIn('state_id', [1, 2])
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('detail_helps as dh2')
                 ->whereRaw('detail_helps.help_id = dh2.help_id')
                 ->whereRaw('detail_helps.created_at < dh2.created_at');
-        })
-        ->pluck('help_id');
+        });
 
-    // Obtener las órdenes atendidas con su posición en la cola
-    $ordersBeingAttended = Help::whereIn('id', $detalleIds)
-    ->with(['detailsHelps']) // Incluye los detalles relacionados
-    ->orderBy('created_at', 'asc') // Ordenar por la fecha más vieja de la cabecera
-    ->get();
+    // Obtener solo id para la cola (sin relaciones)
+    $ordersBeingAttended = Help::whereIn('id', $detalleQuery)
+        ->select('id', 'created_at')
+        ->without(['statuses', 'tecnico', 'detailsHelps', 'documento'])
+        ->orderBy('created_at', 'asc')
+        ->get()
+        ->values()
+        ->map(function ($order, $index) {
+            $order->position = $index + 1;
+            return $order;
+        });
 
+    // Mapa posición por id para lookup O(1)
+    $positionMap = $ordersBeingAttended->pluck('position', 'id');
 
-    // Asignar la posición en la cola
-    $ordersBeingAttended = $ordersBeingAttended->map(function ($order, $index) {
-        $order->position = $index + 1; // La posición es el índice + 1
-        return $order;
-    });
-
-    // Si hay un parámetro de búsqueda por CI o ID
     $ci = $request->search;
     if ($ci) {
         $data = AdminListing::create(Help::class)->processRequestAndGet(
             $request,
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
             ['ci', 'id'],
-            function ($query) use ($ci, $detalleIds) {
-                $query->whereIn('helps.id', $detalleIds)
+            function ($query) use ($ci, $detalleQuery) {
+                $query->whereIn('helps.id', $detalleQuery)
                       ->where(function ($q) use ($ci) {
                           $q->where('helps.ci', '=', $ci)
                             ->orWhere('helps.id', '=', $ci);
@@ -167,16 +159,15 @@ public function consulta(IndexHelp $request)
             }
         );
 
-        // Encontrar la posición del ticket en la cola
+        // Asignar posición usando el mapa (O(1) por ticket)
         foreach ($data as $ticket) {
-            $ticket->position = $ordersBeingAttended->where('id', $ticket->id)->first()->position ?? null;
+            $ticket->position = $positionMap[$ticket->id] ?? null;
         }
     } else {
         $ci = '-1';
         $data = collect([]);
     }
 
-    // Retornar los datos con la posición
     if ($request->ajax()) {
         return response()->json([
             'orders' => $ordersBeingAttended,
