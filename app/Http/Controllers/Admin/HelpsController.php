@@ -120,11 +120,9 @@ class HelpsController extends Controller
     /**
      * Store administrator help request.
      */
-    public function storeadm(StoreHelp $request)
-    {
-        return $this->store($request);
-    }
-
+        /**
+     * Public ticket registration (from homepage / without login).
+     */
     public function store(StoreHelp $request)
     {
         $sanitized = $request->getSanitized();
@@ -135,7 +133,41 @@ class HelpsController extends Controller
         $help = $this->service->registerTicket($sanitized, [
             'state_id'    => $state->id,
             'category_id' => $category->id,
-            'solution'    => 'Ticket registrado',
+            'solution'    => 'INICIO DE SOLUCION PROPUESTA',
+            'user_id'     => auth()->id() ?? 1,
+            'date'        => now(),
+        ]);
+
+        if ($request->hasFile('media')) {
+            $help->addMediaFromRequest('media')->toMediaCollection('gallery');
+        }
+
+        if ($request->ajax()) {
+            return [
+                'redirect'        => url('/'),
+                'ticket'          => $help->id,
+                'showTicketModal' => true,
+                'message'         => trans('brackets/admin-ui::admin.operation.succeeded')
+            ];
+        }
+
+        return redirect('/');
+    }
+
+    /**
+     * Admin ticket registration (from admin panel).
+     */
+    public function storeadm(StoreHelp $request)
+    {
+        $sanitized = $request->getSanitized();
+
+        $state = State::first() ?? State::create(['name' => 'Abierto']);
+        $category = Category::first() ?? Category::create(['name' => 'General']);
+
+        $help = $this->service->registerTicket($sanitized, [
+            'state_id'    => $state->id,
+            'category_id' => $category->id,
+            'solution'    => 'INICIO DE SOLUCION PROPUESTA',
             'user_id'     => auth()->id() ?? 1,
             'date'        => now(),
         ]);

@@ -53,11 +53,31 @@ class HelpFeatureTest extends TestCase
             'dependency_id' => 1,
         ]);
 
-        $response->assertRedirect();
+        $response->assertRedirect('admin/helps');
         $this->assertDatabaseHas('helps', [
             'ci' => 3334445,
             'name' => 'Ana Torres',
             'problem' => 'Falla en impresora de red',
+        ]);
+    }
+
+    /** @test */
+    public function public_user_can_store_help_ticket_and_redirects_home()
+    {
+        $response = $this->post('/test/', [
+            'ci' => 4445556,
+            'name' => 'Marcos Rivas',
+            'user' => 'mrivas',
+            'dependency' => 'Informatica',
+            'fone' => '0971222333',
+            'problem' => 'Solicitud de acceso a correo',
+            'dependency_id' => 1,
+        ]);
+
+        $response->assertRedirect('/');
+        $this->assertDatabaseHas('helps', [
+            'ci' => 4445556,
+            'name' => 'Marcos Rivas',
         ]);
     }
 
