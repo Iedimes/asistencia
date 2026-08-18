@@ -261,7 +261,12 @@ class HelpsController extends Controller
         $this->service->updateTicket($help, $sanitized);
 
         if ($request->ajax()) {
-            return ['redirect' => '/', 'showTicketModal' => false];
+            return [
+                'redirect'        => '/',
+                'ticket'          => $help->id,
+                'showTicketModal' => true,
+                'message'         => trans('brackets/admin-ui::admin.operation.succeeded')
+            ];
         }
 
         return redirect('/');
