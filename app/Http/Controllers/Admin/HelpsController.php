@@ -12,7 +12,6 @@ use App\Models\AdminUser;
 use App\Models\Category;
 use App\Models\DetailHelp;
 use App\Models\Help;
-use App\Models\Medium;
 use App\Models\State;
 use App\Services\HelpService;
 use Brackets\AdminListing\Facades\AdminListing;
@@ -37,32 +36,29 @@ class HelpsController extends Controller
     }
 
     /**
-     * Display a listing of active tickets.
+     * Display a listing of tickets (Activos / En Proceso).
      */
     public function index(Help $help, IndexHelp $request)
     {
-        $detalleQuery = DetailHelp::select('help_id')
-            ->whereIn('state_id', [1, 2])
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('detail_helps as dh2')
-                    ->whereRaw('detail_helps.help_id = dh2.help_id')
-                    ->whereRaw('detail_helps.id < dh2.id');
-            });
+        $detalleIds = DetailHelp::select(DB::raw('MAX(id) as last_id'))
+            ->groupBy('help_id')
+            ->havingRaw('MAX(state_id) != ?', [4])
+            ->pluck('last_id');
 
-        $data = AdminListing::create(Help::class)
-            ->modifyQuery(function ($query) use ($detalleQuery) {
-                $query->whereIn('id', $detalleQuery);
-            })
-            ->processRequestAndGet(
-                $request,
-                ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-                ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem']
-            );
+        $data = AdminListing::create(Help::class)->processRequestAndGet(
+            $request,
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+            function ($query) use ($detalleIds) {
+                $query->whereIn('id', $detalleIds)->orderBy('id', 'ASC');
+            }
+        );
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
-                return ['bulkItems' => $data->pluck('id')];
+                return [
+                    'bulkItems' => $data->pluck('id')
+                ];
             }
             return ['data' => $data];
         }
@@ -71,83 +67,111 @@ class HelpsController extends Controller
     }
 
     /**
-     * Display a listing of finished tickets.
+     * Display a listing of finalizadas tickets.
      */
-    public function finalizadas(Help $help, IndexHelp $request)
+    public function finalizadas(IndexHelp $request)
     {
-        $detalleQuery = DetailHelp::select('help_id')
-            ->where('state_id', 4)
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('detail_helps as dh2')
-                    ->whereRaw('detail_helps.help_id = dh2.help_id')
-                    ->whereRaw('detail_helps.id < dh2.id');
-            });
+        $detalleIds = DetailHelp::select(DB::raw('MAX(id) as last_id'))
+            ->groupBy('help_id')
+            ->havingRaw('MAX(state_id) = ?', [4])
+            ->pluck('last_id');
 
-        $data = AdminListing::create(Help::class)
-            ->modifyQuery(function ($query) use ($detalleQuery) {
-                $query->whereIn('id', $detalleQuery);
-            })
-            ->processRequestAndGet(
-                $request,
-                ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-                ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem']
-            );
+        $data = AdminListing::create(Help::class)->processRequestAndGet(
+            $request,
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+            function ($query) use ($detalleIds) {
+                $query->whereIn('id', $detalleIds)->orderBy('id', 'DESC');
+            }
+        );
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
-                return ['bulkItems' => $data->pluck('id')];
+                return [
+                    'bulkItems' => $data->pluck('id')
+                ];
             }
             return ['data' => $data];
         }
 
-        return view('admin.help.indexfinalizadas', ['data' => $data]);
+        return view('admin.help.finalizadas', ['data' => $data]);
     }
 
     /**
-     * Show form for creating a new help ticket.
+     * Display a listing of pendientes tickets (state_id = 9).
+     */
+    public function pendientes(IndexHelp $request)
+    {
+        $data = $this->service->getPendientesTickets($request);
+
+        if ($request->ajax()) {
+            if ($request->has('bulk')) {
+                return [
+                    'bulkItems' => $data->pluck('id')
+                ];
+            }
+            return ['data' => $data];
+        }
+
+        return view('admin.help.pendientes', ['data' => $data]);
+    }
+
+    /**
+     * Show form for public ticket creation.
      */
     public function create()
     {
-        $this->authorize('admin.help.create');
         return view('admin.help.create');
     }
 
     /**
-     * Store a newly created help ticket.
+     * Show form for admin ticket creation.
      */
-    
+    public function createadm()
+    {
+        return view('admin.help.createadm');
+    }
+
     /**
-     * Store administrator help request.
+     * Show form for detail help creation.
      */
-        /**
-     * Public ticket registration (from homepage / without login).
+    public function createdetail($id)
+    {
+        $this->authorize('admin.detail-help.create');
+
+        $state = State::all();
+        $category = Category::all();
+        $user = AdminUser::all();
+
+        return view('admin.detail-help.create', compact('id', 'state', 'category', 'user'));
+    }
+
+    /**
+     * Store a newly created public ticket.
      */
     public function store(StoreHelp $request)
     {
         $sanitized = $request->getSanitized();
 
-        $state = State::first() ?? State::create(['name' => 'Abierto']);
-        $category = Category::first() ?? Category::create(['name' => 'General']);
+        $stateId = State::first()->id ?? 1;
+        $categoryId = Category::first()->id ?? 1;
 
-        $help = $this->service->registerTicket($sanitized, [
-            'state_id'    => $state->id,
-            'category_id' => $category->id,
+        $initialDetail = [
+            'user_id'     => '1',
+            'state_id'    => $stateId,
             'solution'    => 'INICIO DE SOLUCION PROPUESTA',
-            'user_id'     => auth()->id() ?? 1,
-            'date'        => now(),
-        ]);
+            'date'        => date('Y-m-d H:i:s'),
+            'category_id' => $categoryId,
+            'patrimony'   => '1',
+        ];
 
-        if ($request->hasFile('media')) {
-            $help->addMediaFromRequest('media')->toMediaCollection('gallery');
-        }
+        $help = $this->service->registerTicket($sanitized, $initialDetail);
 
         if ($request->ajax()) {
             return [
                 'redirect'        => url('/'),
                 'ticket'          => $help->id,
                 'showTicketModal' => true,
-                'message'         => trans('brackets/admin-ui::admin.operation.succeeded')
             ];
         }
 
@@ -155,42 +179,37 @@ class HelpsController extends Controller
     }
 
     /**
-     * Admin ticket registration (from admin panel).
+     * Store a newly created admin ticket.
      */
     public function storeadm(StoreHelp $request)
     {
         $sanitized = $request->getSanitized();
 
-        $state = State::first() ?? State::create(['name' => 'Abierto']);
-        $category = Category::first() ?? Category::create(['name' => 'General']);
+        $stateId = State::first()->id ?? 1;
+        $categoryId = Category::first()->id ?? 1;
 
-        $help = $this->service->registerTicket($sanitized, [
-            'state_id'    => $state->id,
-            'category_id' => $category->id,
+        $initialDetail = [
+            'user_id'     => '1',
+            'state_id'    => $stateId,
             'solution'    => 'INICIO DE SOLUCION PROPUESTA',
-            'user_id'     => auth()->id() ?? 1,
-            'date'        => now(),
-        ]);
+            'date'        => date('Y-m-d H:i:s'),
+            'category_id' => $categoryId,
+            'patrimony'   => '1',
+        ];
 
-        if ($request->hasFile('media')) {
-            $help->addMediaFromRequest('media')->toMediaCollection('gallery');
-        }
+        $help = $this->service->registerTicket($sanitized, $initialDetail);
 
         if ($request->ajax()) {
             return [
                 'redirect'        => url('admin/helps'),
                 'ticket'          => $help->id,
                 'showTicketModal' => true,
-                'message'         => trans('brackets/admin-ui::admin.operation.succeeded')
             ];
         }
 
         return redirect('admin/helps');
     }
 
-    /**
-     * Display specified ticket.
-     */
     /**
      * Display specified ticket and its details/history.
      */
@@ -214,13 +233,23 @@ class HelpsController extends Controller
     }
 
     /**
-     * Show edit form.
+     * Show edit form for admin users.
      */
     public function edit(Help $help)
     {
         $this->authorize('admin.help.edit', $help);
 
         return view('admin.help.edit', [
+            'help' => $help,
+        ]);
+    }
+
+    /**
+     * Show edit form for public users (adjuntar documento).
+     */
+    public function editar(Help $help)
+    {
+        return view('admin.help.editar', [
             'help' => $help,
         ]);
     }
@@ -237,29 +266,16 @@ class HelpsController extends Controller
         if ($request->ajax()) {
             $redirectUrl = ($help->statuses && $help->statuses->state_id == 4)
                 ? url('admin/helps/finalizadas')
-                : url('admin/helps/');
+                : url('admin/helps');
 
             return [
                 'redirect'        => $redirectUrl,
                 'ticket'          => $help->id,
-                'showTicketModal' => true
+                'showTicketModal' => true,
             ];
         }
 
         return redirect('admin/helps');
-    }
-
-    /**
-     * Remove specified ticket.
-     */
-        /**
-     * Show edit form for public users (adjuntar documento).
-     */
-    public function editar(Help $help)
-    {
-        return view('admin.help.editar', [
-            'help' => $help,
-        ]);
     }
 
     /**
@@ -288,6 +304,9 @@ class HelpsController extends Controller
         return redirect('/');
     }
 
+    /**
+     * Remove specified help ticket.
+     */
     public function destroy(DestroyHelp $request, Help $help)
     {
         $this->service->deleteTicket($help);
@@ -318,6 +337,31 @@ class HelpsController extends Controller
     }
 
     /**
+     * Endpoint API para obtener datos de funcionario por cedula.
+     */
+    public function api($ci = null)
+    {
+        return response()->json($this->service->getFuncionarioApiData($ci));
+    }
+
+    /**
+     * Generar reporte PDF de ticket.
+     */
+    public function createPDF($id)
+    {
+        $pdf = $this->service->generateTicketPdf($id);
+        return $pdf->download('ReporteDetalle.pdf');
+    }
+
+    /**
+     * Ver/abrir documento adjunto a un ticket.
+     */
+    public function verdocumento($helpId)
+    {
+        return $this->service->viewDocument($helpId);
+    }
+
+    /**
      * Eliminar documento adjunto.
      */
     public function eliminardocumento($helpId)
@@ -331,5 +375,23 @@ class HelpsController extends Controller
         }
 
         return back();
+    }
+
+    /**
+     * Formulario para adjuntar documento a ticket.
+     */
+    public function documento($id)
+    {
+        $help = Help::findOrFail($id);
+        return view('admin.help.createdocument', compact('help'));
+    }
+
+    /**
+     * Guardar documento subido a ticket.
+     */
+    public function storeDocument(Request $request, $id)
+    {
+        $this->service->storeDocument($id, $request);
+        return response()->json(['message' => 'Documento adjuntado con éxito.'], 200);
     }
 }

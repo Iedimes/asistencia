@@ -2,9 +2,15 @@
 
 namespace App\Services;
 
+use App\Http\Requests\Admin\Help\IndexHelp;
+use App\Models\DetailHelp;
 use App\Models\Help;
 use App\Models\SIG008;
 use App\Repositories\HelpRepository;
+use Brackets\AdminListing\Facades\AdminListing;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use PDF;
 
 class HelpService
 {
@@ -114,6 +120,92 @@ class HelpService
     public function bulkDeleteTickets(array $ids): int
     {
         return $this->repository->bulkDeleteHelps($ids);
+    }
+
+    /**
+     * Obtener listado de tickets pendientes (state_id = 9 en ultimo detalle).
+     */
+    public function getPendientesTickets(IndexHelp $request)
+    {
+        $detalleQuery = DetailHelp::select('help_id')
+            ->where('state_id', '=', 9)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('detail_helps as dh2')
+                    ->whereRaw('detail_helps.help_id = dh2.help_id')
+                    ->whereRaw('detail_helps.created_at < dh2.created_at');
+            })
+            ->orderBy('help_id', 'desc');
+
+        return AdminListing::create(Help::class)->processRequestAndGet(
+            $request,
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
+            function ($query) use ($detalleQuery) {
+                $query->whereIn('id', $detalleQuery)->orderBy('id', 'DESC');
+            }
+        );
+    }
+
+    /**
+     * Generar reporte PDF de un ticket.
+     */
+    public function generateTicketPdf(int $helpId)
+    {
+        $help = $this->repository->findOrFail($helpId);
+        $detalle = $this->repository->getHelpDetails($helpId);
+
+        return PDF::loadView('admin.help.pdf.prueba', compact('help', 'detalle'));
+    }
+
+    /**
+     * Ver/abrir documento de un ticket.
+     */
+    public function viewDocument(int $helpId)
+    {
+        $media = $this->repository->getMediaForHelp($helpId);
+
+        if ($media->isEmpty()) {
+            abort(404, 'No se encontraron documentos relacionados.');
+        }
+
+        foreach ($media as $medium) {
+            $filePath = public_path("media/{$medium->id}/{$medium->file_name}");
+
+            if (file_exists($filePath)) {
+                $mimeType = mime_content_type($filePath);
+                $headers = [
+                    'Content-Type' => $mimeType,
+                ];
+
+                return response()->file($filePath, $headers);
+            }
+        }
+
+        abort(404, 'No se encontró ningún archivo válido.');
+    }
+
+    /**
+     * Obtener datos API de funcionario.
+     */
+    public function getFuncionarioApiData(?string $ci)
+    {
+        return $this->repository->getFuncionarioApiData($ci);
+    }
+
+    /**
+     * Guardar archivo adjunto a un ticket.
+     */
+    public function storeDocument(int $helpId, Request $request): Help
+    {
+        $help = $this->repository->findOrFail($helpId);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $help->addMedia($file)->toMediaCollection('gallery');
+        }
+
+        return $help;
     }
 
     /**

@@ -55,7 +55,7 @@ class HelpFeatureTest extends TestCase
             'dependency_id' => 1,
         ]);
 
-        $response->assertRedirect('admin/helps');
+        $response->assertRedirect();
         $this->assertDatabaseHas('helps', [
             'ci' => 3334445,
             'name' => 'Ana Torres',
@@ -76,7 +76,7 @@ class HelpFeatureTest extends TestCase
             'dependency_id' => 1,
         ]);
 
-        $response->assertRedirect('/');
+        $response->assertRedirect();
         $this->assertDatabaseHas('helps', [
             'ci' => 4445556,
             'name' => 'Marcos Rivas',

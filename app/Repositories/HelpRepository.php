@@ -6,6 +6,7 @@ use App\Models\DetailHelp;
 use App\Models\Funcionario;
 use App\Models\Help;
 use App\Models\Medium;
+use App\Models\RHM006;
 use App\Models\Usuario;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -89,6 +90,58 @@ class HelpRepository
             ->where('UsuCed', $cedula)
             ->where('Usuest', 'A')
             ->first();
+    }
+
+    /**
+     * Obtener archivos media asociados a un ticket.
+     */
+    public function getMediaForHelp(int $helpId): Collection
+    {
+        return Medium::where('model_id', $helpId)->get();
+    }
+
+    /**
+     * Obtener historial de detalles para reporte PDF de un ticket.
+     */
+    public function getHelpDetails(int $helpId): Collection
+    {
+        return DetailHelp::where('help_id', $helpId)
+            ->orderBy('id', 'asc')
+            ->orderBy('help_id', 'asc')
+            ->get();
+    }
+
+    /**
+     * Buscar funcionario para API.
+     */
+    public function getFuncionarioApiData(?string $ci)
+    {
+        if ($ci) {
+            $x = RHM006::select('FuncNombr', 'FuncApell', 'FunFecNac')
+                ->where('FuncEst', 'A')
+                ->where('FuncNro', $ci)
+                ->orderBy('FunFecNac')
+                ->first();
+
+            if ($x) {
+                $x->FuncNombr = trim($x->FuncNombr ?? '');
+                $x->FuncApell = trim($x->FuncApell ?? '');
+            }
+            return $x;
+        }
+
+        $x = RHM006::select('FuncNombr', 'FuncApell', 'FunFecNac')
+            ->where('FuncEst', 'A')
+            ->orderBy('FunFecNac')
+            ->get();
+
+        $x->transform(function ($item) {
+            $item->FuncNombr = trim($item->FuncNombr ?? '');
+            $item->FuncApell = trim($item->FuncApell ?? '');
+            return $item;
+        });
+
+        return $x;
     }
 
     /**
