@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SIG008 extends Model
 {
+
+    public function getConnectionName()
+    {
+        if (app()->environment('testing') || env('DB_CONNECTION') === 'pgsql') {
+            return config('database.default');
+        }
+
+        return $this->connection;
+    }
+
     protected $table = 'SIG008';
     //protected $primaryKey = 'VivPer';
     //public $keyType = 'string';

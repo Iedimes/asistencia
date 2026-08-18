@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class RHM006 extends Model
 {
+
+    public function getConnectionName()
+    {
+        if (app()->environment('testing') || env('DB_CONNECTION') === 'pgsql') {
+            return config('database.default');
+        }
+
+        return $this->connection;
+    }
+
     protected $table = 'RHM006';
     //protected $primaryKey = 'VivPer';
     //public $keyType = 'string';

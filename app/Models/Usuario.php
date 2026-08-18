@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model
 {
+
+    public function getConnectionName()
+    {
+        if (app()->environment('testing') || env('DB_CONNECTION') === 'pgsql') {
+            return config('database.default');
+        }
+
+        return $this->connection;
+    }
+
     protected $table = 'USUARIO'; // nombre exacto de la tabla
     protected $primaryKey = 'UsuCod'; // clave primaria
 

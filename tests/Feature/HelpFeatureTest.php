@@ -64,6 +64,8 @@ class HelpFeatureTest extends TestCase
     /** @test */
     public function cedula_lookup_endpoint_returns_json_response()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->actingAs($this->admin, 'admin')
             ->get('/cedula/9999999999');
 

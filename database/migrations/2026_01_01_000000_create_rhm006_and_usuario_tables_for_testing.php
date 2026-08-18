@@ -23,8 +23,8 @@ class CreateRhm006AndUsuarioTablesForTesting extends Migration
             });
         }
 
-        if (!Schema::hasTable('usuario')) {
-            Schema::create('usuario', function (Blueprint $table) {
+        if (!Schema::hasTable('USUARIO')) {
+            Schema::create('USUARIO', function (Blueprint $table) {
                 $table->string('UsuCed')->primary();
                 $table->string('UsuNombre')->nullable();
                 $table->string('UsuCod')->nullable();
@@ -42,6 +42,6 @@ class CreateRhm006AndUsuarioTablesForTesting extends Migration
     public function down()
     {
         Schema::dropIfExists('RHM006');
-        Schema::dropIfExists('usuario');
+        Schema::dropIfExists('USUARIO');
     }
 }
