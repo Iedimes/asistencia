@@ -51,4 +51,9 @@ class Funcionario extends Model
     {
         return url('/admin/funcionarios/'.$this->getKey());
     }
+
+    public function dpto()
+    {
+        return $this->hasOne(SIG008::class, 'DepenCod', 'DepenCod');
+    }
 }

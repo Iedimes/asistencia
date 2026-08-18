@@ -74,7 +74,8 @@ class HelpRepository
      */
     public function findPersonInRrhh(string $cedula)
     {
-        return Funcionario::where('FuncNro', $cedula)
+        return Funcionario::with('dpto')
+            ->where('FuncNro', $cedula)
             ->where('FuncEst', 'A')
             ->first();
     }
@@ -84,7 +85,8 @@ class HelpRepository
      */
     public function findPersonInUsuario(string $cedula)
     {
-        return Usuario::where('UsuCed', $cedula)
+        return Usuario::with('dpto')
+            ->where('UsuCed', $cedula)
             ->where('Usuest', 'A')
             ->first();
     }

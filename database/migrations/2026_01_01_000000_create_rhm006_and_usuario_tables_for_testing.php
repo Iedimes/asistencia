@@ -32,6 +32,13 @@ class CreateRhm006AndUsuarioTablesForTesting extends Migration
                 $table->string('DepenCod')->nullable();
             });
         }
+
+        if (!Schema::hasTable('SIG008')) {
+            Schema::create('SIG008', function (Blueprint $table) {
+                $table->string('DepenCod')->primary();
+                $table->string('DepenDes')->nullable();
+            });
+        }
     }
 
     /**
@@ -43,5 +50,6 @@ class CreateRhm006AndUsuarioTablesForTesting extends Migration
     {
         Schema::dropIfExists('RHM006');
         Schema::dropIfExists('USUARIO');
+        Schema::dropIfExists('SIG008');
     }
 }

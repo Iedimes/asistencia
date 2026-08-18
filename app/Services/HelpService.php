@@ -38,15 +38,16 @@ class HelpService
         $ci = $this->repository->findPersonInRrhh($ced);
 
         if ($ci) {
+            $dpto = $ci->dpto;
             return [
                 'error'  => false,
                 'cedula' => [
-                    'FuncNom' => trim($ci->FuncNom),
-                    'FUsuCod' => trim($ci->FUsuCod),
-                    'dpto'    => $ci->dpto ? [
-                        'DepenDes' => $ci->dpto->DepenDes,
-                        'DepenCod' => $ci->dpto->DepenCod,
-                    ] : null,
+                    'FuncNom' => is_string($ci->FuncNom) ? trim($ci->FuncNom) : ($ci->FuncNom ?? ''),
+                    'FUsuCod' => is_string($ci->FUsuCod) ? trim($ci->FUsuCod) : ($ci->FUsuCod ?? ''),
+                    'dpto'    => [
+                        'DepenDes' => $dpto ? (string) $dpto->DepenDes : '',
+                        'DepenCod' => $dpto ? (string) $dpto->DepenCod : '',
+                    ],
                 ]
             ];
         }
@@ -55,15 +56,16 @@ class HelpService
         $usuario = $this->repository->findPersonInUsuario($ced);
 
         if ($usuario) {
+            $dpto = $usuario->dpto;
             return [
                 'error'  => false,
                 'cedula' => [
-                    'FuncNom' => trim($usuario->UsuNombre),
-                    'FUsuCod' => trim($usuario->UsuCod),
-                    'dpto'    => $usuario->dpto ? [
-                        'DepenDes' => $usuario->dpto->DepenDes,
-                        'DepenCod' => $usuario->dpto->DepenCod,
-                    ] : null,
+                    'FuncNom' => is_string($usuario->UsuNombre) ? trim($usuario->UsuNombre) : ($usuario->UsuNombre ?? ''),
+                    'FUsuCod' => is_string($usuario->UsuCod) ? trim($usuario->UsuCod) : ($usuario->UsuCod ?? ''),
+                    'dpto'    => [
+                        'DepenDes' => $dpto ? (string) $dpto->DepenDes : '',
+                        'DepenCod' => $dpto ? (string) $dpto->DepenCod : '',
+                    ],
                 ]
             ];
         }
