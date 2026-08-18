@@ -145,7 +145,12 @@ class HelpsController extends Controller
         }
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/helps'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect'        => url('admin/helps'),
+                'ticket'          => $help->id,
+                'showTicketModal' => true,
+                'message'         => trans('brackets/admin-ui::admin.operation.succeeded')
+            ];
         }
 
         return redirect('admin/helps');
