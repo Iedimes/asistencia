@@ -191,10 +191,26 @@ class HelpsController extends Controller
     /**
      * Display specified ticket.
      */
-    public function show(Help $help)
+    /**
+     * Display specified ticket and its details/history.
+     */
+    public function show(Help $help, IndexHelp $request)
     {
-        $this->authorize('admin.help.show', $help);
-        return view('admin.help.show', compact('help'));
+        $id = $help->id;
+        $data = AdminListing::create(DetailHelp::class)->processRequestAndGet(
+            $request,
+            ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
+            ['id', 'solution'],
+            function ($query) use ($id) {
+                $query->where('detail_helps.help_id', '=', $id);
+            }
+        );
+
+        if ($request->ajax()) {
+            return ['data' => $data];
+        }
+
+        return view('admin.help.show', compact('help', 'data'));
     }
 
     /**

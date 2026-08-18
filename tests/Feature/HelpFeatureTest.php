@@ -29,9 +29,10 @@ class HelpFeatureTest extends TestCase
         $p2 = Permission::firstOrCreate(['name' => 'admin.help.create', 'guard_name' => 'admin']);
         $p3 = Permission::firstOrCreate(['name' => 'admin.help.edit', 'guard_name' => 'admin']);
         $p4 = Permission::firstOrCreate(['name' => 'admin.help.delete', 'guard_name' => 'admin']);
+        $p5 = Permission::firstOrCreate(['name' => 'admin.help.show', 'guard_name' => 'admin']);
 
         $this->admin = factory(AdminUser::class)->create();
-        $this->admin->givePermissionTo([$pAdmin, $p1, $p2, $p3, $p4]);
+        $this->admin->givePermissionTo([$pAdmin, $p1, $p2, $p3, $p4, $p5]);
     }
 
     /** @test */
@@ -97,6 +98,27 @@ class HelpFeatureTest extends TestCase
 
         $response = $this->get("/{$help->id}/editar");
         $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function authenticated_admin_can_view_help_show_detail()
+    {
+        $state = State::first();
+        $category = Category::first();
+        $help = factory(Help::class)->create();
+        factory(DetailHelp::class)->create([
+            'help_id' => $help->id,
+            'state_id' => $state->id,
+            'category_id' => $category->id,
+            'user_id' => $this->admin->id,
+        ]);
+
+        $response = $this->actingAs($this->admin, 'admin')
+            ->get("/admin/helps/{$help->id}/show");
+
+        $response->assertStatus(200);
+        $response->assertViewHas('data');
+        $response->assertViewHas('help');
     }
 
     /** @test */
