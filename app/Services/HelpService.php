@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Help;
+use App\Models\SIG008;
 use App\Repositories\HelpRepository;
 
 class HelpService
@@ -39,14 +40,21 @@ class HelpService
 
         if ($ci) {
             $dpto = $ci->dpto;
+            if (!$dpto && !empty($ci->DepenCod)) {
+                $dpto = SIG008::where('DepenCod', trim($ci->DepenCod))->first();
+            }
+
+            $depenDes = $dpto ? trim($dpto->DepenDes) : '';
+            $depenCod = $dpto ? trim($dpto->DepenCod) : trim($ci->DepenCod ?? '');
+
             return [
                 'error'  => false,
                 'cedula' => [
                     'FuncNom' => is_string($ci->FuncNom) ? trim($ci->FuncNom) : ($ci->FuncNom ?? ''),
                     'FUsuCod' => is_string($ci->FUsuCod) ? trim($ci->FUsuCod) : ($ci->FUsuCod ?? ''),
                     'dpto'    => [
-                        'DepenDes' => $dpto ? (string) $dpto->DepenDes : '',
-                        'DepenCod' => $dpto ? (string) $dpto->DepenCod : '',
+                        'DepenDes' => $depenDes,
+                        'DepenCod' => $depenCod,
                     ],
                 ]
             ];
@@ -57,14 +65,21 @@ class HelpService
 
         if ($usuario) {
             $dpto = $usuario->dpto;
+            if (!$dpto && !empty($usuario->DepenCod)) {
+                $dpto = SIG008::where('DepenCod', trim($usuario->DepenCod))->first();
+            }
+
+            $depenDes = $dpto ? trim($dpto->DepenDes) : '';
+            $depenCod = $dpto ? trim($dpto->DepenCod) : trim($usuario->DepenCod ?? '');
+
             return [
                 'error'  => false,
                 'cedula' => [
                     'FuncNom' => is_string($usuario->UsuNombre) ? trim($usuario->UsuNombre) : ($usuario->UsuNombre ?? ''),
                     'FUsuCod' => is_string($usuario->UsuCod) ? trim($usuario->UsuCod) : ($usuario->UsuCod ?? ''),
                     'dpto'    => [
-                        'DepenDes' => $dpto ? (string) $dpto->DepenDes : '',
-                        'DepenCod' => $dpto ? (string) $dpto->DepenCod : '',
+                        'DepenDes' => $depenDes,
+                        'DepenCod' => $depenCod,
                     ],
                 ]
             ];

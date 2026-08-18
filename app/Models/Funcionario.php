@@ -26,6 +26,7 @@ class Funcionario extends Model
         'FuncNro',
         'FuncNom',
         'FUsuCod',
+        'DepenCod',
     ];
 
     protected $dates = [
@@ -34,6 +35,11 @@ class Funcionario extends Model
     ];
 
     protected $appends = ['resource_url'];
+
+    public function dpto()
+    {
+        return $this->hasOne(SIG008::class, 'DepenCod', 'DepenCod');
+    }
 
     /* ************************ ACCESSORS ************************* */
 
@@ -50,10 +56,5 @@ class Funcionario extends Model
     public function getResourceUrlAttribute()
     {
         return url('/admin/funcionarios/'.$this->getKey());
-    }
-
-    public function dpto()
-    {
-        return $this->hasOne(SIG008::class, 'DepenCod', 'DepenCod');
     }
 }
