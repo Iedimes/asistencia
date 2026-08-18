@@ -20,6 +20,7 @@ class CreateRhm006AndUsuarioTablesForTesting extends Migration
                 $table->string('FUsuCod')->nullable();
                 $table->string('FuncEst')->default('A');
                 $table->string('DepenCod')->nullable();
+                $table->string('FuncADpto')->nullable();
             });
         }
 

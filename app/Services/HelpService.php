@@ -40,12 +40,12 @@ class HelpService
 
         if ($ci) {
             $dpto = $ci->dpto;
-            if (!$dpto && !empty($ci->DepenCod)) {
-                $dpto = SIG008::where('DepenCod', trim($ci->DepenCod))->first();
+            if (!$dpto && !empty($ci->FuncADpto)) {
+                $dpto = SIG008::where('DepenCod', trim($ci->FuncADpto))->first();
             }
 
             $depenDes = $dpto ? trim($dpto->DepenDes) : '';
-            $depenCod = $dpto ? trim($dpto->DepenCod) : trim($ci->DepenCod ?? '');
+            $depenCod = $dpto ? trim($dpto->DepenCod) : trim($ci->FuncADpto ?? '');
 
             return [
                 'error'  => false,
