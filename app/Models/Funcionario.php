@@ -6,6 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Funcionario extends Model
 {
+    public function getConnectionName()
+    {
+        if (app()->environment('testing') || env('DB_CONNECTION') === 'pgsql') {
+            return config('database.default');
+        }
+
+        return $this->connection;
+    }
+
     protected $table = 'RHM006';
     protected $primaryKey = 'FuncNro';
     public $keyType = 'string';
