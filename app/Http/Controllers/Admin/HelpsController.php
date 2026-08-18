@@ -236,6 +236,37 @@ class HelpsController extends Controller
     /**
      * Remove specified ticket.
      */
+        /**
+     * Show edit form for public users (adjuntar documento).
+     */
+    public function editar(Help $help)
+    {
+        return view('admin.help.editar', [
+            'help' => $help,
+        ]);
+    }
+
+    /**
+     * Guardar solicitud publica con documento adjunto.
+     */
+    public function guardarSolicitud(UpdateHelp $request, Help $help)
+    {
+        $sanitized = $request->getSanitized();
+
+        if ($request->hasFile('media')) {
+            $help->addMediaFromRequest('media')
+                 ->toMediaCollection('gallery');
+        }
+
+        $this->service->updateTicket($help, $sanitized);
+
+        if ($request->ajax()) {
+            return ['redirect' => '/', 'showTicketModal' => false];
+        }
+
+        return redirect('/');
+    }
+
     public function destroy(DestroyHelp $request, Help $help)
     {
         $this->service->deleteTicket($help);

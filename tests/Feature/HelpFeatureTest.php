@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\DetailHelp;
 use App\Models\Help;
 use App\Models\State;
 use Brackets\AdminAuth\Models\AdminUser;
@@ -79,6 +80,23 @@ class HelpFeatureTest extends TestCase
             'ci' => 4445556,
             'name' => 'Marcos Rivas',
         ]);
+    }
+
+    /** @test */
+    public function public_user_can_access_editar_route()
+    {
+        $state = State::first();
+        $category = Category::first();
+        $help = factory(Help::class)->create();
+        factory(DetailHelp::class)->create([
+            'help_id' => $help->id,
+            'state_id' => $state->id,
+            'category_id' => $category->id,
+            'user_id' => $this->admin->id,
+        ]);
+
+        $response = $this->get("/{$help->id}/editar");
+        $response->assertStatus(200);
     }
 
     /** @test */
