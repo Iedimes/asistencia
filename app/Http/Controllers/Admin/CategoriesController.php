@@ -9,7 +9,7 @@ use App\Http\Requests\Admin\Category\IndexCategory;
 use App\Http\Requests\Admin\Category\StoreCategory;
 use App\Http\Requests\Admin\Category\UpdateCategory;
 use App\Models\Category;
-use Brackets\AdminListing\Facades\AdminListing;
+use App\Services\CategoryService;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -17,11 +17,16 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CategoriesController extends Controller
 {
+    private CategoryService $service;
+
+    public function __construct(CategoryService $service)
+    {
+        $this->service = $service;
+    }
 
     /**
      * Display a listing of the resource.
@@ -31,17 +36,7 @@ class CategoriesController extends Controller
      */
     public function index(IndexCategory $request)
     {
-        // create and AdminListing instance for a specific model and
-        $data = AdminListing::create(Category::class)->processRequestAndGet(
-            // pass the request with params
-            $request,
-
-            // set columns to query
-            ['id', 'name'],
-
-            // set columns to searchIn
-            ['id', 'name']
-        );
+        $data = $this->service->listCategories($request);
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
@@ -76,11 +71,9 @@ class CategoriesController extends Controller
      */
     public function store(StoreCategory $request)
     {
-        // Sanitize input
         $sanitized = $request->getSanitized();
 
-        // Store the Category
-        $category = Category::create($sanitized);
+        $this->service->createCategory($sanitized);
 
         if ($request->ajax()) {
             return ['redirect' => url('admin/categories'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
@@ -99,8 +92,6 @@ class CategoriesController extends Controller
     public function show(Category $category)
     {
         $this->authorize('admin.category.show', $category);
-
-        // TODO your code goes here
     }
 
     /**
@@ -113,7 +104,6 @@ class CategoriesController extends Controller
     public function edit(Category $category)
     {
         $this->authorize('admin.category.edit', $category);
-
 
         return view('admin.category.edit', [
             'category' => $category,
@@ -129,11 +119,9 @@ class CategoriesController extends Controller
      */
     public function update(UpdateCategory $request, Category $category)
     {
-        // Sanitize input
         $sanitized = $request->getSanitized();
 
-        // Update changed values Category
-        $category->update($sanitized);
+        $this->service->updateCategory($category, $sanitized);
 
         if ($request->ajax()) {
             return [
@@ -155,7 +143,7 @@ class CategoriesController extends Controller
      */
     public function destroy(DestroyCategory $request, Category $category)
     {
-        $category->delete();
+        $this->service->deleteCategory($category);
 
         if ($request->ajax()) {
             return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
@@ -171,17 +159,9 @@ class CategoriesController extends Controller
      * @throws Exception
      * @return Response|bool
      */
-    public function bulkDestroy(BulkDestroyCategory $request) : Response
+    public function bulkDestroy(BulkDestroyCategory $request): Response
     {
-        DB::transaction(static function () use ($request) {
-            collect($request->data['ids'])
-                ->chunk(1000)
-                ->each(static function ($bulkChunk) {
-                    Category::whereIn('id', $bulkChunk)->delete();
-
-                    // TODO your code goes here
-                });
-        });
+        $this->service->bulkDeleteCategories($request->data['ids']);
 
         return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
     }

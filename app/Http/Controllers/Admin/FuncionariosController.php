@@ -9,8 +9,7 @@ use App\Http\Requests\Admin\Funcionario\IndexFuncionario;
 use App\Http\Requests\Admin\Funcionario\StoreFuncionario;
 use App\Http\Requests\Admin\Funcionario\UpdateFuncionario;
 use App\Models\Funcionario;
-use App\Models\Usuario;
-use Brackets\AdminListing\Facades\AdminListing;
+use App\Services\FuncionarioService;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -18,13 +17,16 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use Illuminate\Pagination\LengthAwarePaginator;
-
 
 class FuncionariosController extends Controller
 {
+    private FuncionarioService $service;
+
+    public function __construct(FuncionarioService $service)
+    {
+        $this->service = $service;
+    }
 
     /**
      * Display a listing of the resource.
@@ -32,160 +34,19 @@ class FuncionariosController extends Controller
      * @param IndexFuncionario $request
      * @return array|Factory|View
      */
-
-
     public function index(IndexFuncionario $request)
-{
-    $search = $request->search;
+    {
+        $data = $this->service->searchAndPaginate($request);
 
-    $funcionarios = collect();
-    $usuarios = collect();
-
-    if ($search) {
-        $words = preg_split('/\s+/', trim($search)); // divide por espacios
-
-        if (!is_numeric($search)) {
-            // FUNCIONARIOS - RRHH
-            $funcionarios = Funcionario::where('FuncEst', 'A')
-                ->where(function ($query) use ($words) {
-                    $query->where(function ($q) use ($words) {
-                        foreach ($words as $word) {
-                            $q->orWhere('FuncNom', 'like', "%{$word}%")
-                              ->orWhere('FUsuCod', 'like', "%{$word}%");
-                        }
-                    });
-                })
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'FuncNro' => $item->FuncNro,
-                        'FuncNom' => trim($item->FuncNom),
-                        'FUsuCod' => trim($item->FUsuCod),
-                        'Origen' => 'RRHH',
-                    ];
-                });
-
-            // USUARIOS - SEGURIDAD
-            $usuarios = Usuario::where('Usuest', 'A')
-                ->where(function ($query) use ($words) {
-                    $query->where(function ($q) use ($words) {
-                        foreach ($words as $word) {
-                            $q->orWhere('UsuNombre', 'like', "%{$word}%")
-                              ->orWhere('UsuCod', 'like', "%{$word}%");
-                        }
-                    });
-                })
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'FuncNro' => trim($item->UsuCed),
-                        'FuncNom' => trim($item->UsuNombre),
-                        'FUsuCod' => trim($item->UsuCod),
-                        'Origen' => 'SEGURIDAD',
-                    ];
-                });
-
-        } else {
-            // Buscar por CÉDULA
-            $funcionarios = Funcionario::where('FuncEst', 'A')
-                ->where('FuncNro', $search)
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'FuncNro' => $item->FuncNro,
-                        'FuncNom' => trim($item->FuncNom),
-                        'FUsuCod' => trim($item->FUsuCod),
-                        'Origen' => 'RRHH',
-                    ];
-                });
-
-            $usuarios = Usuario::where('Usuest', 'A')
-                ->where('UsuCed', $search)
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'FuncNro' => trim($item->UsuCed),
-                        'FuncNom' => trim($item->UsuNombre),
-                        'FUsuCod' => trim($item->UsuCod),
-                        'Origen' => 'SEGURIDAD',
-                    ];
-                });
+        if ($request->ajax()) {
+            if ($request->has('bulk')) {
+                return ['bulkItems' => $data->pluck('FuncNro')];
+            }
+            return ['data' => $data];
         }
 
-    } else {
-        // Sin búsqueda, listar funcionarios
-        $funcionarios = Funcionario::where('FuncEst', 'A')
-            ->where('FuncNro', '>', 99)
-            ->orderBy('FuncNom')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'FuncNro' => $item->FuncNro,
-                    'FuncNom' => trim($item->FuncNom),
-                    'FUsuCod' => trim($item->FUsuCod),
-                    'Origen' => 'RRHH',
-                ];
-            });
-
-        $usuarios = collect();
+        return view('admin.funcionario.index', ['data' => $data]);
     }
-
-    // Unir y paginar
-    $merged = collect($funcionarios)->merge($usuarios)->values(); // aseguramos colección
-
-    $page = $request->input('page', 1);
-    $perPage = $request->input('per_page', 10);
-    $total = $merged->count();
-    $results = $merged->forPage($page, $perPage)->values();
-
-    $data = new LengthAwarePaginator($results, $total, $perPage, $page, [
-        'path' => $request->url(),
-        'query' => $request->query(),
-    ]);
-
-
-    if ($request->ajax()) {
-        if ($request->has('bulk')) {
-            return ['bulkItems' => $data->pluck('FuncNro')];
-        }
-        return ['data' => $data];
-    }
-
-    return view('admin.funcionario.index', ['data' => $data]);
-}
-
-
-
-
-
-
-
-
-    // public function index(IndexFuncionario $request)
-    // {
-    //     // create and AdminListing instance for a specific model and
-    //     $data = AdminListing::create(Funcionario::class)->processRequestAndGet(
-    //         // pass the request with params
-    //         $request,
-
-    //         // set columns to query
-    //         ['FuncNro', 'FuncNom', 'FUsuCod'],
-
-    //         // set columns to searchIn
-    //         ['FuncNom']
-    //     );
-
-    //     if ($request->ajax()) {
-    //         if ($request->has('bulk')) {
-    //             return [
-    //                 'bulkItems' => $data->pluck('FuncNro')
-    //             ];
-    //         }
-    //         return ['data' => $data];
-    //     }
-
-    //     return view('admin.funcionario.index', ['data' => $data]);
-    // }
 
     /**
      * Show the form for creating a new resource.
@@ -208,11 +69,9 @@ class FuncionariosController extends Controller
      */
     public function store(StoreFuncionario $request)
     {
-        // Sanitize input
         $sanitized = $request->getSanitized();
 
-        // Store the Funcionario
-        $funcionario = Funcionario::create($sanitized);
+        $this->service->createFuncionario($sanitized);
 
         if ($request->ajax()) {
             return ['redirect' => url('admin/funcionarios'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
@@ -231,8 +90,6 @@ class FuncionariosController extends Controller
     public function show(Funcionario $funcionario)
     {
         $this->authorize('admin.funcionario.show', $funcionario);
-
-        // TODO your code goes here
     }
 
     /**
@@ -245,7 +102,6 @@ class FuncionariosController extends Controller
     public function edit(Funcionario $funcionario)
     {
         $this->authorize('admin.funcionario.edit', $funcionario);
-
 
         return view('admin.funcionario.edit', [
             'funcionario' => $funcionario,
@@ -261,11 +117,9 @@ class FuncionariosController extends Controller
      */
     public function update(UpdateFuncionario $request, Funcionario $funcionario)
     {
-        // Sanitize input
         $sanitized = $request->getSanitized();
 
-        // Update changed values Funcionario
-        $funcionario->update($sanitized);
+        $this->service->updateFuncionario($funcionario, $sanitized);
 
         if ($request->ajax()) {
             return [
@@ -287,7 +141,7 @@ class FuncionariosController extends Controller
      */
     public function destroy(DestroyFuncionario $request, Funcionario $funcionario)
     {
-        $funcionario->delete();
+        $this->service->deleteFuncionario($funcionario);
 
         if ($request->ajax()) {
             return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
@@ -303,17 +157,9 @@ class FuncionariosController extends Controller
      * @throws Exception
      * @return Response|bool
      */
-    public function bulkDestroy(BulkDestroyFuncionario $request) : Response
+    public function bulkDestroy(BulkDestroyFuncionario $request): Response
     {
-        DB::transaction(static function () use ($request) {
-            collect($request->data['ids'])
-                ->chunk(1000)
-                ->each(static function ($bulkChunk) {
-                    Funcionario::whereIn('id', $bulkChunk)->delete();
-
-                    // TODO your code goes here
-                });
-        });
+        $this->service->bulkDeleteFuncionarios($request->data['ids']);
 
         return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
     }

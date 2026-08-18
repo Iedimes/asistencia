@@ -9,7 +9,7 @@ use App\Http\Requests\Admin\State\IndexState;
 use App\Http\Requests\Admin\State\StoreState;
 use App\Http\Requests\Admin\State\UpdateState;
 use App\Models\State;
-use Brackets\AdminListing\Facades\AdminListing;
+use App\Services\StateService;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -17,11 +17,16 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class StatesController extends Controller
 {
+    private StateService $service;
+
+    public function __construct(StateService $service)
+    {
+        $this->service = $service;
+    }
 
     /**
      * Display a listing of the resource.
@@ -31,17 +36,7 @@ class StatesController extends Controller
      */
     public function index(IndexState $request)
     {
-        // create and AdminListing instance for a specific model and
-        $data = AdminListing::create(State::class)->processRequestAndGet(
-            // pass the request with params
-            $request,
-
-            // set columns to query
-            ['id', 'name'],
-
-            // set columns to searchIn
-            ['id', 'name']
-        );
+        $data = $this->service->listStates($request);
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
@@ -76,11 +71,9 @@ class StatesController extends Controller
      */
     public function store(StoreState $request)
     {
-        // Sanitize input
         $sanitized = $request->getSanitized();
 
-        // Store the State
-        $state = State::create($sanitized);
+        $this->service->createState($sanitized);
 
         if ($request->ajax()) {
             return ['redirect' => url('admin/states'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
@@ -99,8 +92,6 @@ class StatesController extends Controller
     public function show(State $state)
     {
         $this->authorize('admin.state.show', $state);
-
-        // TODO your code goes here
     }
 
     /**
@@ -113,7 +104,6 @@ class StatesController extends Controller
     public function edit(State $state)
     {
         $this->authorize('admin.state.edit', $state);
-
 
         return view('admin.state.edit', [
             'state' => $state,
@@ -129,11 +119,9 @@ class StatesController extends Controller
      */
     public function update(UpdateState $request, State $state)
     {
-        // Sanitize input
         $sanitized = $request->getSanitized();
 
-        // Update changed values State
-        $state->update($sanitized);
+        $this->service->updateState($state, $sanitized);
 
         if ($request->ajax()) {
             return [
@@ -155,7 +143,7 @@ class StatesController extends Controller
      */
     public function destroy(DestroyState $request, State $state)
     {
-        $state->delete();
+        $this->service->deleteState($state);
 
         if ($request->ajax()) {
             return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
@@ -171,17 +159,9 @@ class StatesController extends Controller
      * @throws Exception
      * @return Response|bool
      */
-    public function bulkDestroy(BulkDestroyState $request) : Response
+    public function bulkDestroy(BulkDestroyState $request): Response
     {
-        DB::transaction(static function () use ($request) {
-            collect($request->data['ids'])
-                ->chunk(1000)
-                ->each(static function ($bulkChunk) {
-                    State::whereIn('id', $bulkChunk)->delete();
-
-                    // TODO your code goes here
-                });
-        });
+        $this->service->bulkDeleteStates($request->data['ids']);
 
         return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
     }

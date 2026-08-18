@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Funcionario extends Model
 {
-
     protected $table = 'RHM006';
     protected $primaryKey = 'FuncNro';
     public $keyType = 'string';
@@ -18,19 +17,26 @@ class Funcionario extends Model
         'FuncNro',
         'FuncNom',
         'FUsuCod',
-
     ];
-
 
     protected $dates = [
         'created_at',
         'updated_at',
-
     ];
 
     protected $appends = ['resource_url'];
 
-    /* ************************ ACCESSOR ************************* */
+    /* ************************ ACCESSORS ************************* */
+
+    public function getFuncNomAttribute($value)
+    {
+        return is_string($value) ? trim($value) : $value;
+    }
+
+    public function getFUsuCodAttribute($value)
+    {
+        return is_string($value) ? trim($value) : $value;
+    }
 
     public function getResourceUrlAttribute()
     {
