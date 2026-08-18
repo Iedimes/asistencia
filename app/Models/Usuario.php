@@ -6,24 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model
 {
+    protected $table = 'USUARIO';
+    protected $primaryKey = 'UsuCod';
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
+    public $timestamps = false;
+    protected $connection = 'sqlsrv';
 
     public function getConnectionName()
     {
-        if (app()->environment('testing') || env('DB_CONNECTION') === 'pgsql') {
+        if (app()->environment('testing')) {
             return config('database.default');
         }
 
         return $this->connection;
     }
-
-    protected $table = 'USUARIO'; // nombre exacto de la tabla
-    protected $primaryKey = 'UsuCod'; // clave primaria
-
-    protected $keyType = 'string';      // 👈 importante
-    public $incrementing = false;       // 👈 importante
-
-    public $timestamps = false; // porque no usás created_at/updated_at
-    protected $connection = 'sqlsrv';
 
     protected $fillable = [
         'UsuCod',
