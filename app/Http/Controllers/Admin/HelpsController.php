@@ -49,6 +49,20 @@ class HelpsController extends Controller
                     ->whereRaw('detail_helps.created_at < dh2.created_at');
             });
 
+        // Obtener cola ordenada por fecha de llegada para calcular posición ($item->order)
+        $ordersBeingAttended = Help::whereIn('id', $detalleQuery)
+            ->select('id', 'created_at')
+            ->without(['statuses', 'tecnico', 'detailsHelps', 'documento'])
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->values()
+            ->map(function ($order, $index) {
+                $order->position = $index + 1;
+                return $order;
+            });
+
+        $positionMap = $ordersBeingAttended->pluck('position', 'id');
+
         $data = AdminListing::create(Help::class)->processRequestAndGet(
             $request,
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
@@ -57,6 +71,11 @@ class HelpsController extends Controller
                 $query->whereIn('id', $detalleQuery)->orderBy('id', 'ASC');
             }
         );
+
+        $data->getCollection()->transform(function ($item) use ($positionMap) {
+            $item->order = $positionMap[$item->id] ?? null;
+            return $item;
+        });
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
