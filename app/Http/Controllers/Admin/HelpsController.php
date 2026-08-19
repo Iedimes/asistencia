@@ -73,6 +73,7 @@ class HelpsController extends Controller
         );
 
         $data->getCollection()->transform(function ($item) use ($positionMap) {
+            $item->position = $positionMap[$item->id] ?? null;
             $item->order = $positionMap[$item->id] ?? null;
             return $item;
         });
