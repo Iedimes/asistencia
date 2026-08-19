@@ -30,7 +30,7 @@
     </table>
 <br>
 <center><h2>DETALLE DE ASISTENCIA </h2></center>
-<<br>
+<br>
 <table>
     <tbody>
         <br>
