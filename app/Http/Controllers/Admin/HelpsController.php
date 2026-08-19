@@ -40,17 +40,21 @@ class HelpsController extends Controller
      */
     public function index(Help $help, IndexHelp $request)
     {
-        $detalleIds = DetailHelp::select(DB::raw('MAX(id) as last_id'))
-            ->groupBy('help_id')
-            ->havingRaw('MAX(state_id) != ?', [4])
-            ->pluck('last_id');
+        $detalleQuery = DetailHelp::select('help_id')
+            ->where('state_id', '!=', 4)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('detail_helps as dh2')
+                    ->whereRaw('detail_helps.help_id = dh2.help_id')
+                    ->whereRaw('detail_helps.created_at < dh2.created_at');
+            });
 
         $data = AdminListing::create(Help::class)->processRequestAndGet(
             $request,
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            function ($query) use ($detalleIds) {
-                $query->whereIn('id', $detalleIds)->orderBy('id', 'ASC');
+            function ($query) use ($detalleQuery) {
+                $query->whereIn('id', $detalleQuery)->orderBy('id', 'ASC');
             }
         );
 
@@ -71,17 +75,21 @@ class HelpsController extends Controller
      */
     public function finalizadas(IndexHelp $request)
     {
-        $detalleIds = DetailHelp::select(DB::raw('MAX(id) as last_id'))
-            ->groupBy('help_id')
-            ->havingRaw('MAX(state_id) = ?', [4])
-            ->pluck('last_id');
+        $detalleQuery = DetailHelp::select('help_id')
+            ->where('state_id', '=', 4)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('detail_helps as dh2')
+                    ->whereRaw('detail_helps.help_id = dh2.help_id')
+                    ->whereRaw('detail_helps.created_at < dh2.created_at');
+            });
 
         $data = AdminListing::create(Help::class)->processRequestAndGet(
             $request,
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            function ($query) use ($detalleIds) {
-                $query->whereIn('id', $detalleIds)->orderBy('id', 'DESC');
+            function ($query) use ($detalleQuery) {
+                $query->whereIn('id', $detalleQuery)->orderBy('id', 'DESC');
             }
         );
 
