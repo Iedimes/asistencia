@@ -41,7 +41,7 @@ class HelpsController extends Controller
     public function index(Help $help, IndexHelp $request)
     {
         $detalleQuery = DetailHelp::select('help_id')
-            ->where('state_id', '!=', 4)
+            ->whereNotIn('state_id', [4, 9])
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('detail_helps as dh2')
