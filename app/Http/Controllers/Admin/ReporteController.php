@@ -24,7 +24,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReporteController extends Controller
 {
@@ -148,7 +148,7 @@ class ReporteController extends Controller
     ];
 
     // Generar PDF
-    $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps', 'contar', 'filtros'))
+    $pdf = Pdf::loadView('admin.reporte.prueba', compact('dhelps', 'contar', 'filtros'))
               ->setPaper('a4', 'landscape');
 
     // Descargar PDF

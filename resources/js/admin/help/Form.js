@@ -23,9 +23,10 @@ Vue.component('help-form', {
     onSuccess: function (data) {
         if (data.showTicketModal) {
             // Mostrar el modal solo si `showTicketModal` es true
+            const modalText = data.modalMessage ? data.modalMessage : ('Ticket N° <strong>' + data.ticket + '</strong> generado correctamente!!!');
             this.$modal.show('dialog', {
                 title: 'Importante!',
-                text: 'Ticket N° <strong>' + data.ticket + '</strong> generado correctamente!!!',
+                text: modalText,
                 buttons: [
                     {
                         title: '<span class="btn-dialog btn-primary">Aceptar.<span>',

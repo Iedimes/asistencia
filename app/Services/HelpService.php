@@ -10,7 +10,7 @@ use App\Repositories\HelpRepository;
 use Brackets\AdminListing\Facades\AdminListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HelpService
 {
@@ -155,7 +155,7 @@ class HelpService
         $help = $this->repository->findOrFail($helpId);
         $detalle = $this->repository->getHelpDetails($helpId);
 
-        return PDF::loadView('admin.help.pdf.prueba', compact('help', 'detalle'));
+        return Pdf::loadView('admin.help.pdf.prueba', compact('help', 'detalle'));
     }
 
     /**

@@ -322,14 +322,15 @@ class HelpsController extends Controller
 
         if ($request->ajax()) {
             return [
-                'redirect'        => '/',
+                'redirect'        => url('consulta'),
                 'ticket'          => $help->id,
                 'showTicketModal' => true,
+                'modalMessage'    => 'Se ha adjuntado documento al ticket #' . $help->id,
                 'message'         => trans('brackets/admin-ui::admin.operation.succeeded')
             ];
         }
 
-        return redirect('/');
+        return redirect('consulta');
     }
 
     /**
