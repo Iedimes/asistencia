@@ -4,17 +4,10 @@
         <i class="fa fa-id-card text-primary me-1"></i> Cédula de Identidad <span class="text-danger">*</span>
     </label>
     <div :class="isFormLocalized ? 'col-md-8' : 'col-md-9 col-xl-8'">
-        <input onkeypress="return pulsar(event)" @change="findData" type="text" v-model="form.ci" @input="validate($event)" class="form-control shadow-sm text-dark font-weight-bold" style="border: 1px solid #cbd5e1; color: #0f172a;" id="ci" name="ci" placeholder="Ingrese Nro. de Cédula y presione Enter o Tab">
+        <input @keydown.enter.prevent="findData" @change="findData" type="text" v-model="form.ci" @input="validate($event)" class="form-control shadow-sm text-dark font-weight-bold" style="border: 1px solid #cbd5e1; color: #0f172a;" id="ci" name="ci" placeholder="Ingrese Nro. de Cédula y presione Enter o Tab">
         <div v-if="errors.has('ci')" class="form-control-feedback form-text text-danger font-weight-bold" v-cloak>@{{ errors.first('ci') }}</div>
     </div>
 </div>
-
-<script type="text/javascript">
-    function pulsar(e) {
-      tecla = (document.all) ? e.keyCode : e.which;
-      return (tecla != 13);
-    }
-</script>
 
 <!-- Campo Nombre Completo -->
 <div class="form-group row align-items-center mb-3" :class="{'has-danger': errors.has('name'), 'has-success': fields.name && fields.name.valid }">
