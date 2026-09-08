@@ -25,12 +25,12 @@ class RHM006 extends Model
         'FuncNro',
         'FuncNom',
         'FUsuCod',
-        'FuncADpto',
+        'UniOrgCod',
         'FuncEst',
     ];
 
     public function dpto()
     {
-        return $this->hasOne(SIG008::class, 'DepenCod', 'FuncADpto');
+        return $this->hasOne(SIG008::class, 'DepenCod', 'UniOrgCod');
     }
 }

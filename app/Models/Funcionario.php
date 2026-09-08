@@ -26,7 +26,7 @@ class Funcionario extends Model
         'FuncNro',
         'FuncNom',
         'FUsuCod',
-        'FuncADpto',
+        'UniOrgCod',
     ];
 
     protected $dates = [
@@ -38,7 +38,7 @@ class Funcionario extends Model
 
     public function dpto()
     {
-        return $this->hasOne(SIG008::class, 'DepenCod', 'FuncADpto');
+        return $this->hasOne(SIG008::class, 'DepenCod', 'UniOrgCod');
     }
 
     /* ************************ ACCESSORS ************************* */
