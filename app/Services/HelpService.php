@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\Admin\Help\IndexHelp;
+use App\Http\Requests\Admin\DetailHelp\IndexDetailHelp;
 use App\Models\DetailHelp;
 use App\Models\Help;
 use App\Models\SIG008;
@@ -123,6 +124,137 @@ class HelpService
     }
 
     /**
+     * Aplicar filtro de búsqueda avanzada para Asistencias (index, finalizadas, pendientes).
+     * Soporta 2 buscadores independientes e insensibles a mayúsculas/minúsculas:
+     * - 'search': Solicitante, Cédula, Nro. Ticket, Dependencia, Problema.
+     * - 'tecnico' / 'filters.tecnico': Técnico Asignado.
+     */
+    private function applyAdvancedSearch($query, Request $request): void
+    {
+        // 1. Buscador por Solicitante / Cédula / Nro. Ticket / Dependencia / Problema
+        if ($request->has('search') && trim((string) $request->input('search')) !== '') {
+            $search = trim((string) $request->input('search'));
+            $searchLower = mb_strtolower($search, 'UTF-8');
+
+            $query->where(function ($q) use ($search, $searchLower) {
+                $q->where('helps.id', 'like', "%{$search}%")
+                  ->orWhere('helps.ci', 'like', "%{$search}%")
+                  ->orWhere(DB::raw("LOWER(helps.name)"), 'like', "%{$searchLower}%")
+                  ->orWhere(DB::raw("LOWER(helps.dependency)"), 'like', "%{$searchLower}%")
+                  ->orWhere(DB::raw("LOWER(helps.problem)"), 'like', "%{$searchLower}%")
+                  ->orWhere('helps.fone', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. Buscador separado por Técnico Asignado (excluyendo usuario sistema ID 1 y filtrando solo por el ÚLTIMO detalle/estado del ticket)
+        $tecnicoSearch = trim((string) ($request->input('tecnico') ?? $request->input('filters.tecnico') ?? $request->input('search_tecnico') ?? ''));
+        if ($tecnicoSearch !== '') {
+            $tecnicoLower = mb_strtolower($tecnicoSearch, 'UTF-8');
+            $query->whereExists(function ($subQuery) use ($tecnicoLower) {
+                $subQuery->select(DB::raw(1))
+                    ->from('detail_helps as dh')
+                    ->whereRaw('dh.help_id = helps.id')
+                    ->where('dh.user_id', '!=', 1)
+                    ->whereNotExists(function ($dh2Query) {
+                        $dh2Query->select(DB::raw(1))
+                            ->from('detail_helps as dh2')
+                            ->whereRaw('dh2.help_id = dh.help_id')
+                            ->where(function ($q) {
+                                $q->whereRaw('dh2.created_at > dh.created_at')
+                                  ->orWhere(function ($q2) {
+                                      $q2->whereRaw('dh2.created_at = dh.created_at')
+                                         ->whereRaw('dh2.id > dh.id');
+                                  });
+                            });
+                    })
+                    ->whereExists(function ($userQuery) use ($tecnicoLower) {
+                        $userQuery->select(DB::raw(1))
+                            ->from('admin_users as au')
+                            ->whereRaw('au.id = dh.user_id')
+                            ->where(function ($uq) use ($tecnicoLower) {
+                                $uq->where(DB::raw("LOWER(au.first_name)"), 'like', "%{$tecnicoLower}%")
+                                   ->orWhere(DB::raw("LOWER(au.last_name)"), 'like', "%{$tecnicoLower}%")
+                                   ->orWhere(DB::raw("LOWER(CONCAT(au.first_name, ' ', au.last_name))"), 'like', "%{$tecnicoLower}%");
+                            });
+                    });
+            });
+        }
+    }
+
+    /**
+     * Obtener listado de tickets activos/en proceso (state_id NOT IN (4, 9) en ultimo detalle).
+     */
+    public function getIndexTickets(IndexHelp $request)
+    {
+        $detalleQuery = DetailHelp::select('help_id')
+            ->whereNotIn('state_id', [4, 9])
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('detail_helps as dh2')
+                    ->whereRaw('detail_helps.help_id = dh2.help_id')
+                    ->whereRaw('detail_helps.created_at < dh2.created_at');
+            });
+
+        $ordersBeingAttended = Help::whereIn('id', $detalleQuery)
+            ->select('id', 'created_at')
+            ->without(['statuses', 'tecnico', 'detailsHelps', 'documento'])
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->values()
+            ->map(function ($order, $index) {
+                $order->position = $index + 1;
+                return $order;
+            });
+
+        $positionMap = $ordersBeingAttended->pluck('position', 'id');
+
+        $data = AdminListing::create(Help::class)->processRequestAndGet(
+            $request,
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+            [],
+            function ($query) use ($detalleQuery, $request) {
+                $query->whereIn('id', $detalleQuery);
+                $this->applyAdvancedSearch($query, $request);
+                $query->orderBy('id', 'ASC');
+            }
+        );
+
+        $data->getCollection()->transform(function ($item) use ($positionMap) {
+            $item->position = $positionMap[$item->id] ?? null;
+            $item->order = $positionMap[$item->id] ?? null;
+            return $item;
+        });
+
+        return $data;
+    }
+
+    /**
+     * Obtener listado de tickets finalizados (state_id = 4 en ultimo detalle).
+     */
+    public function getFinalizadasTickets(IndexHelp $request)
+    {
+        $detalleQuery = DetailHelp::select('help_id')
+            ->where('state_id', '=', 4)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('detail_helps as dh2')
+                    ->whereRaw('detail_helps.help_id = dh2.help_id')
+                    ->whereRaw('detail_helps.created_at < dh2.created_at');
+            });
+
+        return AdminListing::create(Help::class)->processRequestAndGet(
+            $request,
+            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
+            [],
+            function ($query) use ($detalleQuery, $request) {
+                $query->whereIn('id', $detalleQuery);
+                $this->applyAdvancedSearch($query, $request);
+                $query->orderBy('id', 'DESC');
+            }
+        );
+    }
+
+    /**
      * Obtener listado de tickets pendientes (state_id = 9 en ultimo detalle).
      */
     public function getPendientesTickets(IndexHelp $request)
@@ -140,9 +272,40 @@ class HelpService
         return AdminListing::create(Help::class)->processRequestAndGet(
             $request,
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            function ($query) use ($detalleQuery) {
-                $query->whereIn('id', $detalleQuery)->orderBy('id', 'DESC');
+            [],
+            function ($query) use ($detalleQuery, $request) {
+                $query->whereIn('id', $detalleQuery);
+                $this->applyAdvancedSearch($query, $request);
+                $query->orderBy('id', 'DESC');
+            }
+        );
+    }
+
+    /**
+     * Obtener listado paginado de historial de detalles de atenciones técnicas.
+     * Búsqueda única por Nro. de Ticket, Solución o Nombre de Técnico (insensible a mayúsculas/minúsculas).
+     */
+    public function getDetailHelpsList(IndexDetailHelp $request)
+    {
+        return AdminListing::create(DetailHelp::class)->processRequestAndGet(
+            $request,
+            ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
+            [],
+            function ($query) use ($request) {
+                $query->where('user_id', '!=', 1);
+
+                if ($request->has('search') && trim((string) $request->input('search')) !== '') {
+                    $search = trim((string) $request->input('search'));
+                    $searchLower = mb_strtolower($search, 'UTF-8');
+
+                    $query->where(function ($q) use ($search, $searchLower) {
+                        $q->where('help_id', 'like', "%{$search}%")
+                          ->orWhere(DB::raw("LOWER(solution)"), 'like', "%{$searchLower}%")
+                          ->orWhere(DB::raw("LOWER(patrimony)"), 'like', "%{$searchLower}%");
+                    });
+                }
+
+                $query->orderBy('date', 'desc');
             }
         );
     }

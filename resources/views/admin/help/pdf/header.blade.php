@@ -12,13 +12,12 @@
             <td><strong>ESTADO:</strong> {{ optional(optional($help->statuses)->state)->name ?? 'SOLICITADO' }}</td>
         </tr>
         <tr>
-            <td colspan="2"><strong>TELÉFONO:</strong> {{ $help->fone }}</td>
-            <td>&nbsp;</td>
+            <td colspan="3"><strong>TELÉFONO:</strong> {{ $help->fone }}</td>
         </tr>
         <tr>
-            <td colspan="3" class="pre-line" style="padding-top: 8px; padding-bottom: 8px;">
-                <strong>DESCRIPCIÓN SOLICITUD:</strong><br>
-                {!! nl2br(e($help->problem)) !!}
+            <td colspan="3" class="problem-cell">
+                <strong style="display: block; margin-bottom: 4px;">DESCRIPCIÓN SOLICITUD:</strong>
+                <div class="problem-text">{!! nl2br(e($help->problem)) !!}</div>
             </td>
         </tr>
     </tbody>
@@ -43,7 +42,7 @@
                 @php $hasDetails = true; @endphp
                 <tr>
                     <td>{{ optional($item->user)->full_name ?? '' }}</td>
-                    <td class="pre-line">{!! nl2br(e($item->solution)) !!}</td>
+                    <td class="solution-text">{!! nl2br(e($item->solution)) !!}</td>
                     <td class="text-center">{{ \Carbon\Carbon::parse($item->date)->format('d/m/Y H:i') }}</td>
                     <td>{{ optional($item->category)->name ?? '' }}</td>
                     <td class="text-center">{{ $item->patrimony }}</td>
@@ -60,3 +59,4 @@
         @endif
     </tbody>
 </table>
+

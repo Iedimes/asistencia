@@ -56,11 +56,27 @@
             line-height: 1.4;
         }
 
-        .pre-line {
-            white-space: pre-wrap;
+        .problem-cell {
+            padding: 8px !important;
+            background-color: #ffffff;
+        }
+
+        .problem-text {
+            text-align: left !important;
+            font-size: 10.5px;
+            color: #111111;
+            line-height: 1.45;
             word-wrap: break-word;
-            word-break: break-all;
-            text-align: justify;
+            white-space: normal;
+        }
+
+        .solution-text {
+            text-align: left !important;
+            font-size: 10.5px;
+            color: #111111;
+            line-height: 1.4;
+            word-wrap: break-word;
+            white-space: normal;
         }
 
         .text-center {
@@ -81,3 +97,4 @@
     @include('admin.help.pdf.footer')
 </body>
 </html>
+

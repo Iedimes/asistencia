@@ -20129,3 +20129,116 @@ select.form-control {
   margin-right: 0;
   background-color: transparent;
 }
+
+/* ==========================================================================
+   Estilos Modernos para Modales de Confirmación (vue-js-modal)
+   ========================================================================== */
+.v--modal-overlay {
+  background: rgba(15, 23, 42, 0.65) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+          backdrop-filter: blur(4px) !important;
+}
+
+.v--modal-box.vue-dialog {
+  border-radius: 1rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+}
+
+.vue-dialog .dialog-content {
+  padding: 1.75rem 1.5rem 1.25rem 1.5rem !important;
+  text-align: center !important;
+}
+
+.vue-dialog .dialog-c-title {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.vue-dialog .dialog-c-text {
+  font-size: 0.95rem !important;
+  color: #475569 !important;
+  line-height: 1.55 !important;
+}
+
+.vue-dialog .vue-dialog-buttons {
+  border-top: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  padding: 0.85rem 1rem !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+
+.vue-dialog .vue-dialog-button {
+  border-radius: 9999px !important;
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 1.25rem !important;
+  border: 1px solid #cbd5e1 !important;
+  background-color: #64748b !important;
+  color: #ffffff !important;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  cursor: pointer !important;
+  flex: 0 1 auto !important;
+  line-height: 1.5 !important;
+}
+
+.vue-dialog .vue-dialog-button:hover {
+  background-color: #475569 !important;
+  border-color: #475569 !important;
+  color: #ffffff !important;
+}
+
+.vue-dialog .vue-dialog-button:last-child,
+.vue-dialog .vue-dialog-button .btn-danger,
+.vue-dialog .btn-dialog.btn-danger {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.vue-dialog .vue-dialog-button:last-child:hover,
+.vue-dialog .btn-dialog.btn-danger:hover {
+  background-color: #b91c1c !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Estilos de Paginación Oscuro Pizarra (#0f172a / #1e293b)
+   ========================================================================== */
+.pagination .page-item.active .page-link,
+.pagination .page-item.active a {
+  background-color: #0f172a !important;
+  border-color: #0f172a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.25) !important;
+  font-weight: 700 !important;
+}
+.pagination .page-item .page-link,
+.pagination .page-item a {
+  color: #1e293b !important;
+  border-radius: 6px !important;
+  margin: 0 2px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+.pagination .page-item .page-link:hover,
+.pagination .page-item a:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+.pagination .page-item.disabled .page-link,
+.pagination .page-item.disabled a {
+  color: #94a3b8 !important;
+  background-color: #f8fafc !important;
+}

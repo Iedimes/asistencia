@@ -40,43 +40,7 @@ class HelpsController extends Controller
      */
     public function index(Help $help, IndexHelp $request)
     {
-        $detalleQuery = DetailHelp::select('help_id')
-            ->whereNotIn('state_id', [4, 9])
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('detail_helps as dh2')
-                    ->whereRaw('detail_helps.help_id = dh2.help_id')
-                    ->whereRaw('detail_helps.created_at < dh2.created_at');
-            });
-
-        // Obtener cola ordenada por fecha de llegada para calcular posición ($item->order)
-        $ordersBeingAttended = Help::whereIn('id', $detalleQuery)
-            ->select('id', 'created_at')
-            ->without(['statuses', 'tecnico', 'detailsHelps', 'documento'])
-            ->orderBy('created_at', 'asc')
-            ->get()
-            ->values()
-            ->map(function ($order, $index) {
-                $order->position = $index + 1;
-                return $order;
-            });
-
-        $positionMap = $ordersBeingAttended->pluck('position', 'id');
-
-        $data = AdminListing::create(Help::class)->processRequestAndGet(
-            $request,
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            function ($query) use ($detalleQuery) {
-                $query->whereIn('id', $detalleQuery)->orderBy('id', 'ASC');
-            }
-        );
-
-        $data->getCollection()->transform(function ($item) use ($positionMap) {
-            $item->position = $positionMap[$item->id] ?? null;
-            $item->order = $positionMap[$item->id] ?? null;
-            return $item;
-        });
+        $data = $this->service->getIndexTickets($request);
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
@@ -95,23 +59,7 @@ class HelpsController extends Controller
      */
     public function finalizadas(IndexHelp $request)
     {
-        $detalleQuery = DetailHelp::select('help_id')
-            ->where('state_id', '=', 4)
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('detail_helps as dh2')
-                    ->whereRaw('detail_helps.help_id = dh2.help_id')
-                    ->whereRaw('detail_helps.created_at < dh2.created_at');
-            });
-
-        $data = AdminListing::create(Help::class)->processRequestAndGet(
-            $request,
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
-            ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem'],
-            function ($query) use ($detalleQuery) {
-                $query->whereIn('id', $detalleQuery)->orderBy('id', 'DESC');
-            }
-        );
+        $data = $this->service->getFinalizadasTickets($request);
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {

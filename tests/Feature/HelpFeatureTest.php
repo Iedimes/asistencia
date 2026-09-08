@@ -132,4 +132,27 @@ class HelpFeatureTest extends TestCase
             'error' => true,
         ]);
     }
+
+    /** @test */
+    public function authenticated_admin_can_view_detail_helps_list()
+    {
+        $pDetailIndex = Permission::firstOrCreate(['name' => 'admin.detail-help.index', 'guard_name' => 'admin']);
+        $this->admin->givePermissionTo($pDetailIndex);
+
+        $state = State::first();
+        $category = Category::first();
+        $help = factory(Help::class)->create();
+        factory(DetailHelp::class)->create([
+            'help_id' => $help->id,
+            'state_id' => $state->id,
+            'category_id' => $category->id,
+            'user_id' => $this->admin->id,
+        ]);
+
+        $response = $this->actingAs($this->admin, 'admin')
+            ->get('/admin/detail-helps');
+
+        $response->assertStatus(200);
+        $response->assertViewHas('data');
+    }
 }
