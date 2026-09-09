@@ -5,7 +5,7 @@
     <title>Reporte de Asistencias Técnicas</title>
     <style>
         @page {
-            margin: 15px 25px 25px 25px;
+            margin: 15px 25px 45px 25px; /* Margen inferior ajustado sin bloque de firmas */
         }
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -13,6 +13,19 @@
             color: #1e293b;
             margin: 0;
             padding: 0;
+        }
+        /* Pie de página fijo únicamente con numeración */
+        .footer-page {
+            position: fixed;
+            bottom: -30px;
+            left: 0px;
+            right: 0px;
+            height: 20px;
+            width: 100%;
+            text-align: right;
+            font-size: 10px;
+            font-weight: bold;
+            color: #475569;
         }
         .header-banner {
             text-align: center;
@@ -107,6 +120,11 @@
     </style>
 </head>
 <body>
+
+    <!-- Pie de página con numeración de páginas -->
+    <footer class="footer-page">
+        Página <script type="php">echo $PAGE_NUM . " de " . $PAGE_COUNT;</script>
+    </footer>
 
     @if(file_exists(storage_path('images/MUVHOF.jpg')))
         <div class="header-banner">

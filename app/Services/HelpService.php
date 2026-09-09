@@ -289,7 +289,7 @@ class HelpService
     {
         return AdminListing::create(DetailHelp::class)->processRequestAndGet(
             $request,
-            ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
+            ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony', 'created_at'],
             [],
             function ($query) use ($request) {
                 $query->where('user_id', '!=', 1);
@@ -311,14 +311,32 @@ class HelpService
     }
 
     /**
-     * Generar reporte PDF de un ticket.
+     * Generar reporte PDF de un ticket con opciones personalizadas de papel, orientación y anchos de columna.
      */
-    public function generateTicketPdf(int $helpId)
+    public function generateTicketPdf(int $helpId, array $params = [])
     {
         $help = $this->repository->findOrFail($helpId);
         $detalle = $this->repository->getHelpDetails($helpId);
 
-        return Pdf::loadView('admin.help.pdf.prueba', compact('help', 'detalle'));
+        $paperSizeRaw = strtolower($params['paper_size'] ?? 'a4');
+        $allowedPaperSizes = ['a4', 'legal', 'letter', 'a3'];
+        $paperSize = in_array($paperSizeRaw, $allowedPaperSizes, true) ? $paperSizeRaw : 'a4';
+
+        $orientationRaw = strtolower($params['orientation'] ?? 'portrait');
+        $allowedOrientations = ['portrait', 'landscape'];
+        $orientation = in_array($orientationRaw, $allowedOrientations, true) ? $orientationRaw : 'portrait';
+
+        // Anchos de columna dinámicos pasados desde la pantalla (o valores por defecto)
+        $colWidths = [
+            'user'      => $params['col_user'] ?? '22%',
+            'solution'  => $params['col_solution'] ?? '44%',
+            'date'      => $params['col_date'] ?? '14%',
+            'category'  => $params['col_category'] ?? '10%',
+            'patrimony' => $params['col_patrimony'] ?? '10%',
+        ];
+
+        return Pdf::loadView('admin.help.pdf.prueba', compact('help', 'detalle', 'colWidths'))
+                  ->setPaper($paperSize, $orientation);
     }
 
     /**

@@ -44,7 +44,7 @@
                                             <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #cbd5e1; border-top-left-radius: 50rem; border-bottom-left-radius: 50rem; padding-left: 14px;">
                                                 <i class="fa fa-calendar"></i>
                                             </span>
-                                            <datetime :config="datetimePickerConfig" id="inicio" name="inicio" class="form-control rounded-end-pill text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px;"></datetime>
+                                            <datetime :config="datePickerConfig" id="inicio" name="inicio" class="form-control rounded-end-pill text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px;" placeholder="{{ trans('brackets/admin-ui::admin.forms.select_a_date') }}"></datetime>
                                         </div>
                                         @if(isset($errors) && $errors->has('inicio'))
                                             <div class="text-danger mt-1 font-weight-bold" style="font-size: 0.8rem;">
@@ -65,7 +65,7 @@
                                             <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #cbd5e1; border-top-left-radius: 50rem; border-bottom-left-radius: 50rem; padding-left: 14px;">
                                                 <i class="fa fa-calendar"></i>
                                             </span>
-                                            <datetime :config="datetimePickerConfig" id="fin" name="fin" class="form-control rounded-end-pill text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px;"></datetime>
+                                            <datetime :config="datePickerConfig" id="fin" name="fin" class="form-control rounded-end-pill text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px;" placeholder="{{ trans('brackets/admin-ui::admin.forms.select_a_date') }}"></datetime>
                                         </div>
                                         @if(isset($errors) && $errors->has('fin'))
                                             <div class="text-danger mt-1 font-weight-bold" style="font-size: 0.8rem;">
@@ -118,6 +118,49 @@
                                                 @foreach($estado as $est)
                                                     <option value="{{ $est['id'] }}"> {{ mb_strtoupper($est->name, 'UTF-8') }}</option>
                                                 @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección 3: Formato e Impresión (Tamaño de Hoja y Orientación) -->
+                            <div class="p-3 mb-2 rounded-3 border" style="background-color: #f8fafc; border-color: #e2e8f0 !important;">
+                                <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 0.95rem;">
+                                    <i class="fa fa-print text-primary"></i> Formato de Impresión (PDF)
+                                </h6>
+                                
+                                <div class="row g-3">
+                                    <!-- Tamaño de Hoja -->
+                                    <div class="col-md-6">
+                                        <label for="paper_size" class="form-label font-weight-bold text-dark" style="font-size: 0.88rem;">
+                                            TAMAÑO DE HOJA
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #cbd5e1; border-top-left-radius: 50rem; border-bottom-left-radius: 50rem; padding-left: 14px;">
+                                                <i class="fa fa-file-text-o"></i>
+                                            </span>
+                                            <select name="paper_size" id="paper_size" class="form-select form-control rounded-end-pill text-dark font-weight-bold px-3" style="border: 1px solid #cbd5e1; height: 44px;">
+                                                <option value="a4" selected>A4 (210 x 297 mm) - Estándar</option>
+                                                <option value="legal">Oficio / Legal (216 x 356 mm)</option>
+                                                <option value="letter">Carta / Letter (216 x 279 mm)</option>
+                                                <option value="a3">A3 (297 x 420 mm)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Orientación -->
+                                    <div class="col-md-6">
+                                        <label for="orientation" class="form-label font-weight-bold text-dark" style="font-size: 0.88rem;">
+                                            ORIENTACIÓN DE HOJA
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #cbd5e1; border-top-left-radius: 50rem; border-bottom-left-radius: 50rem; padding-left: 14px;">
+                                                <i class="fa fa-refresh"></i>
+                                            </span>
+                                            <select name="orientation" id="orientation" class="form-select form-control rounded-end-pill text-dark font-weight-bold px-3" style="border: 1px solid #cbd5e1; height: 44px;">
+                                                <option value="landscape" selected>Horizontal (Apaisado) - Recomendado</option>
+                                                <option value="portrait">Vertical</option>
                                             </select>
                                         </div>
                                     </div>
