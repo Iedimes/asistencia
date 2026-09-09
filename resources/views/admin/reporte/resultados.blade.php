@@ -19,7 +19,7 @@
                         <a href="{{ route('admin/reportes/create') }}" class="btn btn-sm btn-outline-light rounded-pill px-3 font-weight-bold shadow-sm">
                             <i class="fa fa-arrow-left me-1"></i> NUEVA CONSULTA
                         </a>
-                        <a href="{{ url('admin/reportes/imprimir?inicio=' . urlencode($filtros['inicio_raw']) . '&fin=' . urlencode($filtros['fin_raw']) . '&user_id=' . $filtros['user_id'] . '&state_id=' . $filtros['state_id']) }}" target="_blank" class="btn btn-sm rounded-pill px-3 font-weight-bold text-white shadow-sm" style="background-color: #dc2626; border-color: #dc2626;">
+                        <a href="{{ url('admin/reportes/imprimir?inicio=' . urlencode($filtros['inicio_raw']) . '&fin=' . urlencode($filtros['fin_raw']) . '&user_id=' . $filtros['user_id'] . '&state_id=' . $filtros['state_id'] . '&paper_size=' . $filtros['paper_size'] . '&orientation=' . $filtros['orientation']) }}" target="_blank" class="btn btn-sm rounded-pill px-3 font-weight-bold text-white shadow-sm" style="background-color: #dc2626; border-color: #dc2626;">
                             <i class="fa fa-file-pdf-o me-1"></i> IMPRIMIR / GENERAR PDF
                         </a>
                     </div>
@@ -41,6 +41,10 @@
                                 <span class="text-muted font-weight-bold me-1 ms-2" style="font-size: 0.82rem;">ESTADO:</span>
                                 <span class="badge bg-primary rounded-pill px-3 py-1 me-2" style="font-size: 0.82rem;">
                                     <i class="fa fa-tasks me-1"></i> {{ $filtros['state_name'] }}
+                                </span>
+                                <span class="text-muted font-weight-bold me-1 ms-2" style="font-size: 0.82rem;">FORMATO PDF:</span>
+                                <span class="badge bg-info text-dark rounded-pill px-3 py-1 me-2 font-weight-bold" style="font-size: 0.82rem;">
+                                    <i class="fa fa-print me-1"></i> {{ $filtros['paper_size_name'] }} ({{ $filtros['orientation_name'] }})
                                 </span>
                             </div>
                             <div class="col-md-auto text-end">

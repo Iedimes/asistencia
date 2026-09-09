@@ -59,15 +59,34 @@ class ReporteService
         $inicioDisplay = Carbon::parse($inicioRaw)->format('d/m/Y');
         $finDisplay    = Carbon::parse($finRaw)->format('d/m/Y');
 
+        $paperSizeRaw = strtolower($data['paper_size'] ?? 'a4');
+        $allowedPaperSizes = ['a4', 'legal', 'letter', 'a3'];
+        $paperSize = in_array($paperSizeRaw, $allowedPaperSizes, true) ? $paperSizeRaw : 'a4';
+
+        $orientationRaw = strtolower($data['orientation'] ?? 'landscape');
+        $allowedOrientations = ['landscape', 'portrait'];
+        $orientation = in_array($orientationRaw, $allowedOrientations, true) ? $orientationRaw : 'landscape';
+
+        $paperSizeLabels = [
+            'a4' => 'A4 (210 x 297 mm)',
+            'legal' => 'Oficio / Legal',
+            'letter' => 'Carta / Letter',
+            'a3' => 'A3 (297 x 420 mm)',
+        ];
+
         $filtros = [
-            'inicio'     => $inicioDisplay,
-            'fin'        => $finDisplay,
-            'inicio_raw' => $inicioRaw,
-            'fin_raw'    => $finRaw,
-            'user_id'    => $userId,
-            'state_id'   => $stateId,
-            'user_name'  => $userName,
-            'state_name' => $stateName,
+            'inicio'           => $inicioDisplay,
+            'fin'              => $finDisplay,
+            'inicio_raw'       => $inicioRaw,
+            'fin_raw'          => $finRaw,
+            'user_id'          => $userId,
+            'state_id'         => $stateId,
+            'user_name'        => $userName,
+            'state_name'       => $stateName,
+            'paper_size'       => $paperSize,
+            'paper_size_name'  => $paperSizeLabels[$paperSize] ?? strtoupper($paperSize),
+            'orientation'      => $orientation,
+            'orientation_name' => ($orientation === 'landscape' ? 'Horizontal' : 'Vertical'),
         ];
 
         return [$dhelps, $dhelps->count(), $filtros];

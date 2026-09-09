@@ -139,9 +139,28 @@ class ReporteFeatureTest extends TestCase
             'fin' => now()->endOfDay()->toDateTimeString(),
             'user_id' => 0,
             'state_id' => 0,
+            'paper_size' => 'legal',
+            'orientation' => 'portrait',
         ]));
 
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/pdf');
+    }
+
+    /** @test */
+    public function authenticated_admin_can_query_report_resultados_with_custom_paper_size_and_orientation()
+    {
+        $response = $this->actingAs($this->admin, 'admin')->get('/admin/reportes/resultados?' . http_build_query([
+            'inicio' => now()->startOfDay()->toDateTimeString(),
+            'fin' => now()->endOfDay()->toDateTimeString(),
+            'user_id' => 0,
+            'state_id' => 0,
+            'paper_size' => 'legal',
+            'orientation' => 'portrait',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('Oficio / Legal');
+        $response->assertSee('Vertical');
     }
 }

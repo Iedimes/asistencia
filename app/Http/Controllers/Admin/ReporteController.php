@@ -127,9 +127,12 @@ class ReporteController extends Controller
     {
         [$dhelps, $contar, $filtros] = $this->processReporteQuery($request);
 
-        // Generar PDF en orientación horizontal (landscape)
+        $paperSize   = $filtros['paper_size'] ?? 'a4';
+        $orientation = $filtros['orientation'] ?? 'landscape';
+
+        // Generar PDF con el tamaño de hoja y orientación seleccionados por el usuario
         $pdf = Pdf::loadView('admin.reporte.prueba', compact('dhelps', 'contar', 'filtros'))
-                  ->setPaper('a4', 'landscape');
+                  ->setPaper($paperSize, $orientation);
 
         return $pdf->download('ReporteAsistencias_' . date('Ymd_His') . '.pdf');
     }
