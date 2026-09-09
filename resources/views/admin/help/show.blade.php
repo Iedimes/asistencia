@@ -52,7 +52,7 @@
                 </div>
             </div>
 
-            <!-- Fila 2: Descripción y Estado Actual (Estiramiento proporcional h-100) -->
+            <!-- Fila 2: Descripción y Estado Actual -->
             <div class="row g-3 align-items-stretch">
                 <div class="col-md-9 col-sm-12">
                     <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-center" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
@@ -80,7 +80,7 @@
         </div>
     </div>
 
-    <!-- Componente y Tabla de Historial de Atención Técnica -->
+    <!-- Componente y Tabla de Historial de Atención Técnica con Columnas Redimensionables y Selector de PDF -->
     <detail-help-listing
         :data="{{ $data->toJson() }}"
         :url="'{{ url('admin/detail-helps') }}'"
@@ -91,17 +91,34 @@
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa fa-wrench text-primary me-1 fs-5"></i>
                     <h5 class="mb-0 fw-bold text-dark">HISTORIAL DE ATENCIÓN TÉCNICA</h5>
+                    <small class="text-muted ms-2 d-none d-md-inline" style="font-size: 0.78rem;">
+                        <i class="fa fa-arrows-h text-info me-1"></i>Arrastre los bordes de la tabla para ajustar anchos
+                    </small>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
                     @if ($help->statuses->state_id != 4)
                         <a class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm font-weight-bold" href="{{ url('admin/helps/'.$help->id.'/createdetail') }}" role="button" style="background-color: #2563eb; border-color: #2563eb;">
                             <i class="fa fa-plus-circle me-1"></i> REGISTRAR ATENCIÓN TÉCNICA
                         </a>
                     @endif
-                    <a class="btn btn-sm btn-danger rounded-pill px-3 shadow-sm font-weight-bold text-white" href="{{ url('admin/helps/'.$help->id.'/showdetallepdf/') }}" title="Generar PDF" role="button" target="_blank" style="background-color: #dc2626; border-color: #dc2626;">
-                        <i class="fa fa-file-pdf-o me-1"></i> GENERAR PDF
-                    </a>
+
+                    <!-- Barra de Opciones de Impresión PDF -->
+                    <div class="d-flex align-items-center gap-1 bg-white border rounded-pill px-2 py-1 shadow-sm" style="border-color: #cbd5e1 !important;">
+                        <small class="fw-bold text-dark me-1" style="font-size: 0.78rem; padding-left: 6px;"><i class="fa fa-print text-primary me-1"></i>PDF:</small>
+                        <select id="ticket_paper_size" class="form-select form-select-sm border-0 bg-transparent text-dark font-weight-bold" style="font-size: 0.8rem; cursor: pointer; width: auto;">
+                            <option value="a4" selected>Hoja A4</option>
+                            <option value="legal">Hoja Oficio / Legal</option>
+                            <option value="letter">Hoja Carta</option>
+                        </select>
+                        <select id="ticket_orientation" class="form-select form-select-sm border-0 bg-transparent text-dark font-weight-bold" style="font-size: 0.8rem; cursor: pointer; width: auto;">
+                            <option value="portrait" selected>Vertical</option>
+                            <option value="landscape">Horizontal</option>
+                        </select>
+                        <button type="button" onclick="descargarPdfDetalleTicket('{{ url('admin/helps/'.$help->id.'/showdetallepdf') }}')" class="btn btn-sm btn-danger rounded-pill px-3 font-weight-bold text-white shadow-sm" style="background-color: #dc2626; border-color: #dc2626;">
+                            <i class="fa fa-file-pdf-o me-1"></i> GENERAR PDF
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -111,7 +128,7 @@
                         <thead class="bg-light">
                             <tr>
                                 <th is='sortable' :column="'user_id'" class="text-dark font-weight-bold">{{ trans('admin.detail-help.columns.user_id') }}</th>
-                                <th width="50%" is='sortable' :column="'solution'" class="text-dark font-weight-bold">{{ trans('admin.detail-help.columns.solution') }}</th>
+                                <th width="45%" is='sortable' :column="'solution'" class="text-dark font-weight-bold">{{ trans('admin.detail-help.columns.solution') }}</th>
                                 <th is='sortable' :column="'date'" class="text-dark font-weight-bold">{{ trans('admin.detail-help.columns.date') }}</th>
                                 <th is='sortable' :column="'category_id'" class="text-dark font-weight-bold">{{ trans('admin.detail-help.columns.category_id') }}</th>
                                 <th is='sortable' :column="'patrimony'" class="text-dark font-weight-bold">{{ trans('admin.detail-help.columns.patrimony') }}</th>
@@ -123,7 +140,7 @@
                             <tr v-if="item.user.id !== 1" v-for="(item, index) in collection" :key="item.id" :class="bulkItems[item.id] ? 'bg-bulk' : ''">
                                 <td><span class="font-weight-bold text-dark">@{{ item.user.full_name }}</span></td>
                                 <td class="text-uppercase font-weight-bold text-dark" style="font-size: 0.88rem; white-space: pre-line; word-break: break-word;">@{{ item.solution }}</td>
-                                <td class="text-nowrap text-dark" style="font-size: 0.85rem;">@{{ item.date | date }}</td>
+                                <td class="text-nowrap text-dark" style="font-size: 0.85rem;">@{{ (item.created_at || item.date) | datetime }}</td>
                                 <td><span class="badge bg-light text-dark border px-2 py-1">@{{ item.category ? item.category.name : '-' }}</span></td>
                                 <td><span class="font-weight-bold text-secondary">@{{ item.patrimony || '-' }}</span></td>
 
@@ -161,5 +178,83 @@
         </div>
     </detail-help-listing>
 </div>
-@endsection
 
+<script>
+function descargarPdfDetalleTicket(baseUrl) {
+    const paperSize = document.getElementById('ticket_paper_size').value || 'a4';
+    const orientation = document.getElementById('ticket_orientation').value || 'portrait';
+
+    const table = document.querySelector('.table-listing');
+    let params = `paper_size=${paperSize}&orientation=${orientation}`;
+
+    if (table) {
+        const ths = table.querySelectorAll('thead th');
+        if (ths.length >= 5) {
+            const tableWidth = table.offsetWidth;
+            const userPct = Math.round((ths[0].offsetWidth / tableWidth) * 100) + '%';
+            const solutionPct = Math.round((ths[1].offsetWidth / tableWidth) * 100) + '%';
+            const datePct = Math.round((ths[2].offsetWidth / tableWidth) * 100) + '%';
+            const categoryPct = Math.round((ths[3].offsetWidth / tableWidth) * 100) + '%';
+            const patrimonyPct = Math.round((ths[4].offsetWidth / tableWidth) * 100) + '%';
+
+            params += `&col_user=${userPct}&col_solution=${solutionPct}&col_date=${datePct}&col_category=${categoryPct}&col_patrimony=${patrimonyPct}`;
+        }
+    }
+
+    window.open(`${baseUrl}?${params}`, '_blank');
+}
+
+// Script para redimensionar columnas de la tabla en pantalla (Resizable Table Columns)
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const table = document.querySelector('.table-listing');
+        if (!table) return;
+
+        const ths = table.querySelectorAll('thead th');
+        ths.forEach((th, index) => {
+            if (index === ths.length - 1) return; // Omitir columna de acciones
+
+            th.style.position = 'relative';
+            const resizer = document.createElement('div');
+            resizer.className = 'resizer';
+            resizer.style.width = '6px';
+            resizer.style.height = '100%';
+            resizer.style.position = 'absolute';
+            resizer.style.right = '0';
+            resizer.style.top = '0';
+            resizer.style.cursor = 'col-resize';
+            resizer.style.userSelect = 'none';
+            resizer.style.zIndex = '10';
+
+            th.appendChild(resizer);
+
+            let x = 0;
+            let w = 0;
+
+            const mouseDownHandler = function(e) {
+                x = e.clientX;
+                w = th.offsetWidth;
+
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+                resizer.style.background = '#2563eb';
+            };
+
+            const mouseMoveHandler = function(e) {
+                const dx = e.clientX - x;
+                const newWidth = Math.max(60, w + dx);
+                th.style.width = newWidth + 'px';
+            };
+
+            const mouseUpHandler = function() {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+                resizer.style.background = 'transparent';
+            };
+
+            resizer.addEventListener('mousedown', mouseDownHandler);
+        });
+    }, 500);
+});
+</script>
+@endsection

@@ -194,7 +194,7 @@ class HelpsController extends Controller
         $id = $help->id;
         $data = AdminListing::create(DetailHelp::class)->processRequestAndGet(
             $request,
-            ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
+            ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony', 'created_at'],
             ['id', 'solution'],
             function ($query) use ($id) {
                 $query->where('detail_helps.help_id', '=', $id);
@@ -324,10 +324,10 @@ class HelpsController extends Controller
     /**
      * Generar reporte PDF de ticket.
      */
-    public function createPDF($id)
+    public function createPDF($id, Request $request)
     {
-        $pdf = $this->service->generateTicketPdf($id);
-        return $pdf->download('ReporteDetalle.pdf');
+        $pdf = $this->service->generateTicketPdf($id, $request->all());
+        return $pdf->download('ReporteDetalle_' . $id . '.pdf');
     }
 
     /**

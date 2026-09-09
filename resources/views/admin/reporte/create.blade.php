@@ -44,7 +44,7 @@
                                             <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #cbd5e1; border-top-left-radius: 50rem; border-bottom-left-radius: 50rem; padding-left: 14px;">
                                                 <i class="fa fa-calendar"></i>
                                             </span>
-                                            <datetime :config="datetimePickerConfig" id="inicio" name="inicio" class="form-control rounded-end-pill text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px;"></datetime>
+                                            <datetime :config="datePickerConfig" id="inicio" name="inicio" class="form-control rounded-end-pill text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px;" placeholder="{{ trans('brackets/admin-ui::admin.forms.select_a_date') }}"></datetime>
                                         </div>
                                         @if(isset($errors) && $errors->has('inicio'))
                                             <div class="text-danger mt-1 font-weight-bold" style="font-size: 0.8rem;">
@@ -65,7 +65,7 @@
                                             <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #cbd5e1; border-top-left-radius: 50rem; border-bottom-left-radius: 50rem; padding-left: 14px;">
                                                 <i class="fa fa-calendar"></i>
                                             </span>
-                                            <datetime :config="datetimePickerConfig" id="fin" name="fin" class="form-control rounded-end-pill text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px;"></datetime>
+                                            <datetime :config="datePickerConfig" id="fin" name="fin" class="form-control rounded-end-pill text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px;" placeholder="{{ trans('brackets/admin-ui::admin.forms.select_a_date') }}"></datetime>
                                         </div>
                                         @if(isset($errors) && $errors->has('fin'))
                                             <div class="text-danger mt-1 font-weight-bold" style="font-size: 0.8rem;">

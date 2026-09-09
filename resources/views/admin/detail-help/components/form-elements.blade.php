@@ -59,7 +59,7 @@
             <div class="input-group-addon bg-light border-end-0 px-3 d-flex align-items-center rounded-start-3" style="border: 1px solid #cbd5e1;"><i class="fa fa-calendar text-primary"></i></div>
             <datetime
                 v-model="form.date"
-                :config="datePickerConfig"
+                :config="datetimePickerConfig"
                 class="flatpickr text-dark font-weight-bold"
                 :class="{
                     'form-control-danger': errors.has('date'),
@@ -67,7 +67,7 @@
                 }"
                 id="date"
                 name="date"
-                placeholder="{{ trans('brackets/admin-ui::admin.forms.select_a_date') }}">
+                placeholder="{{ trans('brackets/admin-ui::admin.forms.select_date_and_time') }}">
             </datetime>
         </div>
         <div v-if="errors.has('date')" class="form-control-feedback form-text text-danger mt-1" v-cloak>@{{ errors.first('date') }}</div>
