@@ -1,77 +1,62 @@
-<center><h2>SOLICITUD DE ASISTENCIA </h2></center>
+<h2 class="section-title">SOLICITUD DE ASISTENCIA</h2>
 
-
-<table>
-        <tbody>
-            <br>
-            <tr>
-                <td><strong> NUMERO:</strong> {{ $help->id }}</td>
-                <td colspan="2"><strong>NOMBRE:</strong> {{ $help->name }}</td>
-                <td><strong>CEDULA:</strong> {{ $help->ci }}</td>
-
-
-
-            </tr>
-            <br>
-            <tr>
-                <td colspan="3"><strong>DEPENDENCIA:</strong> {{ $help->dependency }}</td>
-
-                 <td><strong>ESTADO:</strong> {{ $help->statuses->state->name}} </td>
-            </tr>
-            <br>
-            <tr>
-                <td colspan="3"><strong>DESCRIPCION SOLICITUD:</strong> {{ $help->problem}} </td>
-                <td><strong>TELEFONO:</strong> {{ $help->fone}}</td>
-            </tr>
-
-            <br>
-
-        </tbody>
-    </table>
-<br>
-<center><h2>DETALLE DE ASISTENCIA </h2></center>
-<<br>
-<table>
+<table class="pdf-table">
     <tbody>
-        <br>
         <tr>
-        <td>
-            TECNICO
-        </td>
-        <td>
-            ACCION REALIZADA
-        </td>
-        <td>
-            FECHA ASISTENCIA
-        </td>
-        <td>
-            CATEGORIA
-        </td>
-        <td>
-            PATRIMONIO
-        </td>
-
+            <td style="width: 20%;"><strong>NÚMERO:</strong> {{ $help->id }}</td>
+            <td style="width: 50%;"><strong>NOMBRE:</strong> {{ $help->name }}</td>
+            <td style="width: 30%;"><strong>CÉDULA:</strong> {{ $help->ci }}</td>
         </tr>
-        @foreach ($detalle as $item)
-        @if ($item->user->id !== 1)
-
-
         <tr>
-            <td> {{ $item->user->full_name}}</td>
-            <td> {{ $item->solution }}</td>
-            <td> {{ $item->date }}</td>
-            <td> {{ $item->category->name }}</td>
-            <td> {{ $item->patrimony }}</td>
+            <td colspan="2"><strong>DEPENDENCIA:</strong> {{ $help->dependency }}</td>
+            <td><strong>ESTADO:</strong> {{ optional(optional($help->statuses)->state)->name ?? 'SOLICITADO' }}</td>
         </tr>
-        @else
-
-        @endif
-        @endforeach
-        <br>
-
-        </tbody>
+        <tr>
+            <td colspan="3"><strong>TELÉFONO:</strong> {{ $help->fone }}</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="problem-cell">
+                <strong style="display: block; margin-bottom: 4px;">DESCRIPCIÓN SOLICITUD:</strong>
+                <div class="problem-text">{!! nl2br(e($help->problem)) !!}</div>
+            </td>
+        </tr>
+    </tbody>
 </table>
-<br><br><br>
 
+<h2 class="section-title" style="margin-top: 20px;">DETALLE DE ASISTENCIA</h2>
 
+<table class="pdf-table">
+    <thead>
+        <tr>
+            <th style="width: 22%;">TÉCNICO</th>
+            <th style="width: 44%;">ACCIÓN REALIZADA</th>
+            <th style="width: 14%;">FECHA ASISTENCIA</th>
+            <th style="width: 10%;">CATEGORÍA</th>
+            <th style="width: 10%;">PATRIMONIO</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php $hasDetails = false; @endphp
+        @foreach ($detalle as $item)
+            @if (optional($item->user)->id !== 1)
+                @php $hasDetails = true; @endphp
+                <tr>
+                    <td>{{ optional($item->user)->full_name ?? '' }}</td>
+                    <td class="solution-text">{!! nl2br(e($item->solution)) !!}</td>
+                    <td class="text-center">{{ \Carbon\Carbon::parse($item->date)->format('d/m/Y H:i') }}</td>
+                    <td>{{ optional($item->category)->name ?? '' }}</td>
+                    <td class="text-center">{{ $item->patrimony }}</td>
+                </tr>
+            @endif
+        @endforeach
+
+        @if (!$hasDetails)
+            <tr>
+                <td colspan="5" class="text-center" style="color: #777777; font-style: italic;">
+                    No se registran acciones realizadas adicionales.
+                </td>
+            </tr>
+        @endif
+    </tbody>
+</table>
 

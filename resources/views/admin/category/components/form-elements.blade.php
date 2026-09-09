@@ -1,9 +1,16 @@
-<div class="form-group row align-items-center" :class="{'has-danger': errors.has('name'), 'has-success': fields.name && fields.name.valid }">
-    <label for="name" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-2'">{{ trans('admin.category.columns.name') }}</label>
-        <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
-        <input type="text" v-model="form.name" v-validate="'required'" @input="validate($event)" class="form-control" :class="{'form-control-danger': errors.has('name'), 'form-control-success': fields.name && fields.name.valid}" id="name" name="name" placeholder="{{ trans('admin.category.columns.name') }}">
-        <div v-if="errors.has('name')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('name') }}</div>
+<div class="p-3 mb-2 rounded-3 border" style="background-color: #f8fafc; border-color: #e2e8f0 !important;">
+    <div class="form-group mb-0" :class="{'has-danger': errors.has('name'), 'has-success': fields.name && fields.name.valid }">
+        <label for="name" class="form-label font-weight-bold text-dark" style="font-size: 0.88rem;">
+            {{ trans('admin.category.columns.name') }} <span class="text-danger">*</span>
+        </label>
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #cbd5e1; border-top-left-radius: 50rem; border-bottom-left-radius: 50rem; padding-left: 14px;">
+                <i class="fa fa-tags text-success"></i>
+            </span>
+            <input type="text" v-model="form.name" v-validate="'required'" @input="form.name = $event.target.value.toUpperCase(); validate($event)" class="form-control rounded-end-pill text-dark font-weight-bold px-3" :class="{'is-invalid': errors.has('name'), 'is-valid': fields.name && fields.name.valid}" id="name" name="name" placeholder="NOMBRE DE LA CATEGORÍA..." style="border: 1px solid #cbd5e1; height: 44px; text-transform: uppercase;">
+        </div>
+        <div v-if="errors.has('name')" class="text-danger mt-1 font-weight-bold" style="font-size: 0.8rem;" v-cloak>
+            <i class="fa fa-exclamation-circle me-1"></i>@{{ errors.first('name') }}
+        </div>
     </div>
 </div>
-
-

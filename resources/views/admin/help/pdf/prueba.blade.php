@@ -1,98 +1,100 @@
-{{-- <div><h4>Nombre de los estados - {{$estado->name}}</h4></div> --}}
-
-
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <title>Reporte de Asistencia</title>
     <style>
-        td {
-        font-family: Arial, Helvetica, sans-serif; font-size:10px;
-        width: auto;
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            color: #222222;
+            margin: 10px 15px;
         }
 
-        table{
-        border: grey 0.5px solid;
-        width: 100%;
+        .imagencentro {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 15px;
         }
 
+        h2.section-title {
+            text-align: center;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #111111;
+        }
 
+        table.pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #b0b0b0;
+            margin-bottom: 15px;
+        }
 
+        table.pdf-table th {
+            background-color: #f2f4f7;
+            color: #111111;
+            font-weight: bold;
+            font-size: 10.5px;
+            padding: 6px 8px;
+            border: 1px solid #b0b0b0;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        table.pdf-table td {
+            padding: 6px 8px;
+            font-size: 10.5px;
+            border: 1px solid #c5c5c5;
+            vertical-align: top;
+            line-height: 1.4;
+        }
+
+        .problem-cell {
+            padding: 8px !important;
+            background-color: #ffffff;
+        }
+
+        .problem-text {
+            text-align: left !important;
+            font-size: 10.5px;
+            color: #111111;
+            line-height: 1.45;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        .solution-text {
+            text-align: left !important;
+            font-size: 10.5px;
+            color: #111111;
+            line-height: 1.4;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
     </style>
-    {{-- <img width="650" height="80" src="https://www.muvh.gov.py/sitio/wp-content/uploads/2022/05/LOGO.jpg"> --}}
-    <img src="{{storage_path('images/MUVHOF.jpg')}}" class="imagencentro" width="690" >
-
-{{-- <style>
-    header {
-        position: fixed;
-        top: 0cm;
-        left: 0cm;
-        right: 0cm;
-        height: 3cm;
-    }
-    body {
-                margin-top: 1cm;
-            }
-    .page-break {
-        page-break-after: always;
-    }
-    #cabecera {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: x-small;
-    }
-    #customers {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-    }
-    .center{
-    text-align:center;
-    }
-    .right{
-        text-align: right;
-    }
-    #customers td {
-    border-bottom: 0px solid #000000;
-    font-size: x-small;
-    padding: 2px;
-    }
-    #customers th {
-    font-size: small;
-    padding: 2px;
-    }
-    #customers tr:nth-child(even){background-color: #fff;}
-    #customers tr:hover {
-        background-color: #DDD;
-        }
-    #customers th {
-    text-align: left;
-    font-size: x-small;
-    background-color: #DCDCDC;
-    color: black;
-    }
-    div.gallery {
-    margin: 5px;
-    border: 1px solid #ccc;
-    float: left;
-    width: 180px;
-    }
-    div.gallery:hover {
-    border: 1px solid #777;
-    }
-    div.gallery img {
-    width: 100%;
-    height: auto;
-    }
-    div.desc {
-    padding: 15px;
-    text-align: center;
-    }
-</style> --}}
 </head>
 <body>
-@include('admin.help.pdf.header')
-@include('admin.help.pdf.footer')
-{{-- @include('applicant.resume.pdf.academic')
-@include('applicant.resume.pdf.work')
-@include('applicant.resume.pdf.language') --}}
+    @if(file_exists(storage_path('images/MUVHOF.jpg')))
+        <img src="{{ storage_path('images/MUVHOF.jpg') }}" class="imagencentro" width="690">
+    @endif
+
+    @include('admin.help.pdf.header')
+    @include('admin.help.pdf.footer')
 </body>
 </html>
+

@@ -38,7 +38,8 @@ Route::get('admin/helps/{help}/documento', 'App\Http\Controllers\Admin\HelpsCont
 Route::get('admin/helps/{help}/eliminar', 'App\Http\Controllers\Admin\HelpsController@eliminardocumento')->name('eliminardocumento');
 
 // Upload público para adjuntar documentos desde el formulario de soporte
-Route::post('upload', 'App\Http\Controllers\PublicUploadController@upload')->name('brackets/media::upload');
+Route::post('upload', 'App\Http\Controllers\PublicUploadController@upload')->name('upload');
+Route::post('admin/media/upload', 'App\Http\Controllers\PublicUploadController@upload')->name('brackets/media::upload');
 
 
 //Route::get('/helps/{help}/show', 'App\Http\Controllers\Admin\HelpsController@show');
@@ -49,6 +50,9 @@ Route::post('upload', 'App\Http\Controllers\PublicUploadController@upload')->nam
 
 /* Auto-generated admin routes */
 Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {
+    Route::get('/admin', function () {
+        return redirect('admin/helps');
+    });
     Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->name('admin/')->group(static function() {
         Route::prefix('admin-users')->name('admin-users/')->group(static function() {
             Route::get('/',                                             'AdminUsersController@index')->name('index');

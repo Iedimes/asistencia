@@ -198,9 +198,5 @@ $factory->define(App\Models\Funcionario::class, static function (Faker\Generator
         'FuncNro' => $faker->randomNumber(5),
         'FuncNom' => $faker->sentence,
         'FUsuCod' => $faker->sentence,
-        'created_at' => $faker->dateTime,
-        'updated_at' => $faker->dateTime,
-        
-        
     ];
 });

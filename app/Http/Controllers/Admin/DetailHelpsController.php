@@ -12,6 +12,7 @@ use App\Models\DetailHelp;
 use App\Models\State;
 use App\Models\Category;
 use App\Models\AdminUser;
+use App\Services\HelpService;
 use Brackets\AdminListing\Facades\AdminListing;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -25,6 +26,12 @@ use Illuminate\View\View;
 
 class DetailHelpsController extends Controller
 {
+    private HelpService $service;
+
+    public function __construct(HelpService $service)
+    {
+        $this->service = $service;
+    }
 
     /**
      * Display a listing of the resource.
@@ -33,31 +40,20 @@ class DetailHelpsController extends Controller
      * @return array|Factory|View
      */
     public function index(IndexDetailHelp $request)
-{
-    // create and AdminListing instance for a specific model and
-    $data = AdminListing::create(DetailHelp::class)->processRequestAndGet(
-        // pass the request with params
-        $request,
-        // set columns to query
-        ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
-        // set columns to searchIn
-        ['id', 'help_id', 'user_id', 'state_id', 'solution', 'date', 'category_id', 'patrimony'],
-        function ($query) {
-            $query->where('user_id', '!=', 1)->orderBy('date', 'desc');
-        }
-    );
+    {
+        $data = $this->service->getDetailHelpsList($request);
 
-    if ($request->ajax()) {
-        if ($request->has('bulk')) {
-            return [
-                'bulkItems' => $data->pluck('id')
-            ];
+        if ($request->ajax()) {
+            if ($request->has('bulk')) {
+                return [
+                    'bulkItems' => $data->pluck('id')
+                ];
+            }
+            return ['data' => $data];
         }
-        return ['data' => $data];
+
+        return view('admin.detail-help.indexD', ['data' => $data]);
     }
-
-    return view('admin.detail-help.indexD', ['data' => $data]);
-}
 
     /**
      * Show the form for creating a new resource.

@@ -24,7 +24,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReporteController extends Controller
 {
@@ -98,115 +98,93 @@ class ReporteController extends Controller
     }
 
 
-    public function pdf(Request $request)
-{
-    // Validación de entradas
-    $rules = [
-        'inicio' => 'required|date',
-        'fin' => 'required|date',
-    ];
-    $messages = [
-        'inicio.required' => 'Debe cargar la fecha de inicio.',
-        'fin.required' => 'Debe cargar la fecha de fin.',
-    ];
-    $this->validate($request, $rules, $messages);
+    /**
+     * Construir consulta de reporte y filtros de manera unificada.
+     */
+    private function buildReporteQuery(Request $request): array
+    {
+        $rules = [
+            'inicio' => 'required|date',
+            'fin'    => 'required|date',
+        ];
+        $messages = [
+            'inicio.required' => 'Debe cargar la fecha de inicio.',
+            'fin.required'    => 'Debe cargar la fecha de fin.',
+        ];
+        $this->validate($request, $rules, $messages);
 
-    // Obtener datos del request
-    $inicio = $request->inicio;
-    $fin = $request->fin;
-    $user = $request->user_id;
-    $estado = $request->state_id;
+        $inicio = $request->inicio;
+        $fin = $request->fin;
+        $user = (int) $request->input('user_id', 0);
+        $estado = (int) $request->input('state_id', 0);
 
-    // Inicializar la consulta
-    $query = DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"]);
+        // Formatear fechas para cubrir todo el rango de inicio y fin (hasta 23:59:59)
+        $inicioFull = str_contains($inicio, ':') ? $inicio : $inicio . ' 00:00:00';
+        $finFull    = str_contains($fin, ':') ? $fin : $fin . ' 23:59:59';
 
-    // Filtrado de resultados según los parámetros
-    if ($user == 0 && $estado == 0) {
-        // Todos los registros
-    } elseif ($user > 0 && $estado == 0) {
-        $query->where('user_id', $user);
-    } elseif ($estado > 0 && $user == 0) {
-        $query->where('state_id', $estado);
-    } elseif ($estado == 1) {
-        $query->where('state_id', 1);
-    } else {
-        $query->where('user_id', $user)->where('state_id', $estado);
+        $query = DetailHelp::whereBetween('created_at', [$inicioFull, $finFull]);
+
+        if ($user > 0) {
+            $query->where('user_id', $user);
+        } else {
+            $query->where('user_id', '!=', 1);
+        }
+
+        if ($estado > 0) {
+            $query->where('state_id', $estado);
+        }
+
+        $dhelps = $query->with(['user', 'state', 'help'])
+                        ->orderBy('user_id', 'ASC')
+                        ->orderBy('help_id', 'ASC')
+                        ->get();
+
+        // Obtener nombres de técnico y estado para visualización
+        $userName = 'TODOS LOS TÉCNICOS';
+        if ($user > 0) {
+            $u = AdminUser::find($user);
+            if ($u) {
+                $userName = trim($u->first_name . ' ' . $u->last_name);
+            }
+        }
+
+        $estadoName = 'TODOS LOS ESTADOS';
+        if ($estado > 0) {
+            $e = State::find($estado);
+            if ($e) {
+                $estadoName = mb_strtoupper($e->name, 'UTF-8');
+            }
+        }
+
+        $filtros = [
+            'inicio'      => $inicio,
+            'fin'         => $fin,
+            'user_id'     => $user,
+            'state_id'    => $estado,
+            'user_name'   => $userName,
+            'state_name'  => $estadoName,
+        ];
+
+        return [$dhelps, $dhelps->count(), $filtros];
     }
 
-    // Obtener resultados
-    $dhelps = $query->orderby('user_id', 'ASC')->orderby('help_id', 'ASC')->get();
+    public function pdf(Request $request)
+    {
+        [$dhelps, $contar, $filtros] = $this->buildReporteQuery($request);
 
-    // Contar registros
-    $contar = $dhelps->count();
+        // Generar PDF en orientación horizontal (landscape)
+        $pdf = Pdf::loadView('admin.reporte.prueba', compact('dhelps', 'contar', 'filtros'))
+                  ->setPaper('a4', 'landscape');
 
-    // Preparar datos de filtros para la vista
-    $filtros = [
-        'inicio' => $inicio,
-        'fin' => $fin,
-        'user_id' => $user,
-        'state_id' => $estado,
-    ];
-
-    // Generar PDF
-    $pdf = PDF::loadView('admin.reporte.prueba', compact('dhelps', 'contar', 'filtros'))
-              ->setPaper('a4', 'landscape');
-
-    // Descargar PDF
-    return $pdf->download('ReporteAsistencias.pdf');
-}
-
+        return $pdf->download('ReporteAsistencias_' . date('Ymd_His') . '.pdf');
+    }
 
     public function resultados(Request $request)
-{
-    // Validación de entradas
-    $rules = [
-        'inicio' => 'required|date',
-        'fin' => 'required|date',
-    ];
-    $messages = [
-        'inicio.required' => 'Debe cargar la fecha de inicio.',
-        'fin.required' => 'Debe cargar la fecha de fin.',
-    ];
-    $this->validate($request, $rules, $messages);
+    {
+        [$dhelps, $contar, $filtros] = $this->buildReporteQuery($request);
 
-    // Obtener datos del request
-    $inicio = $request->inicio;
-    $fin = $request->fin;
-    $user = $request->user_id;
-    $estado = $request->state_id;
-
-    // Inicializar la consulta
-    $query = DetailHelp::whereBetween('updated_at', ["$inicio", "$fin"]);
-
-    // Filtrado de resultados según los parámetros
-    if ($user == 0 && $estado == 0) {
-        // Todos los registros
-    } elseif ($user > 0 && $estado == 0) {
-        $query->where('user_id', $user);
-    } elseif ($estado > 0 && $user == 0) {
-        $query->where('state_id', $estado);
-    } elseif ($estado == 1) {
-        $query->where('state_id', 1);
-    } else {
-        $query->where('user_id', $user)->where('state_id', $estado);
+        return view('admin.reporte.resultados', compact('dhelps', 'contar', 'filtros'));
     }
-
-    // Obtener resultados
-    $dhelps = $query->orderby('user_id', 'ASC')->orderby('help_id', 'ASC')->get();
-
-    // Contar registros
-    $contar = $dhelps->count();
-
-    // Pasar los filtros a la vista
-    $filtros = [
-        'inicio' => $inicio,
-        'fin' => $fin,
-        'user_id' => $user,
-        'state_id' => $estado,
-    ];
-
-    return view('admin.reporte.resultados', compact('dhelps', 'contar', 'filtros'));
-}
 
 
 

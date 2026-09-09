@@ -55,6 +55,7 @@ class ProfileController extends Controller
 
         return view('admin.profile.edit-profile', [
             'adminUser' => $this->adminUser,
+            'locales' => app('translatable')->getLocales(),
         ]);
     }
 
@@ -128,8 +129,7 @@ class ProfileController extends Controller
 
         // Validate the request
         $this->validate($request, [
-            'password' => ['sometimes', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
-            
+            'password' => ['required', 'confirmed', 'min:7', 'string'],
         ]);
 
         // Sanitize input

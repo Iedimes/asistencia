@@ -3,119 +3,107 @@
 @section('title', trans('admin.funcionario.actions.index'))
 
 @section('body')
-
+<div class="container-fluid px-lg-4 px-3 py-3 mx-auto">
     <funcionario-listing
         :data="{{ $data->toJson() }}"
         :url="'{{ url('admin/funcionarios') }}'"
         inline-template>
 
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-align-justify"></i> {{ trans('admin.funcionario.actions.index') }}
-                        {{-- <a class="btn btn-primary btn-spinner btn-sm pull-right m-b-0" href="{{ url('admin/funcionarios/create') }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.funcionario.actions.create') }}</a> --}}
+        <div class="row justify-content-center">
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm overflow-hidden" style="border: 1px solid #cbd5e1 !important; border-radius: 1rem !important; background: #ffffff;">
+                    
+                    <!-- Encabezado Principal con Degradado Moderno -->
+                    <div class="card-header border-0 py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-2" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+                        <div class="d-flex align-items-center gap-3">
+                            <h4 class="mb-0 fw-bold text-white tracking-tight" style="font-size: 1.25rem;">CONSULTA DE FUNCIONARIOS</h4>
+                            <span class="badge bg-info rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">PERSONAL / RRHH</span>
+                        </div>
                     </div>
-                    <div class="card-body" v-cloak>
-                        <div class="card-block">
-                            <form @submit.prevent="">
-                                <div class="row justify-content-md-between">
-                                    <div class="col col-lg-7 col-xl-5 form-group">
-                                        <div class="input-group">
-                                            <input class="form-control" placeholder="{{ trans('brackets/admin-ui::admin.placeholder.search') }}" v-model="search" @keyup.enter="filter('search', $event.target.value)" />
-                                            <span class="input-group-append">
-                                                <button type="button" class="btn btn-primary" @click="filter('search', search)"><i class="fa fa-search"></i>&nbsp; {{ trans('brackets/admin-ui::admin.btn.search') }}</button>
-                                            </span>
+
+                    <div class="card-body p-4" v-cloak>
+                        <!-- Buscador y Controles de Paginación -->
+                        <form @submit.prevent="">
+                            <div class="row justify-content-between align-items-center mb-4 g-3">
+                                <div class="col-lg-6 col-md-7">
+                                    <div class="input-group">
+                                        <input class="form-control rounded-pill shadow-sm text-dark font-weight-bold px-3" style="border: 1px solid #cbd5e1; height: 44px; color: #0f172a; text-transform: uppercase;" placeholder="BUSCAR POR CÉDULA, NOMBRE O USUARIO..." v-model="search" @input="search = $event.target.value.toUpperCase()" @keyup.enter="filter('search', $event.target.value)" />
+                                        <div class="input-group-append ms-2">
+                                            <button type="button" class="btn rounded-pill px-4 shadow-sm font-weight-bold text-white" style="background-color: #2563eb; border-color: #2563eb; height: 44px;" @click="filter('search', search)">
+                                                <i class="fa fa-search me-1"></i> {{ trans('brackets/admin-ui::admin.btn.search') }}
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="col-sm-auto form-group">
-                                        <select class="form-control rounded-pill" v-model="pagination.state.per_page">
-
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="100">100</option>
-                                        </select>
-                                    </div>
                                 </div>
-                            </form>
+                                <div class="col-auto d-flex align-items-center gap-2">
+                                    <label class="mb-0 text-muted font-weight-bold me-2" style="font-size: 0.88rem;">Registros por página:</label>
+                                    <select class="form-select form-control rounded-pill px-3 shadow-sm text-dark font-weight-bold" style="border: 1px solid #cbd5e1; height: 44px; width: 90px;" v-model="pagination.state.per_page">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
 
-                            <table class="table table-hover table-listing">
-                                <thead>
+                        <!-- Tabla de Funcionarios -->
+                        <div class="table-responsive rounded-3 border" style="border-color: #e2e8f0 !important;">
+                            <table class="table table-hover table-listing mb-0 align-middle">
+                                <thead class="bg-light">
                                     <tr>
-                                        {{-- <th class="bulk-checkbox">
-                                            <input class="form-check-input" id="enabled" type="checkbox" v-model="isClickedAll" v-validate="''" data-vv-name="enabled"  name="enabled_fake_element" @click="onBulkItemsClickedAllWithPagination()">
-                                            <label class="form-check-label" for="enabled">
-                                                #
-                                            </label>
-                                        </th> --}}
-
-                                        <th is='sortable' :column="'FuncNro'">{{ trans('admin.funcionario.columns.FuncNro') }}</th>
-                                        <th is='sortable' :column="'FuncNom'">{{ trans('admin.funcionario.columns.FuncNom') }}</th>
-                                        <th is='sortable' :column="'FUsuCod'">{{ trans('admin.funcionario.columns.FUsuCod') }}</th>
-                                        <th>Origen</th>
-
-
-                                        <th></th>
-                                    </tr>
-                                    <tr v-show="(clickedBulkItemsCount > 0) || isClickedAll">
-                                        <td class="bg-bulk-info d-table-cell text-center" colspan="5">
-                                            <span class="align-middle font-weight-light text-dark">{{ trans('brackets/admin-ui::admin.listing.selected_items') }} @{{ clickedBulkItemsCount }}.  <a href="#" class="text-primary" @click="onBulkItemsClickedAll('/admin/funcionarios')" v-if="(clickedBulkItemsCount < pagination.state.total)"> <i class="fa" :class="bulkCheckingAllLoader ? 'fa-spinner' : ''"></i> {{ trans('brackets/admin-ui::admin.listing.check_all_items') }} @{{ pagination.state.total }}</a> <span class="text-primary">|</span> <a
-                                                        href="#" class="text-primary" @click="onBulkItemsClickedAllUncheck()">{{ trans('brackets/admin-ui::admin.listing.uncheck_all_items') }}</a>  </span>
-
-                                            <span class="pull-right pr-2">
-                                                <button class="btn btn-sm btn-danger pr-3 pl-3" @click="bulkDelete('/admin/funcionarios/bulk-destroy')">{{ trans('brackets/admin-ui::admin.btn.delete') }}</button>
-                                            </span>
-
-                                        </td>
+                                        <th is='sortable' :column="'FuncNro'" class="text-dark font-weight-bold" width="130px">{{ trans('admin.funcionario.columns.FuncNro') }}</th>
+                                        <th is='sortable' :column="'FuncNom'" class="text-dark font-weight-bold">{{ trans('admin.funcionario.columns.FuncNom') }}</th>
+                                        <th is='sortable' :column="'FUsuCod'" class="text-dark font-weight-bold">{{ trans('admin.funcionario.columns.FUsuCod') }}</th>
+                                        <th class="text-dark font-weight-bold text-center" width="140px">ORIGEN</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(item, index) in collection" :key="item.id" :class="bulkItems[item.id] ? 'bg-bulk' : ''">
-                                        {{-- <td class="bulk-checkbox">
-                                            <input class="form-check-input" :id="'enabled' + item.id" type="checkbox" v-model="bulkItems[item.id]" v-validate="''" :data-vv-name="'enabled' + item.id"  :name="'enabled' + item.id + '_fake_element'" @click="onBulkItemClicked(item.id)" :disabled="bulkCheckingAllLoader">
-                                            <label class="form-check-label" :for="'enabled' + item.id">
-                                            </label>
-                                        </td> --}}
-
-                                    <td>@{{ item.FuncNro }}</td>
-                                        <td>@{{ item.FuncNom }}</td>
-                                        <td>@{{ item.FUsuCod }}</td>
-                                        <td>@{{ item.Origen }}</td>
-
-                                        <td>
-                                            <div class="row no-gutters">
-                                                <div class="col-auto">
-                                                    {{-- <a class="btn btn-sm btn-spinner btn-info" :href="item.resource_url + '/edit'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a> --}}
-                                                </div>
-                                                <form class="col" @submit.prevent="deleteItem(item.resource_url)">
-                                                    {{-- <button type="submit" class="btn btn-sm btn-danger" title="{{ trans('brackets/admin-ui::admin.btn.delete') }}"><i class="fa fa-trash-o"></i></button> --}}
-                                                </form>
-                                            </div>
+                                    <tr v-for="(item, index) in collection" :key="item.id">
+                                        <td class="font-weight-bold text-dark">
+                                            <span class="badge bg-dark rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.82rem;">@{{ item.FuncNro }}</span>
+                                        </td>
+                                        <td class="font-weight-bold text-dark" style="font-size: 0.9rem;">
+                                            <i class="fa fa-user me-1 text-primary"></i> @{{ item.FuncNom }}
+                                        </td>
+                                        <td class="text-secondary font-weight-bold" style="font-size: 0.88rem;">
+                                            @{{ item.FUsuCod || '-' }}
+                                        </td>
+                                        <td class="text-center">
+                                            <span v-if="item.Origen == 'SIG008'" class="badge rounded-pill bg-info px-3 py-1 font-weight-bold text-white shadow-sm" style="font-size: 0.78rem;">
+                                                @{{ item.Origen }}
+                                            </span>
+                                            <span v-else-if="item.Origen == 'RHM006'" class="badge rounded-pill bg-primary px-3 py-1 font-weight-bold text-white shadow-sm" style="font-size: 0.78rem;">
+                                                @{{ item.Origen }}
+                                            </span>
+                                            <span v-else class="badge rounded-pill bg-secondary px-3 py-1 font-weight-bold text-white shadow-sm" style="font-size: 0.78rem;">
+                                                @{{ item.Origen || 'DB' }}
+                                            </span>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
 
-                            <div class="row" v-if="pagination.state.total > 0">
-                                <div class="col-sm">
-                                    <span class="pagination-caption">{{ trans('brackets/admin-ui::admin.pagination.overview') }}</span>
-                                </div>
-                                <div class="col-sm-auto">
-                                    <pagination></pagination>
-                                </div>
+                        <!-- Paginación -->
+                        <div class="row align-items-center mt-4" v-if="pagination.state.total > 0">
+                            <div class="col-sm text-muted font-weight-bold" style="font-size: 0.88rem;">
+                                {{ trans('brackets/admin-ui::admin.pagination.overview') }}
                             </div>
+                            <div class="col-sm-auto">
+                                <pagination></pagination>
+                            </div>
+                        </div>
 
-                            {{-- <div class="no-items-found" v-if="!collection.length > 0">
-                                <i class="icon-magnifier"></i>
-                                <h3>{{ trans('brackets/admin-ui::admin.index.no_items') }}</h3>
-                                <p>{{ trans('brackets/admin-ui::admin.index.try_changing_items') }}</p>
-                                <a class="btn btn-primary btn-spinner" href="{{ url('admin/funcionarios/create') }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.funcionario.actions.create') }}</a>
-                            </div> --}}
+                        <!-- Estado Sin Registros -->
+                        <div class="no-items-found text-center py-5" v-if="!collection.length > 0">
+                            <i class="fa fa-folder-open text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h4 class="font-weight-bold text-dark">{{ trans('brackets/admin-ui::admin.index.no_items') }}</h4>
+                            <p class="text-muted">{{ trans('brackets/admin-ui::admin.index.try_changing_items') }}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </funcionario-listing>
-
+</div>
 @endsection

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Funcionario extends Model
 {
-
     protected $table = 'RHM006';
     protected $primaryKey = 'FuncNro';
     public $keyType = 'string';
@@ -14,23 +13,45 @@ class Funcionario extends Model
     protected $connection = 'sqlsrv';
     public $incrementing = false;
 
+    public function getConnectionName()
+    {
+        if (app()->environment('testing')) {
+            return config('database.default');
+        }
+
+        return $this->connection;
+    }
+
     protected $fillable = [
         'FuncNro',
         'FuncNom',
         'FUsuCod',
-
+        'UniOrgCod',
     ];
-
 
     protected $dates = [
         'created_at',
         'updated_at',
-
     ];
 
     protected $appends = ['resource_url'];
 
-    /* ************************ ACCESSOR ************************* */
+    public function dpto()
+    {
+        return $this->hasOne(SIG008::class, 'DepenCod', 'UniOrgCod');
+    }
+
+    /* ************************ ACCESSORS ************************* */
+
+    public function getFuncNomAttribute($value)
+    {
+        return is_string($value) ? trim($value) : $value;
+    }
+
+    public function getFUsuCodAttribute($value)
+    {
+        return is_string($value) ? trim($value) : $value;
+    }
 
     public function getResourceUrlAttribute()
     {

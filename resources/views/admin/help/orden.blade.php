@@ -1,22 +1,33 @@
-<div class="row">
-    <!-- Contenedor para Orden de Atención -->
-    <div class="col-md-2 mt-3">
-        <div class="card mb-3">
-            <div class="card-header text-center">
-                <h5 style="color: red; font-weight: bold; text-transform: uppercase; margin-bottom: 0px;">Orden de Atención</h5>
+<!-- Contenedor para Orden de Atención en Vivo -->
+<div class="col-xl-3 col-lg-3 col-md-4 mb-4">
+    <div class="card shadow-sm overflow-hidden" style="border: 1px solid #cbd5e1 !important; border-radius: 1rem !important; background: #ffffff;">
+        <div class="card-header border-0 py-3 px-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+            <h6 class="mb-0 font-weight-bold text-uppercase tracking-wider" style="font-size: 0.85rem; letter-spacing: 0.5px;">Orden de Atención</h6>
+            <span class="badge bg-danger rounded-pill px-2 py-1 d-flex align-items-center gap-1" style="font-size: 0.68rem;">
+                <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" style="width: 0.45rem; height: 0.45rem;"></span>
+                EN VIVO
+            </span>
+        </div>
 
-            </div>
-
-            <div class="card-body" style="padding: 8px;">
+        <div class="card-body p-3">
+            <div id="order-list-container">
                 @if($ordersBeingAttended->isEmpty())
-                    <p class="text-muted text-center" style="margin: 0;">No hay órdenes en atención actualmente.</p>
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa fa-check-circle-o fa-2x mb-2 text-success opacity-75"></i>
+                        <p class="small mb-0 font-weight-bold">Sin órdenes pendientes</p>
+                        <span class="text-xs text-secondary">La cola está al día</span>
+                    </div>
                 @else
-                    <ul class="list-unstyled" id="order-list" style="margin-bottom: 0;">
+                    <ul class="list-unstyled mb-0" id="order-list">
                         @foreach($ordersBeingAttended as $order)
                             <li class="mb-2">
-                                <div class="border p-2 rounded " style="background-color: #f1ebeb;">
-                                    <strong style="color: black;">Ticket: <span style="color: red;">{{ $order->id }}</span></strong><br>
-                                    <strong style="color: black;">Posición: <span style="color: #5cb85c;">{{ $order->position }}</span></strong>
+                                <div class="p-2 px-3 d-flex justify-content-between align-items-center" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; transition: all 0.2s ease;">
+                                    <div>
+                                        <span class="fw-bold text-dark font-weight-bold" style="font-size: 0.95rem; color: #0f172a;">#{{ $order->id }}</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.85rem;">#{{ $order->position }}</span>
+                                    </div>
                                 </div>
                             </li>
                         @endforeach
@@ -24,8 +35,13 @@
                 @endif
             </div>
         </div>
+        <div class="card-footer bg-light border-0 text-center py-2">
+            <small class="text-muted" style="font-size: 0.72rem;">
+                <i class="fa fa-refresh fa-spin text-primary me-1"></i> Actualización cada 30s
+            </small>
+        </div>
     </div>
-
+</div>
 
 <script>
     function fetchOrders() {
@@ -37,28 +53,38 @@
                 return response.json();
             })
             .then(data => {
-                const orderList = document.getElementById('order-list');
-                orderList.innerHTML = ''; // Limpiar la lista existente
+                const orderListContainer = document.getElementById('order-list-container');
 
-                if (data.orders.length === 0) {
-                    orderList.innerHTML = '<p class="text-muted text-center" style="margin: 0;">No hay órdenes en atención actualmente.</p>';
+                if (!data.orders || data.orders.length === 0) {
+                    orderListContainer.innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            <i class="fa fa-check-circle-o fa-2x mb-2 text-success opacity-75"></i>
+                            <p class="small mb-0 font-weight-bold">Sin órdenes pendientes</p>
+                            <span class="text-xs text-secondary">La cola está al día</span>
+                        </div>
+                    `;
                 } else {
+                    let html = '<ul class="list-unstyled mb-0" id="order-list">';
                     data.orders.forEach(order => {
-                        const li = document.createElement('li');
-                        li.className = 'mb-2';
-                        li.innerHTML = `
-                            <div class="border p-2 rounded" style="background-color: #f1ebeb;">
-                                <strong style="color: black;">Ticket: <span style="color: red;">${order.id}</span></strong><br>
-                                <strong style="color: black;">Posición: <span style="color: #5cb85c;">${order.position}</span></strong>
-                            </div>
+                        html += `
+                            <li class="mb-2">
+                                <div class="p-2 px-3 d-flex justify-content-between align-items-center" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; transition: all 0.2s ease;">
+                                    <div>
+                                        <span class="fw-bold text-dark font-weight-bold" style="font-size: 0.95rem; color: #0f172a;">#${order.id}</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.85rem;">#${order.position}</span>
+                                    </div>
+                                </div>
+                            </li>
                         `;
-                        orderList.appendChild(li);
                     });
+                    html += '</ul>';
+                    orderListContainer.innerHTML = html;
                 }
             })
             .catch(error => console.error('Error fetching orders:', error));
     }
 
-    setInterval(fetchOrders, 60000); // Actualizar cada 1 minuto
-    fetchOrders(); // Llamar la función una vez al cargar la página
+    setInterval(fetchOrders, 30000); // Actualizar cada 30 segundos
 </script>

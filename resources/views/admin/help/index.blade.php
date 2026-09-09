@@ -5,182 +5,162 @@
 @section('body')
 <body onLoad="setTimeout('self.location.reload()', 300000)"></body>
 
+<div class="container-fluid px-lg-4 px-3 py-3 mx-auto">
     <help-listing
         :data="{{ $data->toJson() }}"
         :url="'{{ url('admin/helps') }}'"
         inline-template>
 
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        {{-- <i class="fa fa-align-justify"></i> {{ trans('admin.help.actions.index') }} --}}
-                        <center><H4>ADMINISTRACION DE ASISTENCIAS</H4></center>
-                        <a class="btn btn-primary rounded-pill btn-spinner btn-sm pull-right m-b-0" href="{{ url('admin/helps/createadm') }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.help.actions.create') }}</a>
+        <div class="row justify-content-center">
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm overflow-hidden" style="border: 1px solid #cbd5e1 !important; border-radius: 1rem !important; background: #ffffff;">
+                    <!-- Encabezado Principal con Degradado Moderno -->
+                    <div class="card-header border-0 py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-2" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+                        <div class="d-flex align-items-center gap-3">
+                            <h4 class="mb-0 fw-bold text-white tracking-tight" style="font-size: 1.25rem;">ADMINISTRACIÓN DE ASISTENCIAS TÉCNICAS</h4>
+                            <span class="badge bg-success rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">EN PROCESO</span>
+                        </div>
+
+                        <a class="btn btn-primary rounded-pill px-4 shadow-sm font-weight-bold" href="{{ url('admin/helps/createadm') }}" role="button" style="background-color: #2563eb; border-color: #2563eb;">
+                            <i class="fa fa-plus-circle me-1"></i> {{ trans('admin.help.actions.create') }}
+                        </a>
                     </div>
-                    <div class="card-body" v-cloak>
-                        <div class="card-block">
-                            @if (session('success'))
-                            <div class="alert alert-success" role="alert">
-                                {{ session('success') }}
+
+                    <div class="card-body p-4" v-cloak>
+                        <!-- Mensajes de Sesión -->
+                        @if (session('success'))
+                            <div class="alert alert-success border-0 rounded-3 shadow-sm mb-4" role="alert">
+                                <i class="fa fa-check-circle me-2"></i> {{ session('success') }}
                             </div>
                         @elseif (session('error'))
-                            <div class="alert alert-danger" role="alert">
-                                {{ session('error') }}
+                            <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4" role="alert">
+                                <i class="fa fa-exclamation-triangle me-2"></i> {{ session('error') }}
                             </div>
                         @endif
-                            <form @submit.prevent="">
-                                <div class="row justify-content-md-between">
-                                    <div class="col col-lg-7 col-xl-5 form-group">
-                                        <div class="input-group">
-                                            <input class="form-control rounded-pill" placeholder="BUSCAR POR NRO DE TICKET, NRO DE CEDULA O NOMBRE" v-model="search" @keyup.enter="filter('search', $event.target.value)" />
-                                            <span class="input-group-append">
-                                                <button type="button" class="btn btn-primary rounded-pill" @click="filter('search', search)"><i class="fa fa-search"></i>&nbsp; {{ trans('brackets/admin-ui::admin.btn.search') }}</button>
-                                            </span>
+
+                        <!-- Buscadores Independientes y Controles de Paginación -->
+                        <form @submit.prevent="">
+                            <div class="row align-items-end mb-4 g-3">
+                                <!-- Buscador Solicitante / Cédula / Ticket -->
+                                <div class="col-lg-5 col-md-6">
+                                    <label class="form-label font-weight-bold text-dark mb-1" style="font-size: 0.82rem;">
+                                        <i class="fa fa-user me-1 text-primary"></i> Solicitante, Cédula o Ticket:
+                                    </label>
+                                    <div class="input-group">
+                                        <input class="form-control rounded-pill shadow-sm text-dark font-weight-bold px-3" style="border: 1px solid #cbd5e1; height: 42px; color: #0f172a; text-transform: uppercase;" placeholder="BUSCAR POR SOLICITANTE, CÉDULA, ID..." v-model="search" @focus="filters.tecnico = ''" @input="filters.tecnico = ''; search = $event.target.value.toUpperCase()" @keyup.enter="filter('search', $event.target.value)" />
+                                        <div class="input-group-append ms-2">
+                                            <button type="button" class="btn rounded-pill px-3 shadow-sm font-weight-bold text-white" style="background-color: #2563eb; border-color: #2563eb; height: 42px;" @click="filters.tecnico = ''; filter('search', search)">
+                                                <i class="fa fa-search"></i>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="col-sm-auto form-group">
-                                        <select class="form-control rounded-pill" v-model="pagination.state.per_page">
+                                </div>
 
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="100">100</option>
-                                        </select>
+                                <!-- Buscador Técnico Asignado -->
+                                <div class="col-lg-5 col-md-6">
+                                    <label class="form-label font-weight-bold text-dark mb-1" style="font-size: 0.82rem;">
+                                        <i class="fa fa-user-md me-1 text-info"></i> Técnico Asignado:
+                                    </label>
+                                    <div class="input-group">
+                                        <input class="form-control rounded-pill shadow-sm text-dark font-weight-bold px-3" style="border: 1px solid #cbd5e1; height: 42px; color: #0f172a; text-transform: uppercase;" placeholder="BUSCAR POR NOMBRE DEL TÉCNICO..." v-model="filters.tecnico" @focus="search = ''" @input="search = ''; filters.tecnico = $event.target.value.toUpperCase()" @keyup.enter="filter('tecnico', $event.target.value)" />
+                                        <div class="input-group-append ms-2">
+                                            <button type="button" class="btn rounded-pill px-3 shadow-sm font-weight-bold text-white" style="background-color: #0284c7; border-color: #0284c7; height: 42px;" @click="search = ''; filter('tecnico', filters.tecnico)">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </form>
 
-                            <table class="table table-hover table-listing">
-                                <thead>
+                                <!-- Controles por página -->
+                                <div class="col-lg-2 col-md-12 text-lg-end">
+                                    <label class="form-label font-weight-bold text-dark mb-1" style="font-size: 0.82rem;">Por página:</label>
+                                    <select class="form-select form-control rounded-pill px-3 shadow-sm text-dark font-weight-bold d-inline-block" style="border: 1px solid #cbd5e1; height: 42px; width: 90px;" v-model="pagination.state.per_page">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Tabla de Asistencias Tecnicas -->
+                        <div class="table-responsive rounded-3 border" style="border-color: #e2e8f0 !important;">
+                            <table class="table table-hover table-listing mb-0 align-middle">
+                                <thead class="bg-light">
                                     <tr>
-                                        {{-- <th class="bulk-checkbox">
-                                            <input class="form-check-input" id="enabled" type="checkbox" v-model="isClickedAll" v-validate="''" data-vv-name="enabled"  name="enabled_fake_element" @click="onBulkItemsClickedAllWithPagination()">
-                                            <label class="form-check-label" for="enabled">
-                                                #
-                                            </label>
-                                        </th> --}}
-
-                                        <th is='sortable' :column="'id'">{{ trans('admin.help.columns.id') }}</th>
-                                        <th is='sortable' :column="'posicion'">{{ trans('ORDEN') }}</th>
-                                        <th is='sortable' :column="'ci'">{{ trans('admin.help.columns.ci') }}</th>
-                                        <th is='sortable' :column="'name'">{{ trans('admin.help.columns.name') }}</th>
-                                        {{-- <th is='sortable' :column="'user'">{{ trans('admin.help.columns.user') }}</th> --}}
-                                        <th width="250px" is='sortable' :column="'dependency'">{{ trans('admin.help.columns.dependency') }}</th>
-                                        <th is='sortable' :column="'fone'">{{ trans('admin.help.columns.fone') }}</th>
-                                        <th width="250px" is='sortable' :column="'problem'">{{ trans('admin.help.columns.problem') }}</th>
-                                        <th is='sortable' :column="'estado'">{{ trans('admin.help.columns.estado') }}</th>
-                                        <th is='sortable' :column="'tecnico'">{{ trans('admin.help.columns.tecnico') }}</th>
-                                        <th is='sortable' :column="'fechahora'">{{ trans('admin.help.columns.fechahora') }}</th>
-
-                                        <th></th>
-                                    </tr>
-                                    <tr v-show="(clickedBulkItemsCount > 0) || isClickedAll">
-                                        <td class="bg-bulk-info d-table-cell text-center" colspan="9">
-                                            <span class="align-middle font-weight-light text-dark">{{ trans('brackets/admin-ui::admin.listing.selected_items') }} @{{ clickedBulkItemsCount }}.  <a href="#" class="text-primary" @click="onBulkItemsClickedAll('/admin/helps')" v-if="(clickedBulkItemsCount < pagination.state.total)"> <i class="fa" :class="bulkCheckingAllLoader ? 'fa-spinner' : ''"></i> {{ trans('brackets/admin-ui::admin.listing.check_all_items') }} @{{ pagination.state.total }}</a> <span class="text-primary">|</span> <a
-                                                        href="#" class="text-primary" @click="onBulkItemsClickedAllUncheck()">{{ trans('brackets/admin-ui::admin.listing.uncheck_all_items') }}</a>  </span>
-
-                                            <span class="pull-right pr-2">
-                                                <button class="btn btn-sm btn-danger pr-3 pl-3" @click="bulkDelete('/admin/helps/bulk-destroy')">{{ trans('brackets/admin-ui::admin.btn.delete') }}</button>
-                                            </span>
-
-                                        </td>
+                                        <th is='sortable' :column="'id'" class="text-dark font-weight-bold">{{ trans('admin.help.columns.id') }}</th>
+                                        <th is='sortable' :column="'posicion'" class="text-dark font-weight-bold text-center">ORDEN</th>
+                                        <th is='sortable' :column="'ci'" class="text-dark font-weight-bold">{{ trans('admin.help.columns.ci') }}</th>
+                                        <th is='sortable' :column="'name'" class="text-dark font-weight-bold">{{ trans('admin.help.columns.name') }}</th>
+                                        <th width="240px" is='sortable' :column="'dependency'" class="text-dark font-weight-bold">{{ trans('admin.help.columns.dependency') }}</th>
+                                        <th is='sortable' :column="'fone'" class="text-dark font-weight-bold">{{ trans('admin.help.columns.fone') }}</th>
+                                        <th width="260px" is='sortable' :column="'problem'" class="text-dark font-weight-bold">{{ trans('admin.help.columns.problem') }}</th>
+                                        <th is='sortable' :column="'estado'" class="text-dark font-weight-bold text-center">{{ trans('admin.help.columns.estado') }}</th>
+                                        <th is='sortable' :column="'tecnico'" class="text-dark font-weight-bold">{{ trans('admin.help.columns.tecnico') }}</th>
+                                        <th is='sortable' :column="'fechahora'" class="text-dark font-weight-bold">{{ trans('admin.help.columns.fechahora') }}</th>
+                                        <th class="text-dark font-weight-bold text-center" style="min-width: 140px;">ACCIONES</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-
-
                                     <tr v-for="(item, index) in collection" :key="item.id" :class="bulkItems[item.id] ? 'bg-bulk' : ''">
-                                        {{-- <td class="bulk-checkbox">
-                                            <input class="form-check-input" :id="'enabled' + item.id" type="checkbox" v-model="bulkItems[item.id]" v-validate="''" :data-vv-name="'enabled' + item.id"  :name="'enabled' + item.id + '_fake_element'" @click="onBulkItemClicked(item.id)" :disabled="bulkCheckingAllLoader">
-                                            <label class="form-check-label" :for="'enabled' + item.id">
-                                            </label>
-                                        </td> --}}
-
-                                    <td><strong>@{{ item.id }}</strong></td>
-                                    <td class="text-center"><strong class="text-danger">@{{ item.position }}</strong></td>
-
-                                        <td>@{{ item.ci }}</td>
-                                        <td>@{{ item.name }}</td>
-                                        {{-- <td>@{{ item.user }}</td> --}}
+                                        <td><span class="fw-bold text-dark">#@{{ item.id }}</span></td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.82rem;">#@{{ item.position }}</span>
+                                        </td>
+                                        <td class="font-weight-bold text-dark">@{{ item.ci }}</td>
+                                        <td><span class="fw-bold text-dark">@{{ item.name }}</span></td>
                                         <td>@{{ item.dependency }}</td>
                                         <td>@{{ item.fone }}</td>
-                                        <td style="text-transform: uppercase;">@{{ item.problem }}</td>
+                                        <td style="font-size: 0.85rem; text-transform: uppercase;">@{{ item.problem }}</td>
 
-                                        <td v-if="item.statuses.state.id == 1" ><span class="badge bg-warning">@{{ item.statuses.state.name }}</span></td>
-                                        <td v-else-if="item.statuses.state.id == 2" ><span class="badge bg-success">@{{ item.statuses.state.name }}</span></td>
-                                        <td v-else-if="item.statuses.state.id == 9" ><span class="badge"style="color:gray; background:yellow">@{{ item.statuses.state.name }}</span></td>
-
-                                        <td v-else><span class="badge bg-primary">@{{ item.statuses.state.name }}</span></td>
-                                        {{-- <td class="text-center"><span :class="item.statuses.state.name == 'SOLICITADO' ? 'badge bg-warning' : 'badge bg-success' ">@{{  item.statuses.state.name}}</span></td> --}}
-                                        {{-- <td style="text-align:center;">
-                                            @if ($help->state->name == 'SOLICITADO')
-                                                <span class="badge bg-warning">
-                                                    <td ><strong>ESTADO:</strong><span style="text-align:center;"> {{ $help->state->name }} </span></td>
-
-                                            @endif
-                                            @if ($help->state->name == 'ASIGNADO')
-                                                <span class="badge bg-success">
-                                                    <td ><strong>ESTADO:</strong><span style="text-align:center;" > {{ $help->state->name }}</span></td>
-                                            @endif
-                                            @if ($help->state->name == 'FINALIZADO')
-                                                <span class="badge bg-primary">
-                                                    <td ><strong>ESTADO:</strong><span style="text-align:center;" > {{ $help->state->name }}</span></td>
-                                            @endif
-
-                                            @if ($help->state->name == 'PENDIENTE')
-                                                <span class="badge bg-secondary">
-                                                    <td ><strong>ESTADO:</strong><span style="text-align:center;" > {{ $help->state->name }}</span></td>
-                                            @endif
-                                                </span>
-                                        </td> --}}
-
-                                        <td>@{{ item.statuses.user.full_name }}</td>
-                                        <td>@{{ item.created_at | datetime }}</td>
-
-                                        <td>
-                                            <div class="d-flex flex-column">
-                                                <!-- Fila superior con 2 botones -->
-                                                <div class="d-flex mb-2">
-                                                    <div class="me-2">
-                                                        <a class="btn btn-sm btn-spinner btn-success rounded-pill" :href="item.resource_url + '/show'" title="{{ trans('brackets/admin-ui::admin.btn.show') }}" role="button"><i class="fa fa-search"></i></a>
-                                                    </div>
-                                                    <div class="me-2">
-                                                        <a class="btn btn-sm btn-spinner btn-info rounded-pill" :href="item.resource_url + '/edit'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Fila inferior con 2 botones -->
-                                                <div class="d-flex">
-                                                    <div class="me-2" v-if="item.documento!=null">
-                                                        <a class="btn btn-sm btn-spinner btn-warning rounded-pill" :href="item.resource_url + '/documento'" title="{{ trans('VER DOCUMENTO') }}" role="button" target="_blank"><i class="fa fa-eye"></i></a>
-                                                    </div>
-                                                    <div class="me-2" v-if="item.documento!=null">
-                                                        <a class="btn btn-sm btn-spinner btn-danger rounded-pill" :href="item.resource_url + '/eliminar'" title="{{ trans('ELIMINAR') }}" role="button"><i class="fa fa-trash"></i></a>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <!-- Estado -->
+                                        <td class="text-center">
+                                            <span v-if="item.statuses && item.statuses.state && item.statuses.state.id == 1" class="badge rounded-pill bg-warning text-dark px-3 py-1 font-weight-bold">@{{ item.statuses.state.name }}</span>
+                                            <span v-else-if="item.statuses && item.statuses.state && item.statuses.state.id == 2" class="badge rounded-pill bg-success px-3 py-1 font-weight-bold">@{{ item.statuses.state.name }}</span>
+                                            <span v-else-if="item.statuses && item.statuses.state && item.statuses.state.id == 9" class="badge rounded-pill bg-secondary px-3 py-1 font-weight-bold">@{{ item.statuses.state.name }}</span>
+                                            <span v-else-if="item.statuses && item.statuses.state" class="badge rounded-pill bg-primary px-3 py-1 font-weight-bold">@{{ item.statuses.state.name }}</span>
                                         </td>
 
+                                        <td><span class="font-weight-bold text-secondary">@{{ item.statuses && item.statuses.user ? item.statuses.user.full_name : '-' }}</span></td>
+                                        <td style="font-size: 0.82rem;" class="text-nowrap">@{{ item.created_at | datetime }}</td>
 
+                                        <!-- Botones de Acción -->
+                                        <td class="text-center">
+                                            <div class="d-flex align-items-center justify-content-center gap-1">
+                                                <a class="btn btn-sm btn-primary rounded-circle shadow-sm" :href="item.resource_url + '/show'" title="{{ trans('brackets/admin-ui::admin.btn.show') }}" role="button" style="width: 32px; height: 32px; padding: 5px 0; background-color: #2563eb; border-color: #2563eb;">
+                                                    <i class="fa fa-search text-white"></i>
+                                                </a>
+                                                <a class="btn btn-sm btn-info rounded-circle shadow-sm text-white" :href="item.resource_url + '/edit'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button" style="width: 32px; height: 32px; padding: 5px 0; background-color: #0284c7; border-color: #0284c7;">
+                                                    <i class="fa fa-edit text-white"></i>
+                                                </a>
+                                                <a v-if="item.documento != null" class="btn btn-sm btn-warning rounded-circle shadow-sm text-dark" :href="item.resource_url + '/documento'" title="Ver Documento Adjunto" role="button" target="_blank" style="width: 32px; height: 32px; padding: 5px 0;">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                                <a v-if="item.documento != null" class="btn btn-sm btn-danger rounded-circle shadow-sm text-white" :href="item.resource_url + '/eliminar'" title="Eliminar Documento" role="button" style="width: 32px; height: 32px; padding: 5px 0;">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
                                     </tr>
 
+                                    <tr v-if="!collection || collection.length === 0">
+                                        <td colspan="11" class="text-center py-5 text-muted">
+                                            <i class="fa fa-inbox fa-3x mb-3 text-secondary opacity-50 d-block"></i>
+                                            <h6 class="fw-bold mb-1">No hay asistencias en proceso actualmente</h6>
+                                            <p class="small text-muted mb-0">La cola de atenciones activas está al día.</p>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
+                        </div>
 
-                            <div class="row" v-if="pagination.state.total > 0">
-                                <div class="col-sm">
-                                     <span class="pagination-caption">{{ trans('brackets/admin-ui::admin.pagination.overview') }}</span>
-                                </div>
-                                <div class="col-sm-auto">
-                                    <pagination></pagination>
-                                </div>
+                        <!-- Paginación -->
+                        <div class="row mt-3 align-items-center" v-if="pagination && pagination.state && pagination.state.total > 0">
+                            <div class="col-sm">
+                                <span class="pagination-caption text-muted font-weight-bold">{{ trans('brackets/admin-ui::admin.pagination.overview') }}</span>
                             </div>
-
-                            <div class="no-items-found" v-if="!collection.length > 0">
-                                <i class="icon-magnifier"></i>
-                                <h3>{{ trans('brackets/admin-ui::admin.index.no_items') }}</h3>
-                                <p>{{ trans('brackets/admin-ui::admin.index.try_changing_items') }}</p>
-                                <a class="btn btn-primary btn-spinner" href="{{ url('admin/helps/create') }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.help.actions.create') }}</a>
+                            <div class="col-sm-auto">
+                                <pagination></pagination>
                             </div>
                         </div>
                     </div>
@@ -188,25 +168,19 @@
             </div>
         </div>
     </help-listing>
-
+</div>
 @endsection
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    // Comprueba si hay mensajes
-    const successMessage = document.querySelector('.alert-success');
-    const errorMessage = document.querySelector('.alert-danger');
+        const successMessage = document.querySelector('.alert-success');
+        const errorMessage = document.querySelector('.alert-danger');
 
-    if (successMessage) {
-        setTimeout(() => {
-            successMessage.style.display = 'none';
-        }, 10000);  // 10 segundos
-    }
-
-    if (errorMessage) {
-        setTimeout(() => {
-            errorMessage.style.display = 'none';
-        }, 10000);  // 10 segundos
-    }
-});
-
+        if (successMessage) {
+            setTimeout(() => { successMessage.style.display = 'none'; }, 10000);
+        }
+        if (errorMessage) {
+            setTimeout(() => { errorMessage.style.display = 'none'; }, 10000);
+        }
+    });
 </script>
