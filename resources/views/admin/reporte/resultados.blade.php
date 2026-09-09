@@ -19,7 +19,7 @@
                         <a href="{{ route('admin/reportes/create') }}" class="btn btn-sm btn-outline-light rounded-pill px-3 font-weight-bold shadow-sm">
                             <i class="fa fa-arrow-left me-1"></i> NUEVA CONSULTA
                         </a>
-                        <a href="{{ url('admin/reportes/imprimir?inicio=' . $filtros['inicio'] . '&fin=' . $filtros['fin'] . '&user_id=' . $filtros['user_id'] . '&state_id=' . $filtros['state_id']) }}" target="_blank" class="btn btn-sm rounded-pill px-3 font-weight-bold text-white shadow-sm" style="background-color: #dc2626; border-color: #dc2626;">
+                        <a href="{{ url('admin/reportes/imprimir?inicio=' . urlencode($filtros['inicio_raw']) . '&fin=' . urlencode($filtros['fin_raw']) . '&user_id=' . $filtros['user_id'] . '&state_id=' . $filtros['state_id']) }}" target="_blank" class="btn btn-sm rounded-pill px-3 font-weight-bold text-white shadow-sm" style="background-color: #dc2626; border-color: #dc2626;">
                             <i class="fa fa-file-pdf-o me-1"></i> IMPRIMIR / GENERAR PDF
                         </a>
                     </div>

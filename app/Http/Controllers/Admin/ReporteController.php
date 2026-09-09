@@ -26,8 +26,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+use App\Services\ReporteService;
+
 class ReporteController extends Controller
 {
+    protected $reporteService;
+
+    public function __construct(ReporteService $reporteService)
+    {
+        $this->reporteService = $reporteService;
+    }
 
     /**
      * Display a listing of the resource.
@@ -97,11 +105,10 @@ class ReporteController extends Controller
         return redirect('admin/reportes');
     }
 
-
     /**
-     * Construir consulta de reporte y filtros de manera unificada.
+     * Procesar filtros de consulta del reporte mediante el servicio.
      */
-    private function buildReporteQuery(Request $request): array
+    private function processReporteQuery(Request $request): array
     {
         $rules = [
             'inicio' => 'required|date',
@@ -113,64 +120,12 @@ class ReporteController extends Controller
         ];
         $this->validate($request, $rules, $messages);
 
-        $inicio = $request->inicio;
-        $fin = $request->fin;
-        $user = (int) $request->input('user_id', 0);
-        $estado = (int) $request->input('state_id', 0);
-
-        // Formatear fechas para cubrir todo el rango de inicio y fin (hasta 23:59:59)
-        $inicioFull = str_contains($inicio, ':') ? $inicio : $inicio . ' 00:00:00';
-        $finFull    = str_contains($fin, ':') ? $fin : $fin . ' 23:59:59';
-
-        $query = DetailHelp::whereBetween('created_at', [$inicioFull, $finFull]);
-
-        if ($user > 0) {
-            $query->where('user_id', $user);
-        } else {
-            $query->where('user_id', '!=', 1);
-        }
-
-        if ($estado > 0) {
-            $query->where('state_id', $estado);
-        }
-
-        $dhelps = $query->with(['user', 'state', 'help'])
-                        ->orderBy('user_id', 'ASC')
-                        ->orderBy('help_id', 'ASC')
-                        ->get();
-
-        // Obtener nombres de técnico y estado para visualización
-        $userName = 'TODOS LOS TÉCNICOS';
-        if ($user > 0) {
-            $u = AdminUser::find($user);
-            if ($u) {
-                $userName = trim($u->first_name . ' ' . $u->last_name);
-            }
-        }
-
-        $estadoName = 'TODOS LOS ESTADOS';
-        if ($estado > 0) {
-            $e = State::find($estado);
-            if ($e) {
-                $estadoName = mb_strtoupper($e->name, 'UTF-8');
-            }
-        }
-
-        $filtros = [
-            'inicio'      => $inicio,
-            'fin'         => $fin,
-            'user_id'     => $user,
-            'state_id'    => $estado,
-            'user_name'   => $userName,
-            'state_name'  => $estadoName,
-        ];
-
-        return [$dhelps, $dhelps->count(), $filtros];
+        return $this->reporteService->generateReport($request->all());
     }
 
     public function pdf(Request $request)
     {
-        [$dhelps, $contar, $filtros] = $this->buildReporteQuery($request);
+        [$dhelps, $contar, $filtros] = $this->processReporteQuery($request);
 
         // Generar PDF en orientación horizontal (landscape)
         $pdf = Pdf::loadView('admin.reporte.prueba', compact('dhelps', 'contar', 'filtros'))
@@ -181,7 +136,7 @@ class ReporteController extends Controller
 
     public function resultados(Request $request)
     {
-        [$dhelps, $contar, $filtros] = $this->buildReporteQuery($request);
+        [$dhelps, $contar, $filtros] = $this->processReporteQuery($request);
 
         return view('admin.reporte.resultados', compact('dhelps', 'contar', 'filtros'));
     }
