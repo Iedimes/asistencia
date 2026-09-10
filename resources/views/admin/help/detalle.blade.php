@@ -59,7 +59,7 @@
                                     <tr v-for="(item, index) in collection" :key="item.id" :class="bulkItems[item.id] ? 'bg-bulk' : ''">
                                         <td><span class="fw-bold text-dark">#@{{ item.id }}</span></td>
                                         <td class="text-center">
-                                            <span class="badge bg-success rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.82rem;">#@{{ item.position }}</span>
+                                            <span class="badge bg-dark rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.82rem;">#@{{ item.position }}</span>
                                         </td>
 
                                         <td class="font-weight-bold text-dark">@{{ item.ci }}</td>

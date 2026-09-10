@@ -26,7 +26,7 @@
                                         <span class="fw-bold text-dark font-weight-bold" style="font-size: 0.95rem; color: #0f172a;">#{{ $order->id }}</span>
                                     </div>
                                     <div class="text-end">
-                                        <span class="badge bg-success rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.85rem;">#{{ $order->position }}</span>
+                                        <span class="badge bg-dark rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.85rem;">#{{ $order->position }}</span>
                                     </div>
                                 </div>
                             </li>
@@ -73,7 +73,7 @@
                                         <span class="fw-bold text-dark font-weight-bold" style="font-size: 0.95rem; color: #0f172a;">#${order.id}</span>
                                     </div>
                                     <div class="text-end">
-                                        <span class="badge bg-success rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.85rem;">#${order.position}</span>
+                                        <span class="badge bg-dark rounded-pill px-3 py-1 font-weight-bold" style="font-size: 0.85rem;">#${order.position}</span>
                                     </div>
                                 </div>
                             </li>

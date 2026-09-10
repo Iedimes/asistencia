@@ -63,7 +63,7 @@
                         {{ $formattedDateTime }}
                     </td>
                     <td>{{ optional($item->category)->name ?? '' }}</td>
-                    <td class="text-center">{{ $item->patrimony }}</td>
+                    <td class="text-center" style="white-space: pre-line;">{!! nl2br(e($item->patrimony ?? '-')) !!}</td>
                 </tr>
             @endif
         @endforeach
