@@ -142,7 +142,7 @@
                                 <td class="text-uppercase font-weight-bold text-dark" style="font-size: 0.88rem; white-space: pre-line; word-break: break-word;">@{{ item.solution }}</td>
                                 <td class="text-nowrap text-dark" style="font-size: 0.85rem;">@{{ (item.created_at || item.date) | datetime }}</td>
                                 <td><span class="badge bg-light text-dark border px-2 py-1">@{{ item.category ? item.category.name : '-' }}</span></td>
-                                <td><span class="font-weight-bold text-secondary">@{{ item.patrimony || '-' }}</span></td>
+                                <td><span class="font-weight-bold text-secondary" style="white-space: pre-line; word-break: break-word;">@{{ item.patrimony || '-' }}</span></td>
 
                                 <td class="text-center">
                                     @if ($help->statuses->state_id == 4)

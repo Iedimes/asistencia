@@ -92,10 +92,19 @@
     </div>
 </div>
 
-<div class="form-group row align-items-center mb-3" :class="{'has-danger': errors.has('patrimony'), 'has-success': fields.patrimony && fields.patrimony.valid }">
-    <label for="patrimony" class="col-md-3 col-form-label text-md-end font-weight-bold text-dark">{{ trans('admin.detail-help.columns.patrimony') }}</label>
+<div class="form-group row align-items-start mb-3" :class="{'has-danger': errors.has('patrimony'), 'has-success': fields.patrimony && fields.patrimony.valid }">
+    <label for="patrimony" class="col-md-3 col-form-label text-md-end font-weight-bold text-dark pt-2">{{ trans('admin.detail-help.columns.patrimony') }}</label>
     <div class="col-md-8">
-        <input type="text" v-model="form.patrimony" @input="validate($event)" class="form-control text-dark font-weight-bold rounded-3 shadow-sm px-3" style="border: 1px solid #cbd5e1; height: 44px;" :class="{'form-control-danger': errors.has('patrimony'), 'form-control-success': fields.patrimony && fields.patrimony.valid}" id="patrimony" name="patrimony" placeholder="{{ trans('admin.detail-help.columns.patrimony') }}">
+        <textarea
+            v-model="form.patrimony"
+            rows="3"
+            class="form-control text-dark font-weight-bold rounded-3 shadow-sm px-3 py-2"
+            style="border: 1px solid #cbd5e1;"
+            :class="{'form-control-danger': errors.has('patrimony'), 'form-control-success': fields.patrimony && fields.patrimony.valid}"
+            id="patrimony"
+            name="patrimony"
+            placeholder="{{ trans('admin.detail-help.columns.patrimony') }}">
+        </textarea>
         <div v-if="errors.has('patrimony')" class="form-control-feedback form-text text-danger mt-1" v-cloak>@{{ errors.first('patrimony') }}</div>
     </div>
 </div>

@@ -103,7 +103,7 @@
                                                 @{{ item.category ? item.category.name : 'N/A' }}
                                             </span>
                                         </td>
-                                        <td class="text-muted font-weight-bold" style="font-size: 0.85rem;">
+                                        <td class="text-muted font-weight-bold" style="font-size: 0.85rem; white-space: pre-line; word-break: break-word;">
                                             @{{ item.patrimony || '-' }}
                                         </td>
 
