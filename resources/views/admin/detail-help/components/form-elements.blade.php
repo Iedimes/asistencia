@@ -59,7 +59,7 @@
             <div class="input-group-addon bg-light border-end-0 px-3 d-flex align-items-center rounded-start-3" style="border: 1px solid #cbd5e1;"><i class="fa fa-calendar text-primary"></i></div>
             <datetime
                 v-model="form.date"
-                :config="datetimePickerConfig"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i:S', time_24hr: true, defaultHour: new Date().getHours(), defaultMinute: new Date().getMinutes() }"
                 class="flatpickr text-dark font-weight-bold"
                 :class="{
                     'form-control-danger': errors.has('date'),

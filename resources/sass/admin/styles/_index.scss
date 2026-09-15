@@ -125,7 +125,43 @@ select.form-control {
     color: #ffffff !important;
 }
 
-.vue-dialog .vue-dialog-button:last-child,
+.vue-dialog .vue-dialog-buttons button.btn-dark,
+.vue-dialog .vue-dialog-buttons .btn-dark,
+.vue-dialog .vue-dialog-button.btn-dark,
+.vue-dialog .btn-dialog.btn-dark {
+    background-color: #1e293b !important;
+    border-color: #1e293b !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-radius: 9999px !important;
+    padding: 0.5rem 1.75rem !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.vue-dialog .vue-dialog-buttons button.btn-dark:hover,
+.vue-dialog .vue-dialog-buttons .btn-dark:hover,
+.vue-dialog .vue-dialog-button.btn-dark:hover,
+.vue-dialog .btn-dialog.btn-dark:hover {
+    background-color: #0f172a !important;
+    border-color: #0f172a !important;
+    color: #ffffff !important;
+}
+
+.vue-dialog .vue-dialog-button .btn-primary,
+.vue-dialog .btn-dialog.btn-primary {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+.vue-dialog .vue-dialog-button .btn-primary:hover,
+.vue-dialog .btn-dialog.btn-primary:hover {
+    background-color: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: #ffffff !important;
+}
+
 .vue-dialog .vue-dialog-button .btn-danger,
 .vue-dialog .btn-dialog.btn-danger {
     background-color: #dc2626 !important;
@@ -133,7 +169,7 @@ select.form-control {
     color: #ffffff !important;
 }
 
-.vue-dialog .vue-dialog-button:last-child:hover,
+.vue-dialog .vue-dialog-button .btn-danger:hover,
 .vue-dialog .btn-dialog.btn-danger:hover {
     background-color: #b91c1c !important;
     border-color: #b91c1c !important;
