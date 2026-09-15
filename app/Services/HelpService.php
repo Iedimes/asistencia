@@ -233,23 +233,29 @@ class HelpService
      */
     public function getFinalizadasTickets(IndexHelp $request)
     {
-        $detalleQuery = DetailHelp::select('help_id')
-            ->where('state_id', '=', 4)
+        $subQuery = DetailHelp::select('help_id', DB::raw('MAX(created_at) as finalizado_at'))
+            ->where('state_id', 4)
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('detail_helps as dh2')
                     ->whereRaw('detail_helps.help_id = dh2.help_id')
                     ->whereRaw('detail_helps.created_at < dh2.created_at');
-            });
+            })
+            ->groupBy('help_id');
 
         return AdminListing::create(Help::class)->processRequestAndGet(
             $request,
             ['id', 'ci', 'name', 'user', 'dependency', 'fone', 'problem', 'created_at'],
             [],
-            function ($query) use ($detalleQuery, $request) {
-                $query->whereIn('id', $detalleQuery);
+            function ($query) use ($subQuery, $request) {
+                $query->joinSub($subQuery, 'latest_finalizado', function ($join) {
+                    $join->on('helps.id', '=', 'latest_finalizado.help_id');
+                });
                 $this->applyAdvancedSearch($query, $request);
-                $query->orderBy('id', 'DESC');
+                if (!$request->has('orderBy')) {
+                    $query->orderBy('latest_finalizado.finalizado_at', 'DESC')
+                          ->orderBy('helps.id', 'DESC');
+                }
             }
         );
     }

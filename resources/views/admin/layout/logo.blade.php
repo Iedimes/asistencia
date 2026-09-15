@@ -2,6 +2,8 @@
     <img src="{{ asset('images/logo-muvh.jpg') }}" 
          alt="MUVH - Ministerio de Urbanismo, Vivienda y Hábitat" 
          class="img-fluid" 
+         loading="eager"
+         fetchpriority="high"
          style="max-height: 38px; width: auto; object-fit: contain; transition: all 0.3s ease;" 
          onerror="this.onerror=null; this.src='{{ asset('images/logo.jpg') }}';" />
 </a>

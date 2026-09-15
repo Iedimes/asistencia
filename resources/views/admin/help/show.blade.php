@@ -178,83 +178,87 @@
         </div>
     </detail-help-listing>
 </div>
+@endsection
 
-<script>
-function descargarPdfDetalleTicket(baseUrl) {
-    const paperSize = document.getElementById('ticket_paper_size').value || 'a4';
-    const orientation = document.getElementById('ticket_orientation').value || 'portrait';
+@section('bottom-scripts')
+    @parent
+    <script>
+    function descargarPdfDetalleTicket(baseUrl) {
+        const paperSize = document.getElementById('ticket_paper_size').value || 'a4';
+        const orientation = document.getElementById('ticket_orientation').value || 'portrait';
 
-    const table = document.querySelector('.table-listing');
-    let params = `paper_size=${paperSize}&orientation=${orientation}`;
+        const table = document.querySelector('.table-listing');
+        let params = `paper_size=${paperSize}&orientation=${orientation}`;
 
-    if (table) {
-        const ths = table.querySelectorAll('thead th');
-        if (ths.length >= 5) {
-            const tableWidth = table.offsetWidth;
-            const userPct = Math.round((ths[0].offsetWidth / tableWidth) * 100) + '%';
-            const solutionPct = Math.round((ths[1].offsetWidth / tableWidth) * 100) + '%';
-            const datePct = Math.round((ths[2].offsetWidth / tableWidth) * 100) + '%';
-            const categoryPct = Math.round((ths[3].offsetWidth / tableWidth) * 100) + '%';
-            const patrimonyPct = Math.round((ths[4].offsetWidth / tableWidth) * 100) + '%';
+        if (table) {
+            const ths = table.querySelectorAll('thead th');
+            if (ths.length >= 5) {
+                const tableWidth = table.offsetWidth;
+                const userPct = Math.round((ths[0].offsetWidth / tableWidth) * 100) + '%';
+                const solutionPct = Math.round((ths[1].offsetWidth / tableWidth) * 100) + '%';
+                const datePct = Math.round((ths[2].offsetWidth / tableWidth) * 100) + '%';
+                const categoryPct = Math.round((ths[3].offsetWidth / tableWidth) * 100) + '%';
+                const patrimonyPct = Math.round((ths[4].offsetWidth / tableWidth) * 100) + '%';
 
-            params += `&col_user=${userPct}&col_solution=${solutionPct}&col_date=${datePct}&col_category=${categoryPct}&col_patrimony=${patrimonyPct}`;
+                params += `&col_user=${userPct}&col_solution=${solutionPct}&col_date=${datePct}&col_category=${categoryPct}&col_patrimony=${patrimonyPct}`;
+            }
         }
+
+        window.open(`${baseUrl}?${params}`, '_blank');
     }
 
-    window.open(`${baseUrl}?${params}`, '_blank');
-}
+    // Script para redimensionar columnas de la tabla en pantalla (Resizable Table Columns)
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const table = document.querySelector('.table-listing');
+            if (!table) return;
 
-// Script para redimensionar columnas de la tabla en pantalla (Resizable Table Columns)
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        const table = document.querySelector('.table-listing');
-        if (!table) return;
+            const ths = table.querySelectorAll('thead th');
+            ths.forEach((th, index) => {
+                if (index === ths.length - 1) return; // Omitir columna de acciones
 
-        const ths = table.querySelectorAll('thead th');
-        ths.forEach((th, index) => {
-            if (index === ths.length - 1) return; // Omitir columna de acciones
+                th.style.position = 'relative';
+                const resizer = document.createElement('div');
+                resizer.className = 'resizer';
+                resizer.style.width = '6px';
+                resizer.style.height = '100%';
+                resizer.style.position = 'absolute';
+                resizer.style.right = '0';
+                resizer.style.top = '0';
+                resizer.style.cursor = 'col-resize';
+                resizer.style.userSelect = 'none';
+                resizer.style.zIndex = '10';
 
-            th.style.position = 'relative';
-            const resizer = document.createElement('div');
-            resizer.className = 'resizer';
-            resizer.style.width = '6px';
-            resizer.style.height = '100%';
-            resizer.style.position = 'absolute';
-            resizer.style.right = '0';
-            resizer.style.top = '0';
-            resizer.style.cursor = 'col-resize';
-            resizer.style.userSelect = 'none';
-            resizer.style.zIndex = '10';
+                th.appendChild(resizer);
 
-            th.appendChild(resizer);
+                let x = 0;
+                let w = 0;
 
-            let x = 0;
-            let w = 0;
+                const mouseDownHandler = function(e) {
+                    x = e.clientX;
+                    w = th.offsetWidth;
 
-            const mouseDownHandler = function(e) {
-                x = e.clientX;
-                w = th.offsetWidth;
+                    document.addEventListener('mousemove', mouseMoveHandler);
+                    document.addEventListener('mouseup', mouseUpHandler);
+                    resizer.style.background = '#2563eb';
+                };
 
-                document.addEventListener('mousemove', mouseMoveHandler);
-                document.addEventListener('mouseup', mouseUpHandler);
-                resizer.style.background = '#2563eb';
-            };
+                const mouseMoveHandler = function(e) {
+                    const dx = e.clientX - x;
+                    const newWidth = Math.max(60, w + dx);
+                    th.style.width = newWidth + 'px';
+                };
 
-            const mouseMoveHandler = function(e) {
-                const dx = e.clientX - x;
-                const newWidth = Math.max(60, w + dx);
-                th.style.width = newWidth + 'px';
-            };
+                const mouseUpHandler = function() {
+                    document.removeEventListener('mousemove', mouseMoveHandler);
+                    document.removeEventListener('mouseup', mouseUpHandler);
+                    resizer.style.background = 'transparent';
+                };
 
-            const mouseUpHandler = function() {
-                document.removeEventListener('mousemove', mouseMoveHandler);
-                document.removeEventListener('mouseup', mouseUpHandler);
-                resizer.style.background = 'transparent';
-            };
-
-            resizer.addEventListener('mousedown', mouseDownHandler);
-        });
-    }, 500);
-});
-</script>
+                resizer.addEventListener('mousedown', mouseDownHandler);
+            });
+        }, 500);
+    });
+    </script>
 @endsection
+

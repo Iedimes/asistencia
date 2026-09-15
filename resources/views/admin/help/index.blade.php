@@ -3,12 +3,11 @@
 @section('title', trans('admin.help.actions.index'))
 
 @section('body')
-<body onLoad="setTimeout('self.location.reload()', 300000)"></body>
-
 <div class="container-fluid px-lg-4 px-3 py-3 mx-auto">
     <help-listing
         :data="{{ $data->toJson() }}"
         :url="'{{ url('admin/helps') }}'"
+        :auto-refresh-interval="300000"
         inline-template>
 
         <div class="row justify-content-center">
@@ -171,16 +170,20 @@
 </div>
 @endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const successMessage = document.querySelector('.alert-success');
-        const errorMessage = document.querySelector('.alert-danger');
+@section('bottom-scripts')
+    @parent
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const successMessage = document.querySelector('.alert-success');
+            const errorMessage = document.querySelector('.alert-danger');
 
-        if (successMessage) {
-            setTimeout(() => { successMessage.style.display = 'none'; }, 10000);
-        }
-        if (errorMessage) {
-            setTimeout(() => { errorMessage.style.display = 'none'; }, 10000);
-        }
-    });
-</script>
+            if (successMessage) {
+                setTimeout(() => { successMessage.style.display = 'none'; }, 10000);
+            }
+            if (errorMessage) {
+                setTimeout(() => { errorMessage.style.display = 'none'; }, 10000);
+            }
+        });
+    </script>
+@endsection
+

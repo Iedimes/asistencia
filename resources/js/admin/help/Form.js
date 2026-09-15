@@ -29,7 +29,8 @@ Vue.component('help-form', {
                 text: modalText,
                 buttons: [
                     {
-                        title: '<span class="btn-dialog btn-primary">Aceptar.<span>',
+                        title: 'ACEPTAR',
+                        class: 'btn-dialog btn-dark',
                         handler: () => {
                             this.$modal.hide('dialog');
                             window.location.replace(data.redirect);

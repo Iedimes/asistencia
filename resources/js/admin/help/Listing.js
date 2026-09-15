@@ -2,12 +2,32 @@ import AppListing from '../app-components/Listing/AppListing';
 
 Vue.component('help-listing', {
     mixins: [AppListing],
+    props: {
+        autoRefreshInterval: {
+            type: Number,
+            default: 0
+        }
+    },
     data: function() {
         return {
             filters: {
                 tecnico: ''
-            }
+            },
+            refreshTimer: null
         };
+    },
+    mounted: function() {
+        var _this = this;
+        if (this.autoRefreshInterval && this.autoRefreshInterval > 0) {
+            this.refreshTimer = setInterval(function() {
+                _this.loadData();
+            }, this.autoRefreshInterval);
+        }
+    },
+    beforeDestroy: function() {
+        if (this.refreshTimer) {
+            clearInterval(this.refreshTimer);
+        }
     },
     methods: {
         deleteItem: function deleteItem(url) {

@@ -186,18 +186,26 @@
 
 @endsection
 
-<script>
-function verResultados() {
-    const form = document.querySelector('.form-create');
-    form.action = "{{ url('admin/reportes/resultados') }}";
-    form.method = "GET";
-}
+@section('bottom-scripts')
+    @parent
+    <script>
+        function verResultados() {
+            const form = document.querySelector('.form-create');
+            if (form) {
+                form.action = "{{ url('admin/reportes/resultados') }}";
+                form.method = "GET";
+            }
+        }
 
-function descargarPdfDirecto() {
-    const form = document.querySelector('.form-create');
-    form.action = "{{ url('admin/reportes/imprimir') }}";
-    form.method = "GET";
-    form.target = "_blank";
-    form.submit();
-}
-</script>
+        function descargarPdfDirecto() {
+            const form = document.querySelector('.form-create');
+            if (form) {
+                form.action = "{{ url('admin/reportes/imprimir') }}";
+                form.method = "GET";
+                form.target = "_blank";
+                form.submit();
+            }
+        }
+    </script>
+@endsection
+

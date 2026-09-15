@@ -4,7 +4,7 @@
         <i class="fa fa-id-card text-primary me-1"></i> Cédula de Identidad <span class="text-danger">*</span>
     </label>
     <div :class="isFormLocalized ? 'col-md-8' : 'col-md-9 col-xl-8'">
-        <input @keydown.enter.prevent="findData" @change="findData" type="text" v-model="form.ci" @input="validate($event)" class="form-control shadow-sm text-dark font-weight-bold" style="border: 1px solid #cbd5e1; color: #0f172a;" id="ci" name="ci" placeholder="Ingrese Nro. de Cédula y presione Enter o Tab">
+        <input @keydown.enter.prevent="findData" @change="findData" type="text" v-model="form.ci" @input="validate($event)" autocomplete="off" class="form-control shadow-sm text-dark font-weight-bold" style="border: 1px solid #cbd5e1; color: #0f172a;" id="ci" name="ci" placeholder="Ingrese Nro. de Cédula y presione Enter o Tab">
         <div v-if="errors.has('ci')" class="form-control-feedback form-text text-danger font-weight-bold" v-cloak>@{{ errors.first('ci') }}</div>
     </div>
 </div>
@@ -15,7 +15,7 @@
         <i class="fa fa-user text-primary me-1"></i> Nombre Completo
     </label>
     <div :class="isFormLocalized ? 'col-md-8' : 'col-md-9 col-xl-8'">
-        <input readonly type="text" v-model="form.name" @input="validate($event)" class="form-control shadow-sm font-weight-bold text-dark" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a !important;" id="name" name="name" placeholder="Nombre autocompletado automáticamente">
+        <input readonly type="text" v-model="form.name" @input="validate($event)" autocomplete="off" class="form-control shadow-sm font-weight-bold text-dark" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a !important;" id="name" name="name" placeholder="Nombre autocompletado automáticamente">
         <div v-if="errors.has('name')" class="form-control-feedback form-text text-danger font-weight-bold" v-cloak>@{{ errors.first('name') }}</div>
     </div>
 </div>
@@ -26,7 +26,7 @@
         <i class="fa fa-user-circle-o text-primary me-1"></i> Usuario Sistema
     </label>
     <div :class="isFormLocalized ? 'col-md-8' : 'col-md-9 col-xl-8'">
-        <input readonly type="text" v-model="form.user" @input="validate($event)" class="form-control shadow-sm font-weight-bold text-dark" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a !important;" id="user" name="user" placeholder="Usuario institucional del solicitante">
+        <input readonly type="text" v-model="form.user" @input="validate($event)" autocomplete="off" class="form-control shadow-sm font-weight-bold text-dark" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a !important;" id="user" name="user" placeholder="Usuario institucional del solicitante">
         <div v-if="errors.has('user')" class="form-control-feedback form-text text-danger font-weight-bold" v-cloak>@{{ errors.first('user') }}</div>
     </div>
 </div>
@@ -35,7 +35,7 @@
 <div style="display: none" class="form-group row align-items-center" :class="{'has-danger': errors.has('dependency_id'), 'has-success': fields.dependency_id && fields.dependency_id.valid }">
     <label for="dependency_id" class="col-form-label text-start text-md-start" :class="isFormLocalized ? 'col-md-4' : 'col-md-3'">{{ trans('admin.help.columns.dependency_id') }}</label>
     <div :class="isFormLocalized ? 'col-md-8' : 'col-md-9 col-xl-8'">
-        <input readonly type="text" v-model="form.dependency_id" @input="validate($event)" class="form-control" id="dependency_id" name="dependency_id">
+        <input readonly type="text" v-model="form.dependency_id" @input="validate($event)" autocomplete="off" class="form-control" id="dependency_id" name="dependency_id">
     </div>
 </div>
 
@@ -45,7 +45,7 @@
         <i class="fa fa-building text-primary me-1"></i> Dependencia
     </label>
     <div :class="isFormLocalized ? 'col-md-8' : 'col-md-9 col-xl-8'">
-        <input readonly type="text" v-model="form.dependency" @input="validate($event)" class="form-control shadow-sm font-weight-bold text-dark" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a !important;" id="dependency" name="dependency" placeholder="Dependencia o dirección a la que pertenece">
+        <input readonly type="text" v-model="form.dependency" @input="validate($event)" autocomplete="off" class="form-control shadow-sm font-weight-bold text-dark" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a !important;" id="dependency" name="dependency" placeholder="Dependencia o dirección a la que pertenece">
         <div v-if="errors.has('dependency')" class="form-control-feedback form-text text-danger font-weight-bold" v-cloak>@{{ errors.first('dependency') }}</div>
     </div>
 </div>
@@ -56,7 +56,7 @@
         <i class="fa fa-phone text-primary me-1"></i> Teléfono / Interno <span class="text-danger">*</span>
     </label>
     <div :class="isFormLocalized ? 'col-md-8' : 'col-md-9 col-xl-8'">
-        <input type="text" v-model="form.fone" @input="validate($event)" class="form-control shadow-sm font-weight-bold text-dark" style="border: 1px solid #cbd5e1; color: #0f172a;" id="fone" name="fone" placeholder="Nro de interno o teléfono celular para coordinar la atención">
+        <input type="text" v-model="form.fone" @input="validate($event)" autocomplete="off" class="form-control shadow-sm font-weight-bold text-dark" style="border: 1px solid #cbd5e1; color: #0f172a;" id="fone" name="fone" placeholder="Nro de interno o teléfono celular para coordinar la atención">
         <div v-if="errors.has('fone')" class="form-control-feedback form-text text-danger font-weight-bold" v-cloak>@{{ errors.first('fone') }}</div>
     </div>
 </div>

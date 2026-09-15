@@ -8,9 +8,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="Sistema de Asistencia Técnica, Mesa de Ayuda y Gestión de Tickets - Soporte TIC">
 
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-
+    <!-- Preload de Recursos Críticos (Elimina Render Delay) -->
+    <link rel="preload" href="{{ mix('/css/admin.css') }}" as="style">
+    <link rel="preload" href="{{ mix('/js/admin.js') }}" as="script">
+    <link rel="preload" href="{{ asset('images/logo-muvh.jpg') }}" as="image" fetchpriority="high">
 
 	{{-- TODO translatable suffix --}}
     <title>SOPORTE TIC'S - @yield('title', 'Craftable')</title>
