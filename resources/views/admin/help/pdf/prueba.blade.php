@@ -32,6 +32,7 @@
 
         table.pdf-table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             border: 1px solid #b0b0b0;
             margin-bottom: 15px;
@@ -46,6 +47,9 @@
             border: 1px solid #b0b0b0;
             text-align: left;
             text-transform: uppercase;
+            word-break: break-all;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         table.pdf-table td {
@@ -54,11 +58,17 @@
             border: 1px solid #c5c5c5;
             vertical-align: top;
             line-height: 1.4;
+            word-break: break-all;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .problem-cell {
             padding: 8px !important;
             background-color: #ffffff;
+            word-break: break-all;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .problem-text {
@@ -66,7 +76,9 @@
             font-size: 10.5px;
             color: #111111;
             line-height: 1.45;
+            word-break: break-all;
             word-wrap: break-word;
+            overflow-wrap: break-word;
             white-space: normal;
         }
 
@@ -75,7 +87,9 @@
             font-size: 10.5px;
             color: #111111;
             line-height: 1.4;
+            word-break: break-all;
             word-wrap: break-word;
+            overflow-wrap: break-word;
             white-space: normal;
         }
 

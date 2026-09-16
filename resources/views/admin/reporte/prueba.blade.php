@@ -73,6 +73,7 @@
         }
         .table-data {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
             font-size: 10px;
         }
@@ -85,11 +86,17 @@
             text-transform: uppercase;
             border: 1px solid #0f172a;
             font-size: 9.5px;
+            word-break: break-all;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .table-data td {
             padding: 6px 8px;
             border: 1px solid #cbd5e1;
             vertical-align: top;
+            word-break: break-all;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .table-data tr:nth-child(even) {
             background-color: #f8fafc;
@@ -139,18 +146,20 @@
     <!-- Filtros / Metadatos del Informe -->
     <table class="meta-box">
         <tr>
-            <td width="15%"><span class="meta-label">FECHA DESDE:</span></td>
-            <td width="20%"><span class="meta-value">{{ $filtros['inicio'] }}</span></td>
-            <td width="15%"><span class="meta-label">FECHA HASTA:</span></td>
-            <td width="20%"><span class="meta-value">{{ $filtros['fin'] }}</span></td>
-            <td width="15%"><span class="meta-label">TOTAL REGISTROS:</span></td>
-            <td width="15%"><span class="meta-value">{{ $contar }}</span></td>
+            <td width="20%"><span class="meta-label">FECHA DESDE:</span></td>
+            <td width="30%"><span class="meta-value">{{ $filtros['inicio'] }}</span></td>
+            <td width="20%"><span class="meta-label">TOTAL REGISTROS:</span></td>
+            <td width="30%"><span class="meta-value">{{ $contar }}</span></td>
+        </tr>
+        <tr>
+            <td width="20%"><span class="meta-label">FECHA HASTA:</span></td>
+            <td width="30%"><span class="meta-value">{{ $filtros['fin'] }}</span></td>
+            <td width="20%"><span class="meta-label">ESTADO:</span></td>
+            <td width="30%"><span class="meta-value">{{ $filtros['state_name'] }}</span></td>
         </tr>
         <tr>
             <td><span class="meta-label">TÉCNICO:</span></td>
-            <td colspan="2"><span class="meta-value">{{ $filtros['user_name'] }}</span></td>
-            <td><span class="meta-label">ESTADO:</span></td>
-            <td colspan="2"><span class="meta-value">{{ $filtros['state_name'] }}</span></td>
+            <td colspan="3"><span class="meta-value">{{ $filtros['user_name'] }}</span></td>
         </tr>
     </table>
 
