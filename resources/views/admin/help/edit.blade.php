@@ -13,7 +13,7 @@
             v-cloak
             inline-template>
 
-            <form class="form-horizontal form-edit" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
+            <form class="form-horizontal form-edit" method="post" @submit.prevent="form.problem = form.problem ? form.problem.toUpperCase() : ''; onSubmit()" :action="action" novalidate>
 
                 <div class="card-header border-0 py-3 px-4 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
                     <div class="d-flex align-items-center gap-3">
