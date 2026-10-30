@@ -16,7 +16,7 @@
                     v-cloak
                     inline-template>
 
-                    <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
+                    <form class="form-horizontal form-create" method="post" @submit.prevent="form.problem = form.problem ? form.problem.toUpperCase() : ''; onSubmit()" :action="action" novalidate>
                         <!-- Encabezado -->
                         <div class="card-header border-0 py-3 px-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
                             <h4 class="mb-0 fw-bold text-white text-center tracking-tight" style="font-size: 1.3rem; letter-spacing: 0.5px;">SOLICITUD DE SOPORTE</h4>

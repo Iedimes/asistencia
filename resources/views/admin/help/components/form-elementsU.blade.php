@@ -52,7 +52,9 @@
     </label>
     <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
         <textarea v-model="form.problem"
-                  @input="validate($event); form.problem = form.problem.toUpperCase()"
+                  @input="validate($event)"
+                  @blur="form.problem = form.problem ? form.problem.toUpperCase() : ''"
+                  style="text-transform: uppercase;"
                   class="form-control"
                   :class="{'form-control-danger': errors.has('problem'), 'form-control-success': fields.problem && fields.problem.valid}"
                   id="problem" name="problem"

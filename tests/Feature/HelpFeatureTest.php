@@ -155,4 +155,23 @@ class HelpFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewHas('data');
     }
+
+    /** @test */
+    public function public_and_admin_create_forms_preserve_cursor_position_on_problem_textarea()
+    {
+        $publicResponse = $this->get('/');
+        $publicResponse->assertStatus(200);
+        $publicResponse->assertSee('#problem::placeholder', false);
+        $publicResponse->assertSee('@blur="form.problem = form.problem ? form.problem.toUpperCase() : \'\'"', false);
+        $publicResponse->assertDontSee('el.value.toUpperCase()', false);
+        $publicResponse->assertDontSee('validate($event); form.problem = form.problem.toUpperCase()', false);
+
+        $adminResponse = $this->actingAs($this->admin, 'admin')
+            ->get('/admin/helps/createadm');
+        $adminResponse->assertStatus(200);
+        $adminResponse->assertSee('#problem::placeholder', false);
+        $adminResponse->assertSee('@blur="form.problem = form.problem ? form.problem.toUpperCase() : \'\'"', false);
+        $adminResponse->assertDontSee('el.value.toUpperCase()', false);
+        $adminResponse->assertDontSee('validate($event); form.problem = form.problem.toUpperCase()', false);
+    }
 }

@@ -1,3 +1,12 @@
+@section('styles')
+    @parent
+    <style>
+        #problem::placeholder {
+            text-transform: none;
+        }
+    </style>
+@endsection
+
 <!-- Campo Cédula de Identidad -->
 <div class="form-group row align-items-center mb-3" :class="{'has-danger': errors.has('ci'), 'has-success': fields.ci && fields.ci.valid }">
     <label title="Ingrese el número de cédula de la persona que va a solicitar la asistencia" for="ci" class="col-form-label fw-bold text-dark text-start text-md-start" style="color: #1e293b;" :class="isFormLocalized ? 'col-md-4' : 'col-md-3'">
@@ -67,7 +76,17 @@
         <i class="fa fa-pencil-square-o text-primary me-1"></i> Descripción <span class="text-danger">*</span>
     </label>
     <div :class="isFormLocalized ? 'col-md-8' : 'col-md-9 col-xl-8'">
-        <textarea v-model="form.problem" @input="validate($event); form.problem = form.problem.toUpperCase()" class="form-control shadow-sm p-3 font-weight-bold text-dark" style="border: 1px solid #cbd5e1; color: #0f172a;" rows="4" :class="{'form-control-danger': errors.has('problem'), 'form-control-success': fields.problem && fields.problem.valid}" id="problem" name="problem" placeholder="Describa brevemente el inconveniente o la ayuda que requiere (Hardware, Red, Impresora, Accesos, etc.)"></textarea>
+        <textarea
+            v-model="form.problem"
+            @input="validate($event)"
+            @blur="form.problem = form.problem ? form.problem.toUpperCase() : ''"
+            class="form-control shadow-sm p-3 font-weight-bold text-dark"
+            style="border: 1px solid #cbd5e1; color: #0f172a; text-transform: uppercase;"
+            rows="4"
+            :class="{'form-control-danger': errors.has('problem'), 'form-control-success': fields.problem && fields.problem.valid}"
+            id="problem"
+            name="problem"
+            placeholder="Describa brevemente el inconveniente o la ayuda que requiere (Hardware, Red, Impresora, Accesos, etc.)"></textarea>
         <div v-if="errors.has('problem')" class="form-control-feedback form-text text-danger font-weight-bold" v-cloak>@{{ errors.first('problem') }}</div>
     </div>
 </div>
